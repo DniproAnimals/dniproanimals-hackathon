@@ -8,7 +8,6 @@ export default function LostAnimalsPage() {
   const [items, setItems] = useState<LostAnimal[]>([]);
   const [loading, setLoading] = useState(true);
   const filter = "lost";
-  const [animalTypeFilter, setAnimalTypeFilter] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [selectedItem, setSelectedItem] = useState<LostAnimal | null>(null);
   const [detailPhoto, setDetailPhoto] = useState(0);
@@ -42,9 +41,6 @@ export default function LostAnimalsPage() {
     fetchItems();
   }, []);
 
-  const filteredItems = animalTypeFilter
-    ? items.filter((item) => item.animal_type?.toLowerCase().includes(animalTypeFilter.toLowerCase()))
-    : items;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,27 +88,10 @@ export default function LostAnimalsPage() {
         </button>
       </div>
 
-      {/* Filters + count */}
-      <div className="flex items-center gap-3 mb-5 flex-wrap">
-        <div className="flex gap-2">
-          {["", "Собака", "Кішка", "Кіт"].map((t) => (
-            <button
-              key={t}
-              onClick={() => setAnimalTypeFilter(t)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                animalTypeFilter === t
-                  ? "bg-[#ced48c] text-foreground"
-                  : "bg-gray-light text-foreground"
-              }`}
-            >
-              {t || "Всі"}
-            </button>
-          ))}
-        </div>
-        <span className="text-sm text-gray-medium">
-          {!loading && `${filteredItems.length} оголошень`}
-        </span>
-      </div>
+      {/* Count */}
+      {!loading && items.length > 0 && (
+        <p className="text-sm text-gray-medium mb-5">{items.length} оголошень</p>
+      )}
 
       {loading ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -120,7 +99,7 @@ export default function LostAnimalsPage() {
             <div key={i} className="bg-gray-light rounded-2xl animate-pulse h-48" />
           ))}
         </div>
-      ) : filteredItems.length === 0 ? (
+      ) : items.length === 0 ? (
         <div className="text-center py-20">
           <div className="w-20 h-20 rounded-full bg-gray-light mx-auto flex items-center justify-center mb-4">
             <span className="text-4xl">🔍</span>
@@ -130,7 +109,7 @@ export default function LostAnimalsPage() {
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredItems.map((item) => {
+          {items.map((item) => {
             const photos: string[] = JSON.parse(item.photos || "[]");
             return (
               <button
@@ -224,7 +203,7 @@ export default function LostAnimalsPage() {
               <select value={formData.animal_type} onChange={(e) => setFormData({ ...formData, animal_type: e.target.value })} className="px-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm text-foreground">
                 <option value="">Вид тварини</option>
                 <option value="Собака">Собака</option>
-                <option value="Кішка">Кішка</option>
+                <option value="Кіт">Кіт</option>
                 <option value="Інше">Інше</option>
               </select>
               <div className="relative">
