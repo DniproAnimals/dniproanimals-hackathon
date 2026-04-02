@@ -17,7 +17,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const db = getDb();
   const body = await request.json();
-  const { animal_id, name, email, phone, message } = body;
+  const { animal_id, name, email, phone, instagram, telegram, facebook, location, message } = body;
 
   if (!animal_id || !name || !email || !phone) {
     return NextResponse.json(
@@ -35,10 +35,10 @@ export async function POST(request: NextRequest) {
 
   const result = db
     .prepare(
-      `INSERT INTO adoption_requests (animal_id, name, email, phone, message)
-       VALUES (?, ?, ?, ?, ?)`
+      `INSERT INTO adoption_requests (animal_id, name, email, phone, instagram, telegram, facebook, location, message)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
-    .run(animal_id, name, email, phone, message || null);
+    .run(animal_id, name, email, phone, instagram || null, telegram || null, facebook || null, location || null, message || null);
 
   return NextResponse.json(
     { id: result.lastInsertRowid, success: true },

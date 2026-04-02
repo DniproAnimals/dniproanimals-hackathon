@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Animal } from "@/lib/db";
@@ -32,8 +32,10 @@ const tintColors = [
 
 export default function AnimalCard({ animal, index = 0 }: { animal: Animal; index?: number }) {
   const [flipped, setFlipped] = useState(false);
+  const [currentPhoto, setCurrentPhoto] = useState(0);
+  const [hovered, setHovered] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const photos: string[] = JSON.parse(animal.photos || "[]");
-  const photo = photos[0] || "/placeholder-animal.svg";
   const tint = tintColors[index % tintColors.length];
 
   const handleFlip = (e: React.MouseEvent) => {
@@ -42,8 +44,37 @@ export default function AnimalCard({ animal, index = 0 }: { animal: Animal; inde
     setFlipped(!flipped);
   };
 
+  // Auto-slide photos on hover
+  const startSlideshow = useCallback(() => {
+    if (photos.length <= 1 || flipped) return;
+    intervalRef.current = setInterval(() => {
+      setCurrentPhoto((prev) => (prev + 1) % photos.length);
+    }, 1200);
+  }, [photos.length, flipped]);
+
+  const stopSlideshow = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setCurrentPhoto(0);
+  }, []);
+
+  useEffect(() => {
+    if (hovered && !flipped) {
+      startSlideshow();
+    } else {
+      stopSlideshow();
+    }
+    return stopSlideshow;
+  }, [hovered, flipped, startSlideshow, stopSlideshow]);
+
   return (
-    <div className="group">
+    <div
+      className="group"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       {/* Card container with perspective */}
       <div className="relative aspect-square [perspective:800px] mb-2.5">
         <div
@@ -51,19 +82,49 @@ export default function AnimalCard({ animal, index = 0 }: { animal: Animal; inde
             flipped ? "[transform:rotateY(180deg)]" : ""
           }`}
         >
-          {/* Front — photo */}
+          {/* Front — photo with zoom + slideshow */}
           <Link
             href={`/animals/${animal.id}`}
             className="absolute inset-0 [backface-visibility:hidden]"
           >
             <div className={`relative w-full h-full rounded-2xl overflow-hidden ${tint}`}>
-              <Image
-                src={photo}
-                alt={animal.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              />
+              {/* All photos stacked, only currentPhoto visible */}
+              {photos.length > 0 ? (
+                photos.map((photo, i) => (
+                  <Image
+                    key={i}
+                    src={photo}
+                    alt={animal.name}
+                    fill
+                    className={`object-cover transition-all duration-700 ${
+                      i === currentPhoto ? "opacity-100" : "opacity-0"
+                    } ${hovered && !flipped ? "scale-110" : "scale-100"}`}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    priority={i === 0}
+                  />
+                ))
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-4xl bg-gray-light">
+                  {animal.type === "dog" ? "🐕" : animal.type === "cat" ? "🐈" : "🐾"}
+                </div>
+              )}
+
+              {/* Photo dots */}
+              {photos.length > 1 && hovered && !flipped && (
+                <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                  {photos.map((_, i) => (
+                    <span
+                      key={i}
+                      className={`rounded-full transition-all ${
+                        i === currentPhoto
+                          ? "w-4 h-1.5 bg-white"
+                          : "w-1.5 h-1.5 bg-white/50"
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+
               {animal.status === "reserved" && (
                 <span className="absolute top-2.5 left-2.5 bg-yellow-500/90 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium">
                   Зарезервовано
@@ -79,66 +140,49 @@ export default function AnimalCard({ animal, index = 0 }: { animal: Animal; inde
 
           {/* Back — Fast Facts */}
           <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-            <div className="w-full h-full rounded-2xl bg-white border border-gray-border p-4 flex flex-col">
-              <p className="text-xs font-bold text-gray-medium uppercase tracking-wider mb-3">Fast Facts</p>
+            <div className="w-full h-full rounded-2xl bg-[#ced48c] p-3.5 flex flex-col">
+              <p className="text-sm font-bold text-foreground mb-2">
+                {animal.name}
+              </p>
 
-              <div className="flex-1 space-y-2.5">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">🐾</span>
-                  <div>
-                    <p className="text-[10px] text-gray-medium">Вид</p>
-                    <p className="text-xs font-semibold">{animal.type === "dog" ? "Собака" : animal.type === "cat" ? "Кіт" : "Інше"}</p>
-                  </div>
+              <div className="flex-1 flex flex-col justify-center divide-y divide-foreground/10">
+                <div className="flex items-center gap-2 py-1.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/60 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span className="text-[11px] font-semibold text-foreground">Місце</span>
+                  <span className="text-[11px] text-foreground/70 ml-auto truncate max-w-[45%] text-right">{animal.contact_location || "Дніпро"}</span>
                 </div>
-                {animal.breed && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">🏷️</span>
-                    <div>
-                      <p className="text-[10px] text-gray-medium">Порода</p>
-                      <p className="text-xs font-semibold">{animal.breed}</p>
-                    </div>
+                <div className="flex items-center gap-2 py-1.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/60 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span className="text-[11px] font-semibold text-foreground">Розмір</span>
+                  <span className="text-[11px] text-foreground/70 ml-auto">{getSizeLabel(animal.size)}{animal.weight_kg ? ` · ${animal.weight_kg} кг` : ""}</span>
+                </div>
+                {animal.color && (
+                  <div className="flex items-center gap-2 py-1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/60 flex-shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20"/></svg>
+                    <span className="text-[11px] font-semibold text-foreground">Колір</span>
+                    <span className="text-[11px] text-foreground/70 ml-auto">{animal.color}</span>
                   </div>
                 )}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">📅</span>
-                  <div>
-                    <p className="text-[10px] text-gray-medium">Вік</p>
-                    <p className="text-xs font-semibold">{getAgeLabel(animal.age_months)}</p>
-                  </div>
+                <div className="flex items-center gap-2 py-1.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/60 flex-shrink-0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  <span className="text-[11px] font-semibold text-foreground">Вакцинація</span>
+                  <span className="text-[11px] text-foreground/70 ml-auto">{animal.vaccinated ? "Так" : "Ні"}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">{animal.sex === "male" ? "♂️" : "♀️"}</span>
-                  <div>
-                    <p className="text-[10px] text-gray-medium">Стать</p>
-                    <p className="text-xs font-semibold">{animal.sex === "male" ? "Хлопчик" : "Дівчинка"}</p>
-                  </div>
+                <div className="flex items-center gap-2 py-1.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/60 flex-shrink-0"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+                  <span className="text-[11px] font-semibold text-foreground">Стерилізація</span>
+                  <span className="text-[11px] text-foreground/70 ml-auto">{animal.sterilized ? "Так" : "Ні"}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">📏</span>
-                  <div>
-                    <p className="text-[10px] text-gray-medium">Розмір</p>
-                    <p className="text-xs font-semibold">{getSizeLabel(animal.size)}{animal.weight_kg ? ` · ${animal.weight_kg} кг` : ""}</p>
-                  </div>
+                <div className="flex items-center gap-2 py-1.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/60 flex-shrink-0"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+                  <span className="text-[11px] font-semibold text-foreground">Навчено</span>
+                  <span className="text-[11px] text-foreground/70 ml-auto">{animal.trained ? "Так" : "Ні"}</span>
                 </div>
               </div>
 
-              {/* Tags at bottom */}
-              <div className="flex flex-wrap gap-1 mt-2 pt-2 border-t border-gray-border">
-                {animal.vaccinated === 1 && (
-                  <span className="text-[10px] bg-green-light text-green-accent px-2 py-0.5 rounded-full font-medium">💉</span>
-                )}
-                {animal.sterilized === 1 && (
-                  <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">✂️</span>
-                )}
-                {animal.trained === 1 && (
-                  <span className="text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium">🎓</span>
-                )}
-              </div>
-
-              {/* Link to detail */}
               <Link
                 href={`/animals/${animal.id}`}
-                className="block mt-2 text-center bg-[#ced48c] text-foreground text-xs font-semibold py-2 rounded-xl hover:bg-[#b8be72] transition-colors"
+                className="block mt-2 text-center bg-foreground/10 text-foreground text-[11px] font-semibold py-1.5 rounded-lg hover:bg-foreground/20 transition-colors"
               >
                 Детальніше →
               </Link>
@@ -146,7 +190,7 @@ export default function AnimalCard({ animal, index = 0 }: { animal: Animal; inde
           </div>
         </div>
 
-        {/* Flip button — appears on hover */}
+        {/* Flip button */}
         <button
           onClick={handleFlip}
           className={`absolute bottom-2.5 right-2.5 z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center transition-all hover:bg-white ${

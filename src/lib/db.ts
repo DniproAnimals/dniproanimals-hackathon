@@ -50,6 +50,10 @@ function initSchema(db: Database.Database) {
       name TEXT NOT NULL,
       email TEXT NOT NULL,
       phone TEXT NOT NULL,
+      instagram TEXT,
+      telegram TEXT,
+      facebook TEXT,
+      location TEXT,
       message TEXT,
       status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected')),
       created_at TEXT DEFAULT (datetime('now')),
@@ -107,6 +111,10 @@ export type AdoptionRequest = {
   name: string;
   email: string;
   phone: string;
+  instagram: string | null;
+  telegram: string | null;
+  facebook: string | null;
+  location: string | null;
   message: string | null;
   status: "pending" | "approved" | "rejected";
   created_at: string;

@@ -3,7 +3,6 @@
 import { useEffect, useState, Suspense } from "react";
 import AnimalCard from "@/components/AnimalCard";
 import FilterBar from "@/components/FilterBar";
-import ActiveFilters from "@/components/ActiveFilters";
 import type { Animal } from "@/lib/db";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -91,9 +90,6 @@ function CatalogContent() {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          {/* Active filters bar — top of cards */}
-          <ActiveFilters />
-
           {/* Results header: count + sort */}
           {!loading && animals.length > 0 && (
             <div className="flex items-center justify-between mb-4">
