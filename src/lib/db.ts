@@ -66,7 +66,13 @@ function initSchema(db: Database.Database) {
       description TEXT NOT NULL,
       type TEXT NOT NULL CHECK(type IN ('lost', 'found')),
       animal_type TEXT,
+      breed TEXT,
+      sex TEXT,
+      color TEXT,
+      size TEXT,
       location TEXT,
+      last_seen_location TEXT,
+      last_seen_date TEXT,
       contact_name TEXT NOT NULL,
       contact_phone TEXT NOT NULL,
       photos TEXT DEFAULT '[]',
@@ -126,7 +132,13 @@ export type LostAnimal = {
   description: string;
   type: "lost" | "found";
   animal_type: string | null;
+  breed: string | null;
+  sex: string | null;
+  color: string | null;
+  size: string | null;
   location: string | null;
+  last_seen_location: string | null;
+  last_seen_date: string | null;
   contact_name: string;
   contact_phone: string;
   photos: string;

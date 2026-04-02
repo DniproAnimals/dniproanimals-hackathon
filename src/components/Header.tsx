@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -13,6 +14,16 @@ const navItems = [
 
 export default function Header() {
   const pathname = usePathname();
+  const [lostCount, setLostCount] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/lost?type=lost")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) setLostCount(data.length);
+      })
+      .catch(() => {});
+  }, [pathname]);
 
   return (
     <header className="bg-white border-b border-gray-border sticky top-0 z-50">
@@ -41,13 +52,18 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   isActive
                     ? "bg-[#ced48c] text-foreground"
                     : "text-gray-medium hover:bg-gray-light hover:text-foreground"
                 }`}
               >
                 {item.label}
+                {item.href === "/lost" && lostCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                    {lostCount}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -65,11 +81,16 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex flex-col items-center gap-0.5 py-1 px-3 text-xs font-medium transition-colors ${
+                  className={`relative flex flex-col items-center gap-0.5 py-1 px-3 text-xs font-medium transition-colors ${
                     isActive ? "text-green-accent" : "text-gray-400"
                   }`}
                 >
                   {item.label}
+                  {item.href === "/lost" && lostCount > 0 && (
+                    <span className="absolute -top-0.5 right-0 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
+                      {lostCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}

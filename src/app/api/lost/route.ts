@@ -26,7 +26,13 @@ export async function POST(request: NextRequest) {
     description,
     type,
     animal_type,
+    breed,
+    sex,
+    color,
+    size,
     location,
+    last_seen_location,
+    last_seen_date,
     contact_name,
     contact_phone,
     photos,
@@ -41,15 +47,21 @@ export async function POST(request: NextRequest) {
 
   const result = db
     .prepare(
-      `INSERT INTO lost_animals (title, description, type, animal_type, location, contact_name, contact_phone, photos)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO lost_animals (title, description, type, animal_type, breed, sex, color, size, location, last_seen_location, last_seen_date, contact_name, contact_phone, photos)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       title,
       description,
       type,
       animal_type || null,
+      breed || null,
+      sex || null,
+      color || null,
+      size || null,
       location || null,
+      last_seen_location || null,
+      last_seen_date || null,
       contact_name,
       contact_phone,
       JSON.stringify(photos || [])
