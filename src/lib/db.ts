@@ -31,6 +31,7 @@ function initSchema(db: Database.Database) {
       vaccinated INTEGER DEFAULT 0,
       sterilized INTEGER DEFAULT 0,
       trained INTEGER DEFAULT 0,
+      commands TEXT DEFAULT '[]',
       photos TEXT DEFAULT '[]',
       contact_name TEXT,
       contact_phone TEXT,
@@ -79,6 +80,25 @@ function initSchema(db: Database.Database) {
       resolved INTEGER DEFAULT 0,
       created_at TEXT DEFAULT (datetime('now'))
     );
+
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL UNIQUE,
+      password TEXT NOT NULL,
+      role TEXT DEFAULT 'user' CHECK(role IN ('user', 'admin')),
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS favorites (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      animal_id INTEGER NOT NULL,
+      created_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (animal_id) REFERENCES animals(id) ON DELETE CASCADE,
+      UNIQUE(user_id, animal_id)
+    );
   `);
 }
 
@@ -98,6 +118,7 @@ export type Animal = {
   vaccinated: number;
   sterilized: number;
   trained: number;
+  commands: string;
   photos: string;
   contact_name: string | null;
   contact_phone: string | null;
@@ -143,5 +164,14 @@ export type LostAnimal = {
   contact_phone: string;
   photos: string;
   resolved: number;
+  created_at: string;
+};
+
+export type User = {
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role: "user" | "admin";
   created_at: string;
 };

@@ -61,6 +61,26 @@ export async function GET(request: NextRequest) {
     query += " AND status = ?";
     bindings.push(status);
   }
+  const breed = params.get("breed");
+  if (breed) {
+    const breeds = breed.split(",").filter(Boolean);
+    if (breeds.length === 1) {
+      query += " AND breed = ?";
+      bindings.push(breeds[0]);
+    } else if (breeds.length > 1) {
+      query += ` AND breed IN (${breeds.map(() => "?").join(",")})`;
+      bindings.push(...breeds);
+    }
+  }
+  const color = params.get("color");
+  if (color) {
+    const colors = color.split(",").filter(Boolean);
+    if (colors.length > 0) {
+      const colorConditions = colors.map(() => "color LIKE ?").join(" OR ");
+      query += ` AND (${colorConditions})`;
+      colors.forEach((c) => bindings.push(`%${c}%`));
+    }
+  }
   if (q) {
     query += " AND (name LIKE ? OR breed LIKE ? OR description LIKE ?)";
     const like = `%${q}%`;

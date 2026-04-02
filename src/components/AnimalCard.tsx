@@ -3,13 +3,15 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useUser } from "@/lib/UserContext";
 import type { Animal } from "@/lib/db";
 
 function getAgeLabel(months: number | null): string {
   if (!months) return "Невідомо";
   if (months < 12) return `${months} міс.`;
   const years = Math.floor(months / 12);
-  return `${years} р.`;
+  const yWord = years === 1 ? "рік" : years < 5 ? "роки" : "років";
+  return `${years} ${yWord}`;
 }
 
 function getSizeLabel(size: string | null): string {
@@ -35,6 +37,8 @@ export default function AnimalCard({ animal, index = 0 }: { animal: Animal; inde
   const [currentPhoto, setCurrentPhoto] = useState(0);
   const [hovered, setHovered] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { user, favoriteIds, toggleFavorite } = useUser();
+  const isFav = favoriteIds.includes(animal.id);
   const photos: string[] = JSON.parse(animal.photos || "[]");
   const tint = tintColors[index % tintColors.length];
 
@@ -190,7 +194,23 @@ export default function AnimalCard({ animal, index = 0 }: { animal: Animal; inde
           </div>
         </div>
 
-        {/* Flip button */}
+        {/* Favorite paw button — top right */}
+        {user && (
+          <button
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(animal.id); }}
+            className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full backdrop-blur-sm shadow-md flex items-center justify-center transition-all hover:bg-white ${
+              isFav ? "bg-white opacity-100" : "bg-white/90 opacity-0 group-hover:opacity-100"
+            }`}
+            aria-label={isFav ? "Прибрати з обраного" : "Додати до обраного"}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={isFav ? "#ced48c" : "none"} stroke={isFav ? "#ced48c" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 21c-1.5 0-5-2.5-7.5-6C2 11 2 7.5 4 5.5S9 3 12 6c3-3 6-2.5 8-0.5s2 5.5-.5 9.5C17 19 13.5 21 12 21z"/>
+              <circle cx="7.5" cy="7" r="1.5"/><circle cx="16.5" cy="7" r="1.5"/><circle cx="10" cy="4.5" r="1.5"/><circle cx="14" cy="4.5" r="1.5"/>
+            </svg>
+          </button>
+        )}
+
+        {/* Flip button — bottom right */}
         <button
           onClick={handleFlip}
           className={`absolute bottom-2.5 right-2.5 z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center transition-all hover:bg-white ${
@@ -198,21 +218,8 @@ export default function AnimalCard({ animal, index = 0 }: { animal: Animal; inde
           }`}
           aria-label={flipped ? "Показати фото" : "Показати факти"}
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={`transition-transform duration-300 ${flipped ? "rotate-180" : ""}`}
-          >
-            <path d="M17 1l4 4-4 4" />
-            <path d="M3 11V9a4 4 0 014-4h14" />
-            <path d="M7 23l-4-4 4-4" />
-            <path d="M21 13v2a4 4 0 01-4 4H3" />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-300 ${flipped ? "rotate-180" : ""}`}>
+            <path d="M17 1l4 4-4 4" /><path d="M3 11V9a4 4 0 014-4h14" /><path d="M7 23l-4-4 4-4" /><path d="M21 13v2a4 4 0 01-4 4H3" />
           </svg>
         </button>
       </div>
