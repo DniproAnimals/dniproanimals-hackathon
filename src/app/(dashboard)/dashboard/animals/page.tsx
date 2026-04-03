@@ -174,12 +174,9 @@ export default function AnimalsPage() {
     <div className="max-w-5xl">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">Тварини</h1>
-        <button
-          onClick={() => { setEditingId(null); setForm(emptyForm); setShowForm(true); }}
-          className="px-4 py-2 rounded-xl text-sm font-medium bg-[#ced48c] text-foreground hover:bg-[#b8be72] transition-colors"
-        >
+        <Link href="/dashboard/animals/edit" className="px-4 py-2 rounded-xl text-sm font-medium bg-[#ced48c] text-foreground hover:bg-[#b8be72] transition-colors">
           Додати тварину
-        </button>
+        </Link>
       </div>
 
       {/* Filters */}
