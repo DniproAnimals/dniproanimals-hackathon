@@ -95,6 +95,7 @@ export default function AnimalsPage() {
 
   const fetchAnimals = useCallback(() => {
     const params = new URLSearchParams();
+    params.set('admin', '1')
     if (typeFilter) params.set("type", typeFilter);
     if (statusFilter) params.set("status", statusFilter);
     if (search) params.set("q", search);

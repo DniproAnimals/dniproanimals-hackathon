@@ -18,7 +18,17 @@ export async function GET(
     return NextResponse.json({ error: "Тварину не знайдено" }, { status: 404 });
   }
 
-  return NextResponse.json(animal);
+  let org = null;
+  if (animal.org_id) {
+    const { data } = await supabase
+      .from("organizations")
+      .select("id, name, photo, location")
+      .eq("id", animal.org_id)
+      .single();
+    org = data;
+  }
+
+  return NextResponse.json({ ...animal, org });
 }
 
 export async function PUT(

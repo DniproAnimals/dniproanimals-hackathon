@@ -31,6 +31,7 @@ import {
   IconX,
   IconCirclePlus,
   IconWeight,
+  IconBuildingCommunity,
 } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -107,6 +108,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [visibleContacts, setVisibleContacts] = useState<string[]>(["email"]);
+  const [org, setOrg] = useState<{ id: number; name: string; photo: string | null; location: string | null } | null>(null);
   const { user, favoriteIds, toggleFavorite } = useUser();
   const isFav = animal ? favoriteIds.includes(animal.id) : false;
 
@@ -117,7 +119,9 @@ export default function AnimalDetailPage({ id }: { id: string }) {
         return r.json();
       })
       .then((data) => {
-        setAnimal(data);
+        const { org: orgData, ...animalData } = data;
+        setAnimal(animalData);
+        if (orgData) setOrg(orgData);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -474,6 +478,38 @@ export default function AnimalDetailPage({ id }: { id: string }) {
               </span>
             </div>
           </div>
+
+          {/* Organization */}
+          {org && (
+            <div className="mb-6">
+              <h2 className="text-sm font-semibold mb-3">Організація</h2>
+              <Link
+                href={`/organizations/${org.id}`}
+                className="flex items-center gap-3 p-3 rounded-xl border border-gray-border hover:border-[#ced48c] hover:bg-[#ced48c]/5 transition-colors"
+              >
+                {org.photo ? (
+                  <ImageFallback
+                    src={org.photo}
+                    alt={org.name}
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-lg object-cover shrink-0"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-lg bg-[#ced48c]/20 flex items-center justify-center shrink-0">
+                    <IconBuildingCommunity size={18} className="text-[#5b7765]" />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-foreground truncate">{org.name}</p>
+                  {org.location && (
+                    <p className="text-xs text-gray-medium truncate">{org.location}</p>
+                  )}
+                </div>
+                <IconChevronRight size={16} className="text-gray-400 ml-auto shrink-0" />
+              </Link>
+            </div>
+          )}
 
           {/* Contact info */}
           {(animal.contact_name ||

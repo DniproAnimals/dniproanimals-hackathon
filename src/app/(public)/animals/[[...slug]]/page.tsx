@@ -161,7 +161,21 @@ export async function generateMetadata({ params }: { params: Promise<{ slug?: st
 
 async function fetchAnimals(filters: Filters | null): Promise<Animal[]> {
   const supabase = createPublicClient();
+
+  // Only show animals from approved organizations (or without org)
+  const { data: approvedOrgs } = await supabase
+    .from("organizations")
+    .select("id")
+    .eq("status", "approved");
+  const approvedIds = (approvedOrgs || []).map((o: { id: number }) => o.id);
+
   let query = supabase.from("animals").select("*");
+  if (approvedIds.length > 0) {
+    query = query.in("org_id", approvedIds);
+  } else {
+    query = query.eq("org_id", -1);
+  }
+
   if (filters?.type) query = query.eq("type", filters.type);
   if (filters?.sex) query = query.eq("sex", filters.sex);
   if (filters?.size) query = query.eq("size", filters.size);
