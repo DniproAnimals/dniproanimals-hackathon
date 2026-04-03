@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import Image from "next/image";
+import ImageFallback from "@/components/ImageFallback";
 import { IconX } from "@tabler/icons-react";
 
 type Animal = {
@@ -255,7 +255,7 @@ export default function AnimalsPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         {photo ? (
-                          <Image src={photo} alt={a.name} width={36} height={36} className="w-9 h-9 rounded-lg object-cover" />
+                          <ImageFallback src={photo} alt={a.name} width={36} height={36} className="w-9 h-9 rounded-lg object-cover" />
                         ) : (
                           <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-400">
                             {a.name.charAt(0)}

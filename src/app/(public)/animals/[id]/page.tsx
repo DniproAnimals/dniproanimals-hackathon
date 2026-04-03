@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Image from "next/image";
+import ImageFallback from "@/components/ImageFallback";
 import { useUser } from "@/lib/UserContext";
 import type { Animal } from "@/lib/db";
 import {
@@ -186,7 +186,7 @@ export default function AnimalDetailPage() {
           {photos.length > 0 ? (
             <>
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-light group/photo">
-                <Image
+                <ImageFallback
                   src={photos[activePhoto]}
                   alt={animal.name}
                   fill
@@ -226,7 +226,7 @@ export default function AnimalDetailPage() {
                           : "border-transparent opacity-60 hover:opacity-100"
                       }`}
                     >
-                      <Image src={photo} alt="" fill className="object-cover" sizes="64px" />
+                      <ImageFallback src={photo} alt="" fill className="object-cover" sizes="64px" />
                     </button>
                   ))}
                 </div>

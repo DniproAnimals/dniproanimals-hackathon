@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import Image from "next/image";
+import ImageFallback from "@/components/ImageFallback";
 import Link from "next/link";
 import { useUser } from "@/lib/UserContext";
 import type { Animal } from "@/lib/db";
@@ -106,7 +106,7 @@ export default function AnimalCard({ animal, index = 0 }: { animal: Animal; inde
               {/* All photos stacked, only currentPhoto visible */}
               {photos.length > 0 ? (
                 photos.map((photo, i) => (
-                  <Image
+                  <ImageFallback
                     key={i}
                     src={photo}
                     alt={animal.name}

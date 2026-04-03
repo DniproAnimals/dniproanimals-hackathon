@@ -1,4 +1,5 @@
 import Image from "next/image";
+import ImageFallback from "@/components/ImageFallback";
 import Link from "next/link";
 import InstagramFeed from "@/components/InstagramFeed";
 import {
@@ -18,7 +19,7 @@ export default function AboutPage() {
       {/* Hero — full bleed, bold */}
       <div className="relative bg-foreground text-white overflow-hidden">
         <div className="absolute inset-0 opacity-20">
-          <Image src="/uploads/cat1_1.jpg" alt="" fill className="object-cover" />
+          <ImageFallback src="/uploads/cat1_1.jpg" alt="" fill className="object-cover" />
         </div>
         <div className="relative max-w-7xl mx-auto px-8 md:px-12 py-20 md:py-32">
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-none mb-4 max-w-3xl">

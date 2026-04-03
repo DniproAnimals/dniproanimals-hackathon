@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import ImageFallback from "@/components/ImageFallback";
 
 type Post = {
   id: string;
@@ -55,7 +55,7 @@ export default function InstagramFeed() {
           rel="noopener noreferrer"
           className="group relative aspect-square rounded-2xl overflow-hidden bg-white"
         >
-          <Image
+          <ImageFallback
             src={post.thumbnail}
             alt={post.caption}
             fill

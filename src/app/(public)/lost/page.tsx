@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import ImageFallback from "@/components/ImageFallback";
 import type { LostAnimal } from "@/lib/db";
 import {
   IconSearch,
@@ -135,7 +135,7 @@ export default function LostAnimalsPage() {
               >
                 {photos[0] && (
                   <div className="relative w-full h-40 bg-gray-light">
-                    <Image
+                    <ImageFallback
                       src={photos[0]}
                       alt={item.title}
                       fill
@@ -295,7 +295,7 @@ export default function LostAnimalsPage() {
                 {detailPhotos.length > 0 && (
                   <div className="md:w-1/2 p-5 md:p-6 md:pr-0">
                     <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-light group/photo">
-                      <Image src={detailPhotos[detailPhoto]} alt={selectedItem.title} fill className="object-cover" sizes="400px" />
+                      <ImageFallback src={detailPhotos[detailPhoto]} alt={selectedItem.title} fill className="object-cover" sizes="400px" />
                       {detailPhotos.length > 1 && (
                         <>
                           <button onClick={() => setDetailPhoto((p) => (p - 1 + detailPhotos.length) % detailPhotos.length)} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm shadow flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-white">
@@ -314,7 +314,7 @@ export default function LostAnimalsPage() {
                       <div className="flex gap-1.5 mt-2">
                         {detailPhotos.map((p, i) => (
                           <button key={i} onClick={() => setDetailPhoto(i)} className={`relative w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${i === detailPhoto ? "border-[#ced48c]" : "border-transparent opacity-60 hover:opacity-100"}`}>
-                            <Image src={p} alt="" fill className="object-cover" sizes="56px" />
+                            <ImageFallback src={p} alt="" fill className="object-cover" sizes="56px" />
                           </button>
                         ))}
                       </div>
