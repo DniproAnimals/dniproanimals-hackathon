@@ -11,7 +11,6 @@ import { useSearchParams, useRouter } from "next/navigation";
 function CatalogContent() {
   const [animals, setAnimals] = useState<Animal[]>([]);
   const [loading, setLoading] = useState(true);
-  const [seeding, setSeeding] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -27,15 +26,6 @@ function CatalogContent() {
       })
       .catch(() => setLoading(false));
   }, [searchParams]);
-
-  const handleSeed = async () => {
-    setSeeding(true);
-    await fetch("/api/seed", { method: "POST" });
-    const res = await fetch(`/api/animals?${searchParams}`);
-    const data = await res.json();
-    setAnimals(data);
-    setSeeding(false);
-  };
 
   // Count active filters for mobile badge
   let mobileFilterCount = 0;
@@ -155,16 +145,9 @@ function CatalogContent() {
               <p className="text-lg font-semibold text-foreground mb-1">
                 Тварин поки немає
               </p>
-              <p className="text-sm text-gray-medium mb-5">
-                Додайте демо-дані, щоб побачити каталог
+              <p className="text-sm text-gray-medium">
+                Скоро тут з&#39;являться хвостики, які шукають дім
               </p>
-              <button
-                onClick={handleSeed}
-                disabled={seeding}
-                className="bg-[#ced48c] text-foreground px-6 py-3 rounded-2xl font-medium hover:bg-[#b8be72] transition-colors disabled:opacity-50 text-sm"
-              >
-                {seeding ? "Завантаження..." : "Додати демо-дані"}
-              </button>
             </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">

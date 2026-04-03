@@ -49,3 +49,25 @@ export async function PATCH(request: NextRequest) {
   db.prepare("UPDATE organizations SET status = ? WHERE id = ?").run(status, id);
   return NextResponse.json({ success: true });
 }
+
+export async function PUT(request: NextRequest) {
+  const user = await getSession();
+  if (!user || !user.org_id) {
+    return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
+  }
+
+  const db = getDb();
+  const org = db.prepare("SELECT owner_id FROM organizations WHERE id = ?").get(user.org_id) as { owner_id: number } | undefined;
+  if (!org || org.owner_id !== user.id) {
+    return NextResponse.json({ error: "Тільки власник може редагувати організацію" }, { status: 403 });
+  }
+
+  const { name, description, location, phone, email, instagram, telegram, facebook, website } = await request.json();
+  if (!name) return NextResponse.json({ error: "Назва обов'язкова" }, { status: 400 });
+
+  db.prepare(
+    `UPDATE organizations SET name = ?, description = ?, location = ?, phone = ?, email = ?, instagram = ?, telegram = ?, facebook = ?, website = ? WHERE id = ?`
+  ).run(name, description || null, location || null, phone || null, email || null, instagram || null, telegram || null, facebook || null, website || null, user.org_id);
+
+  return NextResponse.json({ success: true });
+}

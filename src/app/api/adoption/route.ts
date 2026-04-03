@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import getDb from "@/lib/db";
+import { getSession } from "@/lib/auth";
 
 export async function GET() {
   const db = getDb();
@@ -44,4 +45,21 @@ export async function POST(request: NextRequest) {
     { id: result.lastInsertRowid, success: true },
     { status: 201 }
   );
+}
+
+export async function PATCH(request: NextRequest) {
+  const user = await getSession();
+  if (!user || !user.org_id) {
+    return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
+  }
+
+  const db = getDb();
+  const { id, status } = await request.json();
+
+  if (!id || !["approved", "rejected"].includes(status)) {
+    return NextResponse.json({ error: "Невірні дані" }, { status: 400 });
+  }
+
+  db.prepare("UPDATE adoption_requests SET status = ? WHERE id = ?").run(status, id);
+  return NextResponse.json({ success: true });
 }
