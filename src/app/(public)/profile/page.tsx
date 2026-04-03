@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AnimalCard from "@/components/AnimalCard";
 import { useUser } from "@/lib/UserContext";
+import { motion } from "motion/react";
 import type { Animal } from "@/lib/db";
 import { IconHeartFilled } from "@tabler/icons-react";
 import Link from "next/link";

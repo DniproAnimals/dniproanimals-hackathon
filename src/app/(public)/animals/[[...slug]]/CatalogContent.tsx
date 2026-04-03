@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryStates, parseAsString } from "nuqs";
+import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import AnimalCard from "@/components/AnimalCard";
 import FilterBar from "@/components/FilterBar";
@@ -110,16 +111,26 @@ function CatalogInner({ initialAnimals, slugType, slugSex, slugSize, seoH1, seoD
   const isFiltered = !!seoH1;
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-6 pb-24 md:pb-6">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.35 }}
+      className="max-w-6xl mx-auto px-6 py-6 pb-24 md:pb-6"
+    >
       <div className="flex items-center justify-between mb-4">
-        <div>
+        <motion.div
+          key={`heading-${slugType}-${slugSex}-${slugSize}`}
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
           <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">
             {seoH1 || "Наші хвостики"}
           </h1>
           <p className="text-sm text-gray-medium">
             {seoDescription || "Знайдіть свого нового друга серед наших підопічних"}
           </p>
-        </div>
+        </motion.div>
         <div className="flex items-center gap-2">
           {user?.role === "admin" && (
             <Link href="/dashboard/animals" className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#ced48c] text-foreground text-sm font-medium hover:bg-[#b8be72] transition-colors">
@@ -169,7 +180,12 @@ function CatalogInner({ initialAnimals, slugType, slugSex, slugSize, seoH1, seoD
 
         <div className="flex-1 min-w-0">
           {!loading && animals.length > 0 && (
-            <div className="flex items-center justify-between mb-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-center justify-between mb-4"
+            >
               <p className="text-sm text-gray-medium">
                 Знайдено <span className="font-semibold text-foreground">{animals.length}</span>{" "}
                 {animals.length === 1 ? "тварину" : animals.length < 5 ? "тварини" : "тварин"}
@@ -191,37 +207,67 @@ function CatalogInner({ initialAnimals, slugType, slugSex, slugSize, seoH1, seoD
                   <option value="weight_desc">Важкі спочатку</option>
                 </select>
               </div>
-            </div>
+            </motion.div>
           )}
 
-          {loading ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
-              {[...Array(6)].map((_, i) => (
-                <div key={i}>
-                  <div className="bg-gray-light rounded-2xl animate-pulse aspect-square" />
-                  <div className="mt-2.5 h-4 bg-gray-light rounded-lg w-2/3" />
-                  <div className="mt-1.5 h-3 bg-gray-light rounded-lg w-1/2" />
+          <AnimatePresence mode="wait">
+            {loading ? (
+              <motion.div
+                key="skeleton"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="grid grid-cols-2 lg:grid-cols-3 gap-5"
+              >
+                {[...Array(6)].map((_, i) => (
+                  <div key={i}>
+                    <div className="bg-gray-light rounded-2xl animate-pulse aspect-square" />
+                    <div className="mt-2.5 h-4 bg-gray-light rounded-lg w-2/3" />
+                    <div className="mt-1.5 h-3 bg-gray-light rounded-lg w-1/2" />
+                  </div>
+                ))}
+              </motion.div>
+            ) : animals.length === 0 ? (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+                className="text-center py-20"
+              >
+                <div className="w-20 h-20 rounded-full bg-green-light mx-auto flex items-center justify-center mb-4">
+                  <span className="text-4xl">🐾</span>
                 </div>
-              ))}
-            </div>
-          ) : animals.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="w-20 h-20 rounded-full bg-green-light mx-auto flex items-center justify-center mb-4">
-                <span className="text-4xl">🐾</span>
-              </div>
-              <p className="text-lg font-semibold text-foreground mb-1">Тварин поки немає</p>
-              <p className="text-sm text-gray-medium">Скоро тут з&#39;являться хвостики, які шукають дім</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
-              {animals.map((animal, i) => (
-                <AnimalCard key={animal.id} animal={animal} index={i} />
-              ))}
-            </div>
-          )}
+                <p className="text-lg font-semibold text-foreground mb-1">Тварин поки немає</p>
+                <p className="text-sm text-gray-medium">Скоро тут з&#39;являться хвостики, які шукають дім</p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={`grid-${slugType}-${slugSex}-${slugSize}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="grid grid-cols-2 lg:grid-cols-3 gap-5"
+              >
+                {animals.map((animal, i) => (
+                  <motion.div
+                    key={animal.id}
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: i * 0.05, ease: "easeOut" }}
+                  >
+                    <AnimalCard animal={animal} index={i} />
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

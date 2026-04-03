@@ -3,6 +3,7 @@
 import { IconHeartFilled, IconCircleCheckFilled, IconDropletFilled, IconCirclePlusFilled, IconHomeFilled, IconBrandInstagram, IconBrandFacebook, IconBrandTelegram, IconPhoneFilled } from "@tabler/icons-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { motion } from "motion/react";
 
 type OrganizationNeed = {
   id: number;
@@ -128,7 +129,7 @@ export default function DonatePage() {
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center justify-between mb-16">
           
           {/* Left: Hero Intro */}
-          <div className="flex-1 text-center lg:text-left pt-4 lg:pt-0">
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="flex-1 text-center lg:text-left pt-4 lg:pt-0">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f2f4e4] text-[#5b7765] text-sm font-bold mb-6 border border-[#ced48c]/40 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-[#5b7765] animate-pulse" />
               Вбудована система підтримки
@@ -139,10 +140,10 @@ export default function DonatePage() {
             <p className="text-lg md:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed mb-6">
               Ваш внесок — це не просто гроші. Це їжа, тепло, і найголовніше — шанс на нове щасливе життя для сотень тварин у притулку.
             </p>
-          </div>
+          </motion.div>
 
           {/* Right: The Billing Widget */}
-          <div className="w-full lg:w-[480px] bg-white rounded-[2.5rem] p-8 md:p-10 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] border border-gray-100 relative flex-shrink-0">
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="w-full lg:w-[480px] bg-white rounded-[2.5rem] p-8 md:p-10 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] border border-gray-100 relative flex-shrink-0">
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#ced48c] rounded-full mix-blend-multiply opacity-20 -translate-y-1/2 translate-x-1/2 blur-[40px]" />
             
             <h2 className="text-2xl md:text-3xl font-extrabold mb-6 text-center text-[#0c1014]">Швидка пожертва онлайн</h2>
@@ -244,7 +245,7 @@ export default function DonatePage() {
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               Безпечний платіж через Monobank
             </p>
-          </div>
+          </motion.div>
         </div>
 
         {/* Alternative Methods (Colors Restored & No Hover Grayscale needed) */}
@@ -325,8 +326,8 @@ export default function DonatePage() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {needs.map((need) => (
-                <div key={need.id} className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+              {needs.map((need, i) => (
+                <motion.div key={need.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.07 }} className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                     <PawIcon className="w-16 h-16 rotate-12" />
                   </div>
@@ -366,10 +367,10 @@ export default function DonatePage() {
                   >
                     Задонатити на це
                   </button>
-                </div>
+                </motion.div>
               ))}
             </div>
-          </div>)} 
+          </div>)}
 
 
         {/* Що потрібно притулкам */}

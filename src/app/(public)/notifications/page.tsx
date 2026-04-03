@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/lib/UserContext";
+import { motion } from "motion/react";
 import { IconBellFilled, IconHeartFilled, IconSearch } from "@tabler/icons-react";
 
 type Notif = { id: number; type: string; title: string; message: string | null; link: string | null; is_read: number; created_at: string };

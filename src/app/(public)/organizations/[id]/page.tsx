@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { motion } from "motion/react";
 import ImageFallback from "@/components/ImageFallback";
 import AnimalCard from "@/components/AnimalCard";
 import type { Animal } from "@/lib/db";
@@ -69,7 +70,12 @@ export default function OrganizationPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-6 pb-24 md:pb-6">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="max-w-6xl mx-auto px-6 py-6 pb-24 md:pb-6"
+    >
       {/* Back */}
       <Link href="/organizations" className="inline-flex items-center gap-1.5 text-gray-medium hover:text-foreground transition-colors text-sm mb-6">
         <IconChevronLeft size={18} />
@@ -216,8 +222,15 @@ export default function OrganizationPage() {
             <span className="text-sm text-gray-medium">({volunteers.length})</span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {volunteers.map((v) => (
-              <div key={v.id} className="bg-white rounded-2xl border border-gray-border p-4 text-center hover:border-[#ced48c] transition-colors">
+            {volunteers.map((v, i) => (
+              <motion.div
+                key={v.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06 }}
+                className="bg-white rounded-2xl border border-gray-border p-4 text-center hover:border-[#ced48c] transition-colors"
+              >
                 <div className="w-16 h-16 rounded-full mx-auto mb-3 overflow-hidden relative bg-[#ced48c]/20">
                   {v.photo ? (
                     <ImageFallback src={v.photo} alt={v.name} fill className="object-cover" sizes="64px" />
@@ -241,7 +254,7 @@ export default function OrganizationPage() {
                     <a href={`https://t.me/${v.telegram}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-foreground"><IconBrandTelegram size={14} /></a>
                   )}
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -261,11 +274,19 @@ export default function OrganizationPage() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {animals.map((animal, i) => (
-              <AnimalCard key={animal.id} animal={animal} index={i} />
+              <motion.div
+                key={animal.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06 }}
+              >
+                <AnimalCard animal={animal} index={i} />
+              </motion.div>
             ))}
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import ImageFallback from "@/components/ImageFallback";
+import { motion } from "motion/react";
 import type { LostAnimal } from "@/lib/db";
 import {
   IconSearch,

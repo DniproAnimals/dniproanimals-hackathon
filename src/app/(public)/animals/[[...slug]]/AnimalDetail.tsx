@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "motion/react";
 import ImageFallback from "@/components/ImageFallback";
 import { useUser } from "@/lib/UserContext";
 import type { Animal } from "@/lib/db";
@@ -183,7 +184,11 @@ export default function AnimalDetailPage({ id }: { id: string }) {
 
       <div className="md:grid md:grid-cols-2 md:gap-10">
         {/* Photos */}
-        <div>
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
           {photos.length > 0 ? (
             <>
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-light group/photo">
@@ -268,10 +273,15 @@ export default function AnimalDetailPage({ id }: { id: string }) {
               </p>
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* Info */}
-        <div className="mt-6 md:mt-0">
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
+          className="mt-6 md:mt-0"
+        >
           {/* Name + adopt button */}
           <div className="flex items-center justify-between gap-3 mb-1">
             <div className="flex items-center gap-2.5">
@@ -604,7 +614,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
               </div>
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
 
       {/* Adopt form — modal */}

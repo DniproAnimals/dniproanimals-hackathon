@@ -4,6 +4,7 @@ import ImageFallback from "@/components/ImageFallback";
 import { IconHeartFilled, IconBrandInstagram, IconBrandTelegram, IconBrandFacebook, IconMapPinFilled, IconPhoneFilled, IconMailFilled, IconCalendarFilled } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "motion/react";
 
 // Subtle Paw icon for the background pattern
 const PawIcon = ({ className }: { className?: string }) => (
@@ -37,7 +38,7 @@ export default function AboutPage() {
       {/* HERO SECTION */}
       <div className="max-w-7xl mx-auto px-6 py-12 md:py-20 relative z-10">
         <div className="flex flex-col lg:flex-row gap-12 items-center">
-          <div className="flex-1 text-center lg:text-left">
+          <motion.div className="flex-1 text-center lg:text-left" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7 }}>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f2f4e4] text-[#5b7765] text-sm font-bold mb-6 border border-[#ced48c]/40 shadow-sm">
               <span className="text-lg">🐾</span> Благодійний фонд · м. Дніпро
             </div>
@@ -47,7 +48,7 @@ export default function AboutPage() {
             <p className="text-lg md:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed mb-8">
               Рятуємо тих, хто не може попросити про допомогу. Понад 300 тварин у нашому притулку щодня отримують шанс на нове життя завдяки небайдужим людям.
             </p>
-            
+
             {/* PROMINENT SOCIAL MEDIA */}
             <div className="mb-10">
               <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Слідкуйте за життям хвостиків:</p>
@@ -79,10 +80,10 @@ export default function AboutPage() {
                 Знайти друга
               </Link>
             </div>
-          </div>
+          </motion.div>
           
           {/* Hero Image Collage */}
-          <div className="flex-1 w-full max-w-lg mx-auto relative">
+          <motion.div className="flex-1 w-full max-w-lg mx-auto relative" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
             <div className="absolute inset-0 bg-[#ced48c] rounded-full blur-[80px] opacity-20 -z-10"></div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-4 pt-8">
@@ -94,7 +95,7 @@ export default function AboutPage() {
                 <Image src="/happy-dog.jpg" alt="Щасливий собака" width={300} height={400} className="rounded-3xl object-cover shadow-lg border-4 border-white h-48 w-full" />
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
@@ -106,11 +107,11 @@ export default function AboutPage() {
             { number: "2015", label: "Рік заснування", accent: "text-blue-400" },
             { number: "23K", label: "Підписників", accent: "text-pink-400" },
             { number: "24/7", label: "Піклування", accent: "text-amber-400" },
-          ].map((s) => (
-            <div key={s.label} className="bg-white rounded-2xl p-5 shadow-lg shadow-black/5 text-center">
+          ].map((s, i) => (
+            <motion.div key={s.label} className="bg-white rounded-2xl p-5 shadow-lg shadow-black/5 text-center" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.1 }}>
               <p className={`text-3xl md:text-4xl font-bold ${s.accent}`}>{s.number}</p>
               <p className="text-xs text-gray-medium mt-1">{s.label}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -118,7 +119,7 @@ export default function AboutPage() {
       {/* Story — two column with offset */}
       <div className="max-w-7xl mx-auto px-8 md:px-12 py-20 md:py-28">
         <div className="md:flex md:gap-16 md:items-center">
-          <div className="flex-1 mb-10 md:mb-0">
+          <motion.div className="flex-1 mb-10 md:mb-0" initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <p className="text-[#ced48c] text-xs font-semibold uppercase tracking-widest mb-3">Наша історія</p>
             <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">Від волонтерки до фонду, що рятує сотні життів</h2>
             <div className="space-y-4 text-sm md:text-base text-gray-600 leading-relaxed">
@@ -132,8 +133,8 @@ export default function AboutPage() {
                 З 2022 року фонд активно евакуює поранених та покинутих тварин із зон бойових дій по всій Україні.
               </p>
             </div>
-          </div>
-          <div className="md:w-96 flex-shrink-0">
+          </motion.div>
+          <motion.div className="md:w-96 flex-shrink-0" initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <div className="relative">
               <div className="rounded-3xl overflow-hidden">
                 <Image src="/logo.jpg" alt="DniproAnimals" width={384} height={384} className="w-full object-cover" />
@@ -143,7 +144,7 @@ export default function AboutPage() {
                 <p className="text-xs text-foreground/60">рятуємо тварин</p>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
@@ -160,12 +161,12 @@ export default function AboutPage() {
               { icon: "🔍", title: "Пошук загублених", desc: "Платформа для розміщення оголошень про загублених тварин та возз'єднання з господарями." },
               { icon: "📚", title: "Освіта", desc: "Просвіта щодо гуманного та відповідального ставлення до домашніх тварин." },
               { icon: "🤝", title: "Волонтерство", desc: "Координація волонтерів для кормління, вигулу, прибирання та соціалізації тварин." },
-            ].map((item) => (
-              <div key={item.title} className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/5 hover:border-[#ced48c]/30 transition-colors">
+            ].map((item, i) => (
+              <motion.div key={item.title} className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/5 hover:border-[#ced48c]/30 transition-colors" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
                 <span className="text-3xl mb-4 block">{item.icon}</span>
                 <h3 className="font-bold text-base mb-2">{item.title}</h3>
                 <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -182,12 +183,12 @@ export default function AboutPage() {
             { value: "2.5 кг", label: "Вологого корму", sub: "щодня", color: "bg-green-50 border-green-200" },
             { value: "∞", label: "Ліків та вакцин", sub: "постійно", color: "bg-red-50 border-red-200" },
             { value: "∞", label: "Любові", sub: "завжди", color: "bg-[#ced48c]/20 border-[#ced48c]/40" },
-          ].map((n) => (
-            <div key={n.label} className={`${n.color} border rounded-2xl p-6 text-center`}>
+          ].map((n, i) => (
+            <motion.div key={n.label} className={`${n.color} border rounded-2xl p-6 text-center`} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
               <p className="text-3xl md:text-4xl font-bold text-foreground mb-1">{n.value}</p>
               <p className="text-sm font-medium text-foreground">{n.label}</p>
               <p className="text-xs text-gray-medium mt-0.5">{n.sub}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
         <div className="text-center mt-8">
@@ -201,7 +202,7 @@ export default function AboutPage() {
       {/* Founder — quote style */}
       <div className="bg-[#ced48c]/10">
         <div className="max-w-7xl mx-auto px-8 md:px-12 py-16 md:py-24">
-          <div className="max-w-3xl mx-auto text-center">
+          <motion.div className="max-w-3xl mx-auto text-center" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <div className="w-20 h-20 rounded-full bg-[#ced48c] mx-auto flex items-center justify-center text-4xl mb-6">
               🐾
             </div>
@@ -221,13 +222,13 @@ export default function AboutPage() {
                 <IconBrandFacebook size={20} />
               </a>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* LOCATION & CONTACTS */}
       <div className="max-w-7xl mx-auto px-6 py-16 md:py-24 relative z-10">
-        <div className="bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col md:flex-row">
+        <motion.div className="bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col md:flex-row" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
           <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
             <h2 className="text-3xl font-extrabold mb-8 text-[#0c1014]">Чекаємо в гості!</h2>
             <div className="space-y-6">
@@ -278,7 +279,7 @@ export default function AboutPage() {
               src="https://maps.google.com/maps?q=вул.+Героїв+Дніпра,+Дніпро,+Україна&output=embed&z=14"
             />
           </div>
-        </div>
+        </motion.div>
       </div>
 
     </div>
