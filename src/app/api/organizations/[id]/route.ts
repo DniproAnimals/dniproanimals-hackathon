@@ -18,7 +18,9 @@ export async function GET(
   if (!org) return NextResponse.json(null, { status: 404 });
 
   const user = await getSession();
-  if (org.status !== "approved" && (!user || user.role !== "superadmin")) {
+  const isSuperadmin = user?.role === "superadmin";
+  const isMember = user?.org_id === org.id;
+  if (org.status !== "approved" && !isSuperadmin && !isMember) {
     return NextResponse.json(null, { status: 404 });
   }
 

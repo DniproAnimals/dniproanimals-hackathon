@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import ImageFallback from "@/components/ImageFallback";
 import { IconX, IconPhoto, IconChevronDown } from "@tabler/icons-react";
 import Link from "next/link";
+import { useDashboard } from "../layout";
 
 const colorOptions = [
   { value: "Білий", color: "#ffffff" },
@@ -55,6 +56,7 @@ const emptyForm = {
 };
 
 export default function AnimalsPage() {
+  const { org } = useDashboard();
   const [animals, setAnimals] = useState<Animal[]>([]);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
@@ -94,8 +96,9 @@ export default function AnimalsPage() {
   };
 
   const fetchAnimals = useCallback(() => {
+    if (!org) return;
     const params = new URLSearchParams();
-    params.set('admin', '1')
+    params.set("org_id", String(org.id));
     if (typeFilter) params.set("type", typeFilter);
     if (statusFilter) params.set("status", statusFilter);
     if (search) params.set("q", search);
@@ -104,7 +107,7 @@ export default function AnimalsPage() {
       .then((data) => {
         if (Array.isArray(data)) setAnimals(data);
       });
-  }, [typeFilter, statusFilter, search]);
+  }, [org, typeFilter, statusFilter, search]);
 
   useEffect(() => {
     fetchAnimals();

@@ -53,9 +53,10 @@ export default function DashboardOverview() {
   const [volSubmitting, setVolSubmitting] = useState(false);
 
   useEffect(() => {
+    if (!org) return;
     Promise.all([
-      fetch("/api/animals").then((r) => r.json()),
-      fetch("/api/adoption").then((r) => r.json()),
+      fetch(`/api/animals?org_id=${org.id}`).then((r) => r.json()),
+      fetch(`/api/adoption?org_id=${org.id}`).then((r) => r.json()),
       fetch("/api/volunteers").then((r) => r.json()),
     ]).then(([a, r, v]) => {
       if (Array.isArray(a)) setAnimals(a);
@@ -63,7 +64,7 @@ export default function DashboardOverview() {
       if (Array.isArray(v)) setVolunteers(v);
       setLoading(false);
     });
-  }, []);
+  }, [org]);
 
   const handleAddVolunteer = async (e: React.FormEvent) => {
     e.preventDefault();

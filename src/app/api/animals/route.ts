@@ -6,23 +6,23 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const supabase = await createClient();
 
-  // Only show animals from approved organizations (or without org)
-  let approvedOrgIds: number[] | null = null;
-  if (params.get('admin')) {
+  let query = supabase.from("animals").select("*");
+
+  const orgIdParam = params.get("org_id");
+  if (orgIdParam) {
+    // Dashboard: filter by specific org
+    query = query.eq("org_id", Number(orgIdParam));
+  } else {
+    // Public: only show animals from approved orgs (or without org)
     const { data: approvedOrgs } = await supabase
       .from("organizations")
       .select("id")
       .eq("status", "approved");
-    approvedOrgIds = (approvedOrgs || []).map((o: { id: number }) => o.id);
-  }
-
-  let query = supabase.from("animals").select("*");
-
-  if (approvedOrgIds !== null) {
+    const approvedOrgIds = (approvedOrgs || []).map((o: { id: number }) => o.id);
     if (approvedOrgIds.length > 0) {
-      query = query.in("org_id", approvedOrgIds);
+      query = query.or(`org_id.is.null,org_id.in.(${approvedOrgIds.join(",")})`);
     } else {
-      query = query.eq("org_id", -1);
+      query = query.is("org_id", null);
     }
   }
 

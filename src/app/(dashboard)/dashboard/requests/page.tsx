@@ -7,6 +7,7 @@ import {
   IconMessageFilled, IconPawFilled, IconCheck, IconBan,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import { useDashboard } from "../layout";
 
 type Request = {
   id: number;
@@ -26,6 +27,7 @@ type Request = {
 };
 
 export default function RequestsPage() {
+  const { org } = useDashboard();
   const [requests, setRequests] = useState<Request[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "approved" | "rejected">("all");
@@ -33,10 +35,11 @@ export default function RequestsPage() {
   const [selected, setSelected] = useState<Request | null>(null);
 
   const fetchRequests = useCallback(() => {
-    fetch("/api/adoption").then((r) => r.json()).then((data) => {
+    if (!org) return;
+    fetch(`/api/adoption?org_id=${org.id}`).then((r) => r.json()).then((data) => {
       if (Array.isArray(data)) setRequests(data);
     });
-  }, []);
+  }, [org]);
 
   useEffect(() => { fetchRequests(); }, [fetchRequests]);
 

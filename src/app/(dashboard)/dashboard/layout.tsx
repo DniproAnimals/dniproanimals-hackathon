@@ -85,14 +85,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const refreshOrg = useCallback(async () => {
     if (!user?.org_id) return;
-    const res = await fetch("/api/organizations");
-    const orgs = await res.json();
-    if (Array.isArray(orgs)) {
-      const myOrg = orgs.find((o: Organization) => o.id === user.org_id);
-      if (myOrg) {
-        setOrg(myOrg);
-        setIsOwner(myOrg.owner_id === user.id);
-      }
+    const res = await fetch(`/api/organizations/${user.org_id}`);
+    if (!res.ok) return;
+    const myOrg = await res.json();
+    if (myOrg) {
+      setOrg(myOrg);
+      setIsOwner(myOrg.owner_id === user.id);
     }
   }, [user]);
 

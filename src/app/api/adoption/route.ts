@@ -2,16 +2,29 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
+  const orgId = request.nextUrl.searchParams.get("org_id");
 
-  const { data: result } = await supabase
+  let query = supabase
     .from("adoption_requests")
-    .select("*, animals(name, type)")
+    .select("*, animals(name, type, org_id)")
     .order("created_at", { ascending: false });
 
-  const formatted = (result || []).map((r: Record<string, unknown>) => {
-    const animals = r.animals as { name: string; type: string } | null;
+  const { data: result } = await query;
+
+  let filtered = result || [];
+
+  // If org_id param is set, filter to only that org's animals
+  if (orgId) {
+    filtered = filtered.filter((r: Record<string, unknown>) => {
+      const animal = r.animals as { name: string; type: string; org_id: number | null } | null;
+      return animal?.org_id === Number(orgId);
+    });
+  }
+
+  const formatted = filtered.map((r: Record<string, unknown>) => {
+    const animals = r.animals as { name: string; type: string; org_id?: number | null } | null;
     return {
       ...r,
       animal_name: animals?.name,
