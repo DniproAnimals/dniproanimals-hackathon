@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import ImageFallback from "@/components/ImageFallback";
 import { useUser } from "@/lib/UserContext";
 import type { Animal } from "@/lib/db";
@@ -87,8 +87,7 @@ function getColorStyle(color: string): string {
   return colorMap[lower] || "#ced48c";
 }
 
-export default function AnimalDetailPage() {
-  const { id } = useParams();
+export default function AnimalDetailPage({ id }: { id: string }) {
   const router = useRouter();
   const [animal, setAnimal] = useState<Animal | null>(null);
   const [loading, setLoading] = useState(true);

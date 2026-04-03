@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { UserProvider } from "@/lib/UserContext";
 import "./globals.css";
 
@@ -34,9 +35,11 @@ export default function RootLayout({
         <Script defer data-id="3158505" src="https://usd.org/js/count.js" strategy="afterInteractive" />
       </head>
       <body className="min-h-full flex flex-col bg-white">
-        <UserProvider>
-          {children}
-        </UserProvider>
+        <NuqsAdapter>
+          <UserProvider>
+            {children}
+          </UserProvider>
+        </NuqsAdapter>
       </body>
     </html>
   );
