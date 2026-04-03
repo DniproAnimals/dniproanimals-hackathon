@@ -50,7 +50,7 @@ export default function DonatePage() {
       .then((orgs: Organization[]) => {
         setOrganizations([
           { id: "general", name: "DniproAnimals (Загальний фонд)", jarId: "jjJbZRhoQ" },
-          ...orgs.map((o) => ({ id: String(o.id), name: o.name, jarId: o.monobank_jar_id })),
+          ...orgs.filter((o) => o.monobank_jar_id).map((o) => ({ id: String(o.id), name: o.name, jarId: o.monobank_jar_id })),
         ]);
       })
       .catch(() => {});

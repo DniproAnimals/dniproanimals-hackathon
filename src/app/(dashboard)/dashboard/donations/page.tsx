@@ -119,6 +119,30 @@ export default function DonationsPage() {
         </div>
       </div>
 
+      {/* Other donation methods — Coming Soon */}
+      <div className="bg-white rounded-2xl border border-gray-border p-6 mb-6">
+        <h3 className="font-bold text-foreground mb-4">Інші способи допомоги</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[
+            { name: "PayPal", icon: "💳", color: "from-[#003087] to-[#001D4F]" },
+            { name: "Patreon", icon: "♥️", color: "from-[#FF424D] to-[#E91E63]" },
+            { name: "Buy Me a Coffee", icon: "☕", color: "from-[#FFDD00] to-[#F1C40F]" },
+          ].map((item) => (
+            <div key={item.name} className="relative rounded-2xl bg-gradient-to-br p-4 border border-gray-border overflow-hidden opacity-60">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{item.icon}</span>
+                <div>
+                  <p className="font-bold text-foreground text-sm">{item.name}</p>
+                  <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-[#ced48c]/30 text-[10px] font-bold uppercase tracking-wider text-[#5b7765]">
+                    Soon
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* How it works */}
       {jarId && (
         <>
