@@ -19,14 +19,14 @@ export async function DELETE(request: NextRequest) {
   const db = getDb();
   const { id } = await request.json();
 
-  // Reset owner role
-  const org = db.prepare("SELECT owner_id FROM organizations WHERE id = ?").get(id) as { owner_id: number } | undefined;
-  if (org) {
-    db.prepare("UPDATE users SET role = 'user', org_id = NULL WHERE org_id = ?").run(id);
-  }
+  // Delete all user accounts linked to this org (owner + volunteers)
+  db.prepare("DELETE FROM users WHERE org_id = ?").run(id);
 
   // Delete volunteers
   db.prepare("DELETE FROM volunteers WHERE org_id = ?").run(id);
+
+  // Delete notifications
+  db.prepare("DELETE FROM notifications WHERE org_id = ?").run(id);
 
   // Delete org
   db.prepare("DELETE FROM organizations WHERE id = ?").run(id);

@@ -86,7 +86,7 @@ function initSchema(db: Database.Database) {
       name TEXT NOT NULL,
       email TEXT NOT NULL UNIQUE,
       password TEXT NOT NULL,
-      role TEXT DEFAULT 'user' CHECK(role IN ('user', 'admin', 'superadmin')),
+      role TEXT DEFAULT 'user' CHECK(role IN ('user', 'admin', 'volunteer', 'superadmin')),
       photo TEXT,
       description TEXT,
       phone TEXT,
@@ -227,7 +227,7 @@ export type User = {
   name: string;
   email: string;
   password: string;
-  role: "user" | "admin" | "superadmin";
+  role: "user" | "admin" | "volunteer" | "superadmin";
   photo: string | null;
   description: string | null;
   phone: string | null;

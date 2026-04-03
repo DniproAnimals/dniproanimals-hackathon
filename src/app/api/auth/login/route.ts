@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Невірний email або пароль" }, { status: 401 });
   }
 
-  const res = NextResponse.json({ id: user.id, name: user.name, email: user.email, role: user.role });
+  const res = NextResponse.json({ id: user.id, name: user.name, email: user.email, role: user.role, org_id: user.org_id });
   res.cookies.set(setSessionCookie(user.id));
   return res;
 }

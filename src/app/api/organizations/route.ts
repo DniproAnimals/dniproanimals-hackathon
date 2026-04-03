@@ -32,3 +32,20 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ id: result.lastInsertRowid }, { status: 201 });
 }
+
+export async function PATCH(request: NextRequest) {
+  const user = await getSession();
+  if (!user || (user.role !== "admin" && user.role !== "superadmin")) {
+    return NextResponse.json({ error: "Недостатньо прав" }, { status: 403 });
+  }
+
+  const db = getDb();
+  const { id, status } = await request.json();
+
+  if (!id || !["approved", "rejected"].includes(status)) {
+    return NextResponse.json({ error: "Невірні дані" }, { status: 400 });
+  }
+
+  db.prepare("UPDATE organizations SET status = ? WHERE id = ?").run(status, id);
+  return NextResponse.json({ success: true });
+}

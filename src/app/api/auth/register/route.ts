@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     .prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)")
     .run(name, email, password);
 
-  const res = NextResponse.json({ id: result.lastInsertRowid, name, email }, { status: 201 });
+  const res = NextResponse.json({ id: result.lastInsertRowid, name, email, role: "user" }, { status: 201 });
   res.cookies.set(setSessionCookie(Number(result.lastInsertRowid)));
   return res;
 }
