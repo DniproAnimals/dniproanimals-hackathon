@@ -225,7 +225,7 @@ function AddAnimalPage() {
               <p className="text-xs text-gray-medium">JPG, PNG до 5 МБ</p>
               {uploading && <p className="text-xs text-[#ced48c] mt-1">Завантаження...</p>}
             </div>
-            <input ref={fileRef} type="file" accept="image/*" multiple onChange={handlePhotoUpload} className="hidden" />
+            <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={handlePhotoUpload} className="hidden" />
             {form.photos.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {form.photos.map((url, i) => (

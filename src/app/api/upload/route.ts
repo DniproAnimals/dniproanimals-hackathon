@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
-import path from "path";
+import { createClient } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
@@ -31,14 +30,28 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
   const ext = file.name.split(".").pop() || "jpg";
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const filepath = path.join(process.cwd(), "public", "uploads", filename);
 
-  await writeFile(filepath, buffer);
+  const supabase = await createClient();
 
-  return NextResponse.json({ url: `/uploads/${filename}` });
+  const { error } = await supabase.storage
+    .from("photos")
+    .upload(filename, file, {
+      contentType: file.type,
+      upsert: false,
+    });
+
+  if (error) {
+    return NextResponse.json(
+      { error: "Помилка завантаження: " + error.message },
+      { status: 500 }
+    );
+  }
+
+  const { data: urlData } = supabase.storage
+    .from("photos")
+    .getPublicUrl(filename);
+
+  return NextResponse.json({ url: urlData.publicUrl });
 }

@@ -271,7 +271,7 @@ export default function VolunteersPage() {
                 </button>
                 {form.photo && <button type="button" onClick={() => setForm({ ...form, photo: "" })} className="block text-xs text-red-500 mt-0.5">Видалити</button>}
               </div>
-              <input ref={fileRef} type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
+              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handlePhotoUpload} className="hidden" />
             </div>
 
             <div className="grid grid-cols-2 gap-3">

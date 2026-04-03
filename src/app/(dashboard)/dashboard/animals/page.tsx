@@ -326,7 +326,7 @@ export default function AnimalsPage() {
                     <IconPhoto size={18} className="text-gray-400" />
                   </button>
                 </div>
-                <input ref={fileRef} type="file" accept="image/*" multiple onChange={handlePhotoUpload} className="hidden" />
+                <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={handlePhotoUpload} className="hidden" />
                 {uploading && <p className="text-[11px] text-gray-400 mt-1">Завантаження...</p>}
               </div>
 

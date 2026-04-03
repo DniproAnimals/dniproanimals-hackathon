@@ -114,7 +114,7 @@ export default function CreateOrgPage() {
               <p className="text-xs text-gray-400 mt-0.5">JPG, PNG до 5 МБ</p>
             </div>
           )}
-          <input ref={fileRef} type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
+          <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handlePhotoUpload} className="hidden" />
         </div>
 
         {/* Name */}
