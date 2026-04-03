@@ -90,5 +90,20 @@ export async function PATCH(request: NextRequest) {
     .update({ status })
     .eq("id", id);
 
+  if (status === "approved") {
+    const { data: req } = await supabase
+      .from("adoption_requests")
+      .select("animal_id")
+      .eq("id", id)
+      .single();
+
+    if (req?.animal_id) {
+      await supabase
+        .from("animals")
+        .update({ status: "adopted" })
+        .eq("id", req.animal_id);
+    }
+  }
+
   return NextResponse.json({ success: true });
 }
