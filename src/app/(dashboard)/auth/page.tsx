@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/lib/UserContext";
 import Image from "next/image";
@@ -14,12 +14,15 @@ export default function AuthPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (user) {
-    if (user.role === "superadmin") router.replace("/admin");
-    else if (user.org_id) router.replace("/dashboard");
-    else router.replace("/onboarding");
-    return null;
-  }
+  useEffect(() => {
+    if (user) {
+      if (user.role === "superadmin") router.replace("/admin");
+      else if (user.org_id) router.replace("/dashboard");
+      else router.replace("/onboarding");
+    }
+  }, [user, router]);
+
+  if (user) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
