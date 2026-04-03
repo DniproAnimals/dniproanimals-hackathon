@@ -104,7 +104,7 @@ export default function AnimalDetailPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [visibleContacts, setVisibleContacts] = useState<string[]>([]);
+  const [visibleContacts, setVisibleContacts] = useState<string[]>(["email"]);
   const { user, favoriteIds, toggleFavorite } = useUser();
   const isFav = animal ? favoriteIds.includes(animal.id) : false;
 
@@ -273,7 +273,7 @@ export default function AnimalDetailPage() {
             <div className="flex items-center gap-2 flex-shrink-0">
               {user?.role === "admin" && (
                 <>
-                  <a href={`/admin/add?edit=${animal.id}`} className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center justify-center" title="Редагувати">
+                  <a href={`/dashboard/animals`} className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center justify-center" title="Редагувати">
                     <IconPencil size={14} />
                   </a>
                   <button

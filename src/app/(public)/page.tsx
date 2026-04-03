@@ -51,7 +51,7 @@ function CatalogContent() {
         </div>
         <div className="flex items-center gap-2">
           {user?.role === "admin" && (
-            <Link href="/admin/add" className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#ced48c] text-foreground text-sm font-medium hover:bg-[#b8be72] transition-colors">
+            <Link href="/dashboard/animals" className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#ced48c] text-foreground text-sm font-medium hover:bg-[#b8be72] transition-colors">
               <IconPlus size={14} />
               Додати
             </Link>
