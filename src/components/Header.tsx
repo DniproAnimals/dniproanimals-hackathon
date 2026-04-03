@@ -8,8 +8,8 @@ import { useUser } from "@/lib/UserContext";
 import { IconChevronDown, IconShieldFilled, IconHomeFilled, IconUserFilled, IconLogout } from "@tabler/icons-react";
 
 const navItems = [
-  { href: "/about", label: "Про нас" },
-  { href: "/", label: "Тварини" },
+  { href: "/", label: "Про нас" },
+  { href: "/animals", label: "Тварини" },
   { href: "/lost", label: "Загублені" },
   { href: "/organizations", label: "Організації" },
   { href: "/donate", label: "Допомогти" },
@@ -56,7 +56,7 @@ export default function Header() {
   return (
     <header className="bg-white border-b border-gray-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/about" className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3">
           <Image src="/logo.jpg" alt="DniproAnimals" width={40} height={40} className="rounded-full object-cover" />
           <span className="text-xl font-bold text-foreground tracking-tight hidden sm:block">DniproAnimals</span>
         </Link>
