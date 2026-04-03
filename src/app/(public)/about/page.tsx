@@ -1,43 +1,99 @@
-import Image from "next/image";
+"use client";
+
 import ImageFallback from "@/components/ImageFallback";
+import { IconHeartFilled, IconBrandInstagram, IconBrandTelegram, IconBrandFacebook, IconMapPinFilled, IconPhoneFilled, IconMailFilled, IconCalendarFilled } from "@tabler/icons-react";
+import Image from "next/image";
 import Link from "next/link";
-import InstagramFeed from "@/components/InstagramFeed";
-import {
-  IconHeartFilled,
-  IconBrandInstagram,
-  IconBrandTelegram,
-  IconBrandFacebook,
-  IconMapPinFilled,
-  IconPhoneFilled,
-  IconMailFilled,
-  IconCalendarFilled,
-} from "@tabler/icons-react";
+
+// Subtle Paw icon for the background pattern
+const PawIcon = ({ className }: { className?: string }) => (
+  <svg 
+    className={className} 
+    viewBox="0 0 24 24" 
+    fill="currentColor" 
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M11 20c-3 0-5.5-2.5-6-5s3-6 7-6 7 3.5 7 6-3 5-8 5z"/>
+    <circle cx="7" cy="8" r="2.5"/>
+    <circle cx="12" cy="5" r="2.5"/>
+    <circle cx="17" cy="8" r="2.5"/>
+  </svg>
+);
 
 export default function AboutPage() {
   return (
-    <div className="pb-24 md:pb-0">
-      {/* Hero — full bleed, bold */}
-      <div className="relative bg-foreground text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <ImageFallback src="/uploads/cat1_1.jpg" alt="" fill className="object-cover" />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-8 md:px-12 py-20 md:py-32">
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-none mb-4 max-w-3xl">
-            <span className="text-[#ced48c]">Dnipro</span>Animals
-          </h1>
-          <p className="text-lg md:text-2xl text-white/70 max-w-xl mb-2 leading-snug font-medium">
-            Рятуємо тих, хто не може попросити про допомогу
-          </p>
-          <p className="text-sm md:text-base text-white/40 max-w-lg mb-8 leading-relaxed">
-            Благодійний фонд · м. Дніпро · Понад 300 тварин у притулку · З 2015 року
-          </p>
-          <div className="flex gap-3 flex-wrap">
-            <Link href="/" className="bg-[#ced48c] text-foreground px-7 py-3.5 rounded-xl font-semibold text-sm hover:bg-[#b8be72] transition-colors">
-              Знайти друга
-            </Link>
-            <Link href="/donate" className="bg-white/10 backdrop-blur-sm text-white px-7 py-3.5 rounded-xl font-semibold text-sm hover:bg-white/20 transition-colors border border-white/10">
-              Допомогти
-            </Link>
+    <div className="min-h-screen bg-[#Fcfcfc] text-[#0c1014] selection:bg-[#ced48c] selection:text-[#0c1014] relative z-0 pb-24 md:pb-0 overflow-hidden">
+      
+      {/* Background Decorative Paws */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-[-1]">
+        <PawIcon className="absolute top-[5%] left-[5%] w-32 h-32 -rotate-12" />
+        <PawIcon className="absolute top-[20%] right-[10%] w-48 h-48 rotate-45" />
+        <PawIcon className="absolute top-[40%] left-[15%] w-24 h-24 rotate-12" />
+        <PawIcon className="absolute bottom-[30%] right-[20%] w-40 h-40 -rotate-45" />
+        <PawIcon className="absolute bottom-[10%] left-[30%] w-20 h-20 rotate-90" />
+        <PawIcon className="absolute top-[60%] right-[5%] w-32 h-32 rotate-180" />
+      </div>
+
+      {/* HERO SECTION */}
+      <div className="max-w-7xl mx-auto px-6 py-12 md:py-20 relative z-10">
+        <div className="flex flex-col lg:flex-row gap-12 items-center">
+          <div className="flex-1 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f2f4e4] text-[#5b7765] text-sm font-bold mb-6 border border-[#ced48c]/40 shadow-sm">
+              <span className="text-lg">🐾</span> Благодійний фонд · м. Дніпро
+            </div>
+            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-[1.1]">
+              Ми — <span className="text-[#5b7765]">DniproAnimals</span>
+            </h1>
+            <p className="text-lg md:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed mb-8">
+              Рятуємо тих, хто не може попросити про допомогу. Понад 300 тварин у нашому притулку щодня отримують шанс на нове життя завдяки небайдужим людям.
+            </p>
+            
+            {/* PROMINENT SOCIAL MEDIA */}
+            <div className="mb-10">
+              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Слідкуйте за життям хвостиків:</p>
+              <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
+                <a href="https://instagram.com/dniproanimals" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#bc1888] text-white font-bold hover:scale-105 transition-transform shadow-md">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                  Instagram
+                </a>
+                <a href="https://t.me/itsmotherofcats" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#0088cc] text-white font-bold hover:scale-105 transition-transform shadow-md">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  Telegram
+                </a>
+                <a href="https://facebook.com/dniproanimals" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#1877F2] text-white font-bold hover:scale-105 transition-transform shadow-md">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                  Facebook
+                </a>
+                <a href="#" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-black text-white font-bold hover:scale-105 transition-transform shadow-md">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.95-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.12-3.44-3.37-3.4-5.74.04-2.18 1.34-4.14 3.26-5.11 1.25-.66 2.7-.91 4.11-.83V15c-.86-.03-1.73.18-2.48.64-.84.5-1.4 1.4-1.46 2.37-.05 1.05.47 2.05 1.33 2.6.93.58 2.11.66 3.12.28 1.18-.45 1.97-1.64 2.02-2.93.02-3.19.01-6.38.01-9.56 0-2.8-.02-5.61.02-8.42z"/></svg>
+                  TikTok
+                </a>
+              </div>
+            </div>
+
+            <div className="flex gap-4 flex-wrap justify-center lg:justify-start">
+              <Link href="/donate" className="bg-[#0c1014] text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-gray-800 transition-colors shadow-lg hover:-translate-y-1">
+                Допомогти притулку
+              </Link>
+              <Link href="/" className="bg-white border-2 border-gray-200 text-[#0c1014] px-8 py-4 rounded-2xl font-bold text-lg hover:border-[#ced48c] hover:bg-gray-50 transition-colors">
+                Знайти друга
+              </Link>
+            </div>
+          </div>
+          
+          {/* Hero Image Collage */}
+          <div className="flex-1 w-full max-w-lg mx-auto relative">
+            <div className="absolute inset-0 bg-[#ced48c] rounded-full blur-[80px] opacity-20 -z-10"></div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4 pt-8">
+                <Image src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop" alt="Собака з притулку" width={300} height={400} className="rounded-3xl object-cover shadow-lg border-4 border-white h-48 w-full" />
+                <Image src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=600&auto=format&fit=crop" alt="Кіт з притулку" width={300} height={300} className="rounded-3xl object-cover shadow-lg border-4 border-white h-64 w-full" />
+              </div>
+              <div className="space-y-4">
+                <Image src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?q=80&w=600&auto=format&fit=crop" alt="Кошеня" width={300} height={300} className="rounded-3xl object-cover shadow-lg border-4 border-white h-64 w-full" />
+                <Image src="https://images.unsplash.com/photo-1537151608804-ea6d11542125?q=80&w=600&auto=format&fit=crop" alt="Щасливий собака" width={300} height={400} className="rounded-3xl object-cover shadow-lg border-4 border-white h-48 w-full" />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -169,91 +225,62 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* Location */}
-      <div className="max-w-7xl mx-auto px-8 md:px-12 py-16 md:py-24">
-        <p className="text-[#ced48c] text-xs font-semibold uppercase tracking-widest mb-3 text-center">Контакти</p>
-        <h2 className="text-3xl md:text-4xl font-bold mb-10 text-center">Де нас знайти</h2>
-        <div className="md:flex md:gap-10">
-          <div className="flex-1 mb-6 md:mb-0">
-            <div className="rounded-2xl overflow-hidden border border-gray-border h-80 md:h-full">
-              <iframe
-                title="Розташування DniproAnimals"
-                width="100%"
-                height="100%"
-                style={{ border: 0, minHeight: 320 }}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                src="https://maps.google.com/maps?q=вул.+Героїв+Дніпра,+Дніпро,+Україна&output=embed&z=14"
-              />
-            </div>
-          </div>
-          <div className="md:w-80 flex-shrink-0 space-y-5">
-            {[
-              { icon: <IconMapPinFilled size={20} />, title: "Адреса", text: "вул. Героїв Дніпра, м. Дніпро, Україна" },
-              { icon: <IconPhoneFilled size={20} />, title: "Телефон", text: "+380 (96) 660 18 17", href: "tel:+380966601817" },
-              { icon: <IconMailFilled size={20} />, title: "Email", text: "dniproanimals.org@gmail.com", href: "mailto:dniproanimals.org@gmail.com" },
-              { icon: <IconCalendarFilled size={20} />, title: "Візит", text: "Пишіть в дірект Instagram" },
-            ].map((item) => (
-              <div key={item.title} className="flex items-start gap-3">
-                <span className="text-[#ced48c] flex-shrink-0 mt-0.5">{item.icon}</span>
+      {/* LOCATION & CONTACTS */}
+      <div className="max-w-7xl mx-auto px-6 py-16 md:py-24 relative z-10">
+        <div className="bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col md:flex-row">
+          <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+            <h2 className="text-3xl font-extrabold mb-8 text-[#0c1014]">Чекаємо в гості!</h2>
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-[#ced48c]/20 text-[#5b7765] rounded-full flex items-center justify-center shrink-0">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
                 <div>
-                  <p className="font-semibold text-sm">{item.title}</p>
-                  {item.href ? (
-                    <a href={item.href} className="text-sm text-gray-medium hover:underline">{item.text}</a>
-                  ) : (
-                    <p className="text-sm text-gray-medium">{item.text}</p>
-                  )}
+                  <p className="font-bold text-gray-400 uppercase text-xs tracking-wider mb-1">Адреса притулку</p>
+                  <p className="text-lg font-bold text-gray-800">м. Дніпро, вул. Героїв Дніпра</p>
                 </div>
               </div>
-            ))}
-            <a href="https://www.google.com/maps/search/?api=1&query=вул.+Героїв+Дніпра,+Дніпро" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-[#ced48c] text-foreground px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#b8be72] transition-colors">
-              <IconMapPinFilled size={16} />
-              Прокласти маршрут
-            </a>
-          </div>
-        </div>
-      </div>
+              
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-[#ced48c]/20 text-[#5b7765] rounded-full flex items-center justify-center shrink-0">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                </div>
+                <div>
+                  <p className="font-bold text-gray-400 uppercase text-xs tracking-wider mb-1">Телефон керівника</p>
+                  <a href="tel:+380966601817" className="text-lg font-bold text-gray-800 hover:text-[#5b7765]">+380 96 660 18 17</a>
+                </div>
+              </div>
 
-      {/* Instagram */}
-      <div className="bg-gray-light">
-        <div className="max-w-7xl mx-auto px-8 md:px-12 py-16 md:py-24">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <p className="text-[#ced48c] text-xs font-semibold uppercase tracking-widest mb-2">Соціальні мережі</p>
-              <h2 className="text-3xl md:text-4xl font-bold">Ми в Instagram</h2>
-              <p className="text-sm text-gray-medium mt-1">@dniproanimals · 23K підписників</p>
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-[#ced48c]/20 text-[#5b7765] rounded-full flex items-center justify-center shrink-0">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+                <div>
+                  <p className="font-bold text-gray-400 uppercase text-xs tracking-wider mb-1">Email</p>
+                  <a href="mailto:dniproanimals.org@gmail.com" className="text-lg font-bold text-gray-800 hover:text-[#5b7765]">dniproanimals.org@gmail.com</a>
+                </div>
+              </div>
             </div>
-            <a href="https://instagram.com/dniproanimals" target="_blank" rel="noopener noreferrer" className="hidden md:flex items-center gap-2 bg-white px-5 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:bg-[#ced48c]/20 transition-colors border border-gray-border">
-              <IconBrandInstagram size={16} />
-              Підписатися
+            
+            <a href="https://www.google.com/maps/search/?api=1&query=вул.+Героїв+Дніпра,+Дніпро" target="_blank" rel="noopener noreferrer" className="mt-8 inline-flex items-center justify-center gap-2 bg-[#0c1014] text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition-colors w-full sm:w-auto shadow-md">
+              Відкрити на карті
             </a>
           </div>
-          <InstagramFeed />
-          <div className="mt-6 text-center md:hidden">
-            <a href="https://instagram.com/dniproanimals" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-white px-5 py-2.5 rounded-xl text-sm font-semibold text-foreground border border-gray-border">
-              Підписатися в Instagram
-            </a>
+          <div className="md:w-1/2 bg-gray-100 min-h-[300px] relative">
+            <iframe
+              title="Розташування DniproAnimals"
+              width="100%"
+              height="100%"
+              className="absolute inset-0"
+              style={{ border: 0 }}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              src="https://maps.google.com/maps?q=вул.+Героїв+Дніпра,+Дніпро,+Україна&output=embed&z=14"
+            />
           </div>
         </div>
       </div>
 
-      {/* CTA */}
-      <div className="bg-[#ced48c]">
-        <div className="max-w-7xl mx-auto px-8 md:px-12 py-16 md:py-24 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Кожен внесок — це шанс на життя</h2>
-          <p className="text-sm text-foreground/60 mb-8 max-w-lg mx-auto">
-            Допоможіть нашим 300+ хвостикам. Задонатьте, станьте волонтером, усиновіть тварину або просто поширте інформацію.
-          </p>
-          <div className="flex gap-3 justify-center flex-wrap">
-            <Link href="/donate" className="bg-foreground text-white px-7 py-3.5 rounded-xl font-semibold text-sm hover:bg-foreground/90 transition-colors">
-              Задонатити
-            </Link>
-            <Link href="/" className="bg-white text-foreground px-7 py-3.5 rounded-xl font-semibold text-sm hover:bg-white/80 transition-colors">
-              Знайти друга
-            </Link>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

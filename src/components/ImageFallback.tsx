@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image, { type ImageProps } from "next/image";
 
 type ImageFallbackProps = Omit<ImageProps, "src"> & {
@@ -10,6 +10,10 @@ type ImageFallbackProps = Omit<ImageProps, "src"> & {
 
 export default function ImageFallback({ src, fallback = "/logo.jpg", alt, ...props }: ImageFallbackProps) {
   const [imgSrc, setImgSrc] = useState(src);
+
+  useEffect(() => {
+    setImgSrc(src);
+  }, [src]);
 
   return (
     <Image

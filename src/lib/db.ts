@@ -201,7 +201,7 @@ function seedIfEmpty(db: Database.Database) {
       insertLost.run(l.title, l.description, l.type, l.animal_type, l.breed, l.sex, l.color, l.size, l.location, l.last_seen_location, l.last_seen_date, l.contact_name, l.contact_phone, l.photos);
     }
     // Superadmin account
-    db.prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)").run("Superadmin", "super@dniproanimals.org", "super123", "superadmin");
+    db.prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)").run("Admin", "admin@gmail.com", "admin", "superadmin");
   })();
 }
 

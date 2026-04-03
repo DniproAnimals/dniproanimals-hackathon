@@ -1,190 +1,336 @@
+"use client";
+
+import { IconHeartFilled, IconCircleCheckFilled, IconDropletFilled, IconCirclePlusFilled, IconHomeFilled, IconBrandInstagram, IconBrandFacebook, IconBrandTelegram, IconPhoneFilled } from "@tabler/icons-react";
 import Image from "next/image";
-import {
-  IconCreditCardFilled,
-  IconArrowRight,
-  IconCoffee,
-  IconHeartFilled,
-  IconWorld,
-  IconTruckDelivery,
-  IconShoppingBag,
-  IconCircleCheckFilled,
-  IconDropletFilled,
-  IconCirclePlusFilled,
-  IconHomeFilled,
-  IconBrandInstagram,
-  IconBrandFacebook,
-  IconBrandTelegram,
-  IconPhoneFilled,
-} from "@tabler/icons-react";
+import { useState, useEffect } from "react";
+
+type OrganizationNeed = {
+  id: number;
+  org_id: number;
+  item_name: string;
+  quantity: string;
+  price_per_unit: number | null;
+  org_name: string;
+};
+
+// Subtle Paw icon for the background pattern
+const PawIcon = ({ className }: { className?: string }) => (
+  <svg 
+    className={className} 
+    viewBox="0 0 24 24" 
+    fill="currentColor" 
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M11 20c-3 0-5.5-2.5-6-5s3-6 7-6 7 3.5 7 6-3 5-8 5z"/>
+    <circle cx="7" cy="8" r="2.5"/>
+    <circle cx="12" cy="5" r="2.5"/>
+    <circle cx="17" cy="8" r="2.5"/>
+  </svg>
+);
 
 export default function DonatePage() {
+  const [amount, setAmount] = useState<number | null>(500);
+  const [customAmount, setCustomAmount] = useState<string>("");
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "processing" | "success">("idle");
+  const [selectedOrg, setSelectedOrg] = useState<string>("general");
+  
+  const organizations = [
+    { id: "general", name: "DniproAnimals (Загальний фонд)" },
+    { id: "1", name: "Притулок 'Вірний друг'" },
+    { id: "2", name: "Ковчег" },
+    { id: "3", name: "Реабілітаційний центр 'Шанс'" },
+  ];
+
+  const [needs, setNeeds] = useState<OrganizationNeed[]>([
+    {
+      id: 1,
+      org_id: 1,
+      item_name: "Сухий корм для собак 'Brit Premium'",
+      quantity: "15 мішків по 15 кг",
+      price_per_unit: 1200,
+      org_name: "Притулок 'Вірний друг'",
+    },
+    {
+      id: 2,
+      org_id: 2,
+      item_name: "Вологий корм для кошенят 'Royal Canin'",
+      quantity: "50 павучів",
+      price_per_unit: 45,
+      org_name: "Ковчег",
+    },
+    {
+      id: 3,
+      org_id: 1,
+      item_name: "Деревний наповнювач для туалетів",
+      quantity: "10 упаковок",
+      price_per_unit: 250,
+      org_name: "Притулок 'Вірний друг'",
+    },
+    {
+      id: 4,
+      org_id: 3,
+      item_name: "Пелюшки поглинаючі 60х90",
+      quantity: "5 упаковок",
+      price_per_unit: 350,
+      org_name: "Реабілітаційний центр 'Шанс'",
+    }
+  ]);
+  const [loadingNeeds, setLoadingNeeds] = useState(false);
+
+  useEffect(() => {
+    // Змінено на мок-дані для демонстрації
+  }, []);
+
+  const handleCheckout = () => {
+    const finalAmount = amount || parseInt(customAmount) || 0;
+    if (finalAmount > 0) {
+      setShowCheckout(true);
+    }
+  };
+
+  const simulatePayment = () => {
+    setPaymentStatus("processing");
+    setTimeout(() => {
+      setPaymentStatus("success");
+      setTimeout(() => {
+        setShowCheckout(false);
+        setPaymentStatus("idle");
+        setAmount(500);
+        setCustomAmount("");
+      }, 3000);
+    }, 2000);
+  };
+
   return (
-    <div className="max-w-6xl mx-auto px-6 py-6 pb-24 md:pb-6">
-      {/* Hero */}
-      <div className="bg-[#ced48c] rounded-3xl p-8 md:p-12 mb-10 md:flex md:items-center md:gap-10">
-        <div className="flex-1 mb-6 md:mb-0">
-          <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-3">
-            Допоможіть тим, хто так на це чекає...
-          </h1>
-          <p className="text-sm md:text-base text-foreground/70 leading-relaxed">
-            Кожна пачка корму, кожна гривня — це шанс для тварини знайти тепло, здоров&apos;я та любов. Кожен внесок — це шанс на життя!
-          </p>
-        </div>
-        <Image src="/logo.jpg" alt="DniproAnimals" width={140} height={140} className="rounded-2xl object-cover mx-auto flex-shrink-0" />
+    <div className="min-h-screen bg-[#Fcfcfc] text-[#0c1014] selection:bg-[#ced48c] selection:text-[#0c1014] relative z-0">
+      
+      {/* Background Decorative Paws */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] overflow-hidden z-[-1]">
+        <PawIcon className="absolute top-[5%] left-[5%] w-32 h-32 -rotate-12" />
+        <PawIcon className="absolute top-[20%] right-[10%] w-48 h-48 rotate-45" />
+        <PawIcon className="absolute top-[50%] left-[15%] w-24 h-24 rotate-12" />
+        <PawIcon className="absolute bottom-[20%] right-[20%] w-40 h-40 -rotate-45" />
+        <PawIcon className="absolute bottom-[5%] left-[30%] w-20 h-20 rotate-90" />
       </div>
 
-      {/* Donate buttons */}
-      <h2 className="text-xl md:text-2xl font-bold mb-5">Задонатити</h2>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        {/* Monobank */}
-        <a href="https://send.monobank.ua/jar/jjJbZRhoQ" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-[#1a1a1a] text-white rounded-2xl p-5 hover:opacity-90 transition-opacity">
-          <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-            <IconCreditCardFilled size={22} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm">Monobank</p>
-            <p className="text-xs text-white/60">Банка — найшвидший спосіб</p>
-          </div>
-          <IconArrowRight size={18} className="text-white/40 flex-shrink-0" />
-        </a>
-
-        {/* Buy Me a Coffee */}
-        <a href="https://buymeacoffee.com/dniproanimals" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-[#FFDD00] text-[#1a1a1a] rounded-2xl p-5 hover:opacity-90 transition-opacity">
-          <div className="w-11 h-11 rounded-full bg-black/10 flex items-center justify-center flex-shrink-0">
-            <IconCoffee size={22} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm">Buy Me a Coffee</p>
-            <p className="text-xs text-black/50">Міжнародні перекази</p>
-          </div>
-          <IconArrowRight size={18} className="text-black/30 flex-shrink-0" />
-        </a>
-
-        {/* Patreon */}
-        <a href="https://www.patreon.com/foxrescueteam" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-[#FF424D] text-white rounded-2xl p-5 hover:opacity-90 transition-opacity">
-          <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-            <IconHeartFilled size={22} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm">Patreon</p>
-            <p className="text-xs text-white/60">Щомісячна підтримка</p>
-          </div>
-          <IconArrowRight size={18} className="text-white/40 flex-shrink-0" />
-        </a>
-
-        {/* PayPal */}
-        <a href="https://paypal.me/dniproanimals" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-[#003087] text-white rounded-2xl p-5 hover:opacity-90 transition-opacity">
-          <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-            <IconWorld size={22} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm">PayPal</p>
-            <p className="text-xs text-white/60">dniproanimals.org@gmail.com</p>
-          </div>
-          <IconArrowRight size={18} className="text-white/40 flex-shrink-0" />
-        </a>
-      </div>
-
-      {/* Card requisites + Crypto — info blocks */}
-      <div className="grid md:grid-cols-2 gap-4 mb-6">
-        {/* Cards */}
-        <div className="bg-[#ced48c]/20 rounded-2xl p-5 border border-[#ced48c]/30">
-          <p className="text-xs font-semibold text-foreground/50 uppercase tracking-wider mb-3">Реквізити карток</p>
-          <div className="space-y-3">
-            <div>
-              <p className="text-xs text-gray-medium">Monobank</p>
-              <p className="text-sm font-mono font-medium">4441 1144 4172 7326</p>
-              <p className="text-xs text-gray-medium">Капінус Інеса</p>
+      <div className="max-w-7xl mx-auto px-6 py-6 lg:py-12 relative z-10">
+        
+        {/* TOP SECTION: Hero Text + Native Billing Widget Side-by-Side to minimize scrolling */}
+        <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center justify-between mb-16">
+          
+          {/* Left: Hero Intro */}
+          <div className="flex-1 text-center lg:text-left pt-4 lg:pt-0">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f2f4e4] text-[#5b7765] text-sm font-bold mb-6 border border-[#ced48c]/40 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-[#5b7765] animate-pulse" />
+              Вбудована система підтримки
             </div>
-            <div className="border-t border-[#ced48c]/20 pt-3">
-              <p className="text-xs text-gray-medium">ПриватБанк</p>
-              <p className="text-sm font-mono font-medium">5168 7456 0790 6259</p>
-              <p className="text-xs text-gray-medium">Капінус Інеса</p>
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 leading-[1.1]">
+              Рятуємо життя <span className="text-[#5b7765]">хвостатих</span> разом.
+            </h1>
+            <p className="text-lg md:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed mb-6">
+              Ваш внесок — це не просто гроші. Це їжа, тепло, і найголовніше — шанс на нове щасливе життя для сотень тварин у притулку.
+            </p>
+          </div>
+
+          {/* Right: The Billing Widget */}
+          <div className="w-full lg:w-[480px] bg-white rounded-[2.5rem] p-8 md:p-10 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] border border-gray-100 relative overflow-hidden flex-shrink-0">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#ced48c] rounded-full mix-blend-multiply opacity-20 -translate-y-1/2 translate-x-1/2 blur-[40px]" />
+            
+            <h2 className="text-2xl md:text-3xl font-extrabold mb-6 text-center text-[#0c1014]">Швидка пожертва онлайн</h2>
+            
+            <div className="mb-5 relative z-10">
+              <label className="block text-sm font-bold text-gray-700 mb-2">Кому допомагаємо?</label>
+              <div className="relative">
+                <select
+                  value={selectedOrg}
+                  onChange={(e) => setSelectedOrg(e.target.value)}
+                  className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl py-3 pl-4 pr-10 text-foreground outline-none focus:border-[#ced48c] focus:bg-white transition-colors font-medium appearance-none cursor-pointer"
+                >
+                  {organizations.map(org => (
+                    <option key={org.id} value={org.id}>{org.name}</option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+              </div>
             </div>
+
+            <div className="grid grid-cols-3 gap-3 mb-5 relative z-10">
+              {[100, 500, 1000].map(val => (
+                <button
+                  key={val}
+                  onClick={() => { setAmount(val); setCustomAmount(""); }}
+                  className={`py-4 text-xl font-bold rounded-2xl border-2 transition-all duration-300 ${
+                    amount === val 
+                      ? "bg-[#ced48c] text-[#0c1014] border-[#ced48c] shadow-[0_8px_20px_-6px_rgba(206,212,140,0.6)] scale-[1.02]" 
+                      : "bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100 hover:border-gray-300"
+                  }`}
+                >
+                  {val} ₴
+                </button>
+              ))}
+            </div>
+
+            <div className="relative mb-6 z-10">
+              <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <span className="text-gray-400 text-xl font-medium">₴</span>
+              </div>
+              <input 
+                type="number" 
+                min="1"
+                placeholder="Або введіть свою суму..." 
+                value={customAmount}
+                onChange={(e) => { 
+                  const val = e.target.value;
+                  if (val === "" || Number(val) > 0) {
+                    setCustomAmount(val); 
+                    setAmount(null); 
+                  }
+                }}
+                className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl py-4 pl-12 pr-6 text-xl text-foreground outline-none focus:border-[#ced48c] focus:bg-white transition-colors placeholder:text-gray-400 font-medium"
+              />
+            </div>
+
+            <button 
+              onClick={handleCheckout}
+              disabled={!(amount || parseInt(customAmount) > 0)}
+              className="w-full py-5 rounded-2xl bg-[#0c1014] text-white text-xl font-bold uppercase tracking-wide hover:shadow-xl hover:bg-[#1a232c] hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none relative z-10"
+            >
+              Допомогти хвостатим
+            </button>
+            <p className="text-xs text-center text-gray-400 mt-4 flex items-center justify-center gap-1 relative z-10">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Безпечний платіж
+            </p>
           </div>
         </div>
 
-        {/* Crypto */}
-        <div className="bg-[#ced48c]/20 rounded-2xl p-5 border border-[#ced48c]/30">
-          <p className="text-xs font-semibold text-foreground/50 uppercase tracking-wider mb-3">Криптовалюта</p>
-          <div>
-            <p className="text-xs text-gray-medium mb-1">USDT (TRC20)</p>
-            <p className="text-sm font-mono font-medium break-all">TB8owr1wSr7DyX6arVBNjmvtoGp3Fw/dMw</p>
-          </div>
-          <p className="text-xs text-gray-medium mt-3 leading-relaxed">
-            Триває збір на ліки та ветеринарне обслуговування підопічних притулку DniproAnimals — врятованих та евакуйованих тварин.
-          </p>
-        </div>
-      </div>
-
-      {/* Nova Poshta — red block */}
-      <div className="bg-red-500 text-white rounded-2xl p-6 mb-10">
-        <div className="md:flex md:items-center md:gap-6">
-          <div className="flex items-center gap-3 mb-3 md:mb-0">
-            <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-              <IconTruckDelivery size={22} />
-            </div>
-            <div>
-              <p className="font-bold text-base">Відправити допомогу Новою Поштою</p>
-              <p className="text-xs text-white/70">Корм, ліки, побутову хімію, пледи</p>
-            </div>
-          </div>
-          <div className="flex-1 md:text-right">
-            <p className="text-sm font-medium">НП Дніпро, 85 відділення</p>
-            <p className="text-sm font-mono">+380 (96) 660 18 17</p>
-            <p className="text-sm font-semibold">Капінус Інеса</p>
+        {/* Alternative Methods (Colors Restored & No Hover Grayscale needed) */}
+        <div className="mb-16">
+          <h3 className="text-xl font-bold mb-6 text-center text-gray-400 uppercase tracking-wider">Інші способи допомоги</h3>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { name: "Monobank", desc: "Банка", url: "https://send.monobank.ua/jar/jjJbZRhoQ", color: "from-black to-gray-800", text: "text-white", icon: "🐈" },
+              { name: "Buy Me a Coffee", desc: "Міжнародні", url: "https://buymeacoffee.com/dniproanimals", color: "from-[#FFDD00] to-[#F1C40F]", text: "text-black", icon: "☕" },
+              { name: "Patreon", desc: "Підписка", url: "https://www.patreon.com/foxrescueteam", color: "from-[#FF424D] to-[#E91E63]", text: "text-white", icon: "♥️" },
+              { name: "PayPal", desc: "Увесь світ", url: "https://paypal.me/dniproanimals", color: "from-[#003087] to-[#001D4F]", text: "text-white", icon: "💳" }
+            ].map(btn => (
+              <a 
+                key={btn.name} 
+                href={btn.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className={`group relative overflow-hidden rounded-2xl p-5 shadow-sm hover:shadow-xl bg-gradient-to-br ${btn.color} ${btn.text} transition-all duration-300 hover:-translate-y-1 block`}
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold mb-0.5 leading-tight">{btn.name}</h3>
+                    <p className="opacity-80 text-xs font-medium">{btn.desc}</p>
+                  </div>
+                  <span className="text-3xl opacity-90 group-hover:scale-110 transition-transform">{btn.icon}</span>
+                </div>
+              </a>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Needs */}
-      <h2 className="text-xl md:text-2xl font-bold mb-5">Наші потреби</h2>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
-        {/* Royal Canin */}
-        <div className="bg-white rounded-2xl border border-gray-border p-5">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center">
-              <IconShoppingBag size={18} className="text-amber-600" />
-            </div>
-            <h3 className="font-semibold">Корми Royal Canin</h3>
+        {/* Offline & Banking Details in light style */}
+        <div className="grid lg:grid-cols-2 gap-8 mb-16">
+          <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm relative overflow-hidden">
+             <div className="absolute top-0 left-0 w-2 h-full bg-[#ced48c]" />
+             <h2 className="text-xl font-bold mb-6 flex items-center gap-3 text-[#0c1014]">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                Прямі банківські реквізити
+             </h2>
+             <div className="space-y-4">
+               <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                  <p className="text-xs text-gray-500 uppercase font-bold mb-1">Monobank</p>
+                  <p className="text-xl font-mono font-bold text-[#5b7765]">4441 1144 4172 7326</p>
+                  <p className="text-xs text-gray-500 mt-1">Отримувач: Капінус Інеса</p>
+               </div>
+               <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                  <p className="text-xs text-gray-500 uppercase font-bold mb-1">ПриватБанк</p>
+                  <p className="text-xl font-mono font-bold text-[#5b7765]">5168 7456 0790 6259</p>
+                  <p className="text-xs text-gray-500 mt-1">Отримувач: Капінус Інеса</p>
+               </div>
+             </div>
           </div>
-          <div className="space-y-3">
-            <div>
-              <p className="text-xs font-semibold text-gray-medium uppercase tracking-wider mb-1.5">Паштет</p>
-              {[
-                { name: "Гастро кітен", price: "~90 грн/шт" },
-                { name: "Рекавері", price: "~85 грн/шт" },
-                { name: "Babycat", price: "~80 грн/шт" },
-              ].map((i) => (
-                <div key={i.name} className="flex items-center justify-between text-sm text-gray-600 py-0.5">
-                  <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#ced48c] flex-shrink-0" />{i.name}</div>
-                  <span className="text-xs text-gray-400">{i.price}</span>
+
+          <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm relative overflow-hidden">
+             <div className="absolute top-0 left-0 w-2 h-full bg-[#7c4b22]" />
+             <h2 className="text-xl font-bold mb-6 flex items-center gap-3 text-[#0c1014]">
+               Крипта та Відправка речей (📦)
+             </h2>
+             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 mb-4">
+                <p className="text-xs text-gray-500 uppercase font-bold mb-1">USDT (TRC20)</p>
+                <p className="text-sm font-mono break-all text-gray-800 font-bold">TB8owr1wSr7DyX6arVBNjmvtoGp3Fw/dMw</p>
+             </div>
+             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                <p className="text-xs text-gray-500 uppercase font-bold mb-1">Нова Пошта (Речі, корм)</p>
+                <p className="font-semibold text-gray-800">м. Дніпро, Відділення №85</p>
+                <p className="font-mono text-[#7c4b22] font-bold mt-1">+380 96 660 18 17</p>
+                <p className="text-xs text-gray-500 mt-1">Отримувач: Капінус Інеса</p>
+             </div>
+          </div>
+        </div>
+
+        {/* Shelter Needs Section */}
+        {needs.length > 0 && (
+          <div className="mb-16">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="h-8 w-1.5 bg-[#ced48c] rounded-full"></div>
+              <h2 className="text-3xl font-extrabold text-[#0c1014]">Актуальні потреби притулків</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {needs.map((need) => (
+                <div key={need.id} className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <PawIcon className="w-16 h-16 rotate-12" />
+                  </div>
+                  
+                  <div className="mb-4">
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-[#5b7765] bg-[#f2f4e4] px-2.5 py-1 rounded-full mb-2 inline-block">
+                      {need.org_name}
+                    </span>
+                    <h3 className="text-xl font-bold text-[#0c1014] leading-tight">{need.item_name}</h3>
+                  </div>
+                  
+                  <div className="flex items-end justify-between mt-auto">
+                    <div>
+                      <p className="text-xs text-gray-400 uppercase font-bold mb-0.5">Кількість</p>
+                      <p className="text-lg font-bold text-gray-700">{need.quantity}</p>
+                    </div>
+                    {need.price_per_unit && (
+                      <div className="text-right">
+                        <p className="text-xs text-gray-400 uppercase font-bold mb-0.5">Орієнтовна ціна</p>
+                        <p className="text-lg font-bold text-[#5b7765]">{need.price_per_unit} ₴ <span className="text-xs font-medium text-gray-400">/ од.</span></p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <button 
+                    onClick={() => {
+                      setSelectedOrg(need.org_id.toString());
+                      if (need.price_per_unit) {
+                        setAmount(null);
+                        setCustomAmount(need.price_per_unit.toString());
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      } else {
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }
+                    }}
+                    className="w-full mt-6 py-3 rounded-xl border-2 border-[#ced48c] text-[#5b7765] font-bold text-sm hover:bg-[#ced48c] hover:text-[#0c1014] transition-all"
+                  >
+                    Задонатити на це
+                  </button>
                 </div>
               ))}
             </div>
-            <div>
-              <p className="text-xs font-semibold text-gray-medium uppercase tracking-wider mb-1.5">Сухий корм</p>
-              {[
-                { name: "Кітен", price: "~350 грн/кг" },
-                { name: "Ренал", price: "~450 грн/кг" },
-                { name: "Фіт", price: "~280 грн/кг" },
-              ].map((i) => (
-                <div key={i.name} className="flex items-center justify-between text-sm text-gray-600 py-0.5">
-                  <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#ced48c] flex-shrink-0" />{i.name}</div>
-                  <span className="text-xs text-gray-400">{i.price}</span>
-                </div>
-              ))}
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-gray-medium uppercase tracking-wider mb-1.5">Лікувальний корм</p>
-              {["Ренал", "Урінарі", "Гастроінтестінал", "Діабетік"].map((i) => (
-                <div key={i} className="flex items-center gap-2 text-sm text-gray-600 py-0.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#ced48c] flex-shrink-0" />{i}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+          </div>)} 
+
 
         {/* Корми та смаколики */}
         <div className="bg-white rounded-2xl border border-gray-border p-5">

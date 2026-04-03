@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@/lib/UserContext";
 import Image from "next/image";
 import { IconMailFilled, IconLockFilled } from "@tabler/icons-react";
 
-export default function InvitePage() {
+export default function InvitePageWrapper() {
+  return <Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center"><div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" /></div>}><InvitePage /></Suspense>;
+}
+
+function InvitePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { refresh } = useUser();

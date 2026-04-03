@@ -51,6 +51,24 @@ export async function POST(request: NextRequest) {
   }, { status: 201 });
 }
 
+export async function PUT(request: NextRequest) {
+  const user = await getSession();
+  if (!user || !user.org_id) return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
+
+  const db = getDb();
+  const org = db.prepare("SELECT owner_id FROM organizations WHERE id = ?").get(user.org_id) as { owner_id: number } | undefined;
+  if (!org || org.owner_id !== user.id) return NextResponse.json({ error: "Недостатньо прав" }, { status: 403 });
+
+  const { id, name, surname, photo, description, phone, email, instagram, telegram } = await request.json();
+  if (!id || !name) return NextResponse.json({ error: "Невірні дані" }, { status: 400 });
+
+  db.prepare(
+    `UPDATE volunteers SET name=?, surname=?, photo=?, description=?, phone=?, email=?, instagram=?, telegram=? WHERE id=? AND org_id=?`
+  ).run(name, surname || null, photo || null, description || null, phone || null, email || null, instagram || null, telegram || null, id, user.org_id);
+
+  return NextResponse.json({ success: true });
+}
+
 export async function DELETE(request: NextRequest) {
   const user = await getSession();
   if (!user || !user.org_id) {

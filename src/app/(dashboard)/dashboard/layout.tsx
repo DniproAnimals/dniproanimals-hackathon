@@ -11,6 +11,7 @@ type Organization = {
   id: number;
   name: string;
   description: string | null;
+  photo: string | null;
   location: string | null;
   phone: string | null;
   email: string | null;

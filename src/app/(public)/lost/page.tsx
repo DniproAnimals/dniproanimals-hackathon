@@ -8,7 +8,6 @@ import {
   IconMapPin,
   IconPaw,
   IconX,
-  IconPencil,
   IconTag,
   IconPalette,
   IconEye,
@@ -197,89 +196,83 @@ export default function LostAnimalsPage() {
           <form
             onSubmit={handleSubmit}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl p-6 w-full max-w-md space-y-3 shadow-xl animate-modal-in"
+            className="bg-white rounded-2xl w-full max-w-sm shadow-xl animate-modal-in overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                <h3 className="font-semibold text-lg">Загубив тварину</h3>
+            {/* Header */}
+            <div className="bg-red-500 px-5 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-white">
+                <IconSearch size={18} />
+                <h3 className="font-semibold">Загубив тварину</h3>
               </div>
-              <button type="button" onClick={() => setShowForm(false)} className="text-gray-400 hover:text-foreground transition-colors">
+              <button type="button" onClick={() => setShowForm(false)} className="text-white/70 hover:text-white">
                 <IconX size={20} />
               </button>
             </div>
 
-            <div className="relative">
-              <IconPencil size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type="text" placeholder="Заголовок *" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
-            </div>
-
-            {/* Animal info */}
-            <div className="grid grid-cols-2 gap-2">
-              <select value={formData.animal_type} onChange={(e) => setFormData({ ...formData, animal_type: e.target.value })} className="px-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm text-foreground">
-                <option value="">Вид тварини</option>
-                <option value="Собака">Собака</option>
-                <option value="Кіт">Кіт</option>
-                <option value="Інше">Інше</option>
-              </select>
-              <div className="relative">
-                <IconTag size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input type="text" placeholder="Порода" value={formData.breed} onChange={(e) => setFormData({ ...formData, breed: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
+            <div className="p-5 space-y-3">
+              {/* What */}
+              <div>
+                <p className="text-xs text-gray-medium mb-1.5">Хто загубився? *</p>
+                <input type="text" placeholder="Наприклад: Рудий кіт Мурчик" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
               </div>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <select value={formData.sex} onChange={(e) => setFormData({ ...formData, sex: e.target.value })} className="px-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm text-foreground">
-                <option value="">Стать</option>
-                <option value="male">Хлопчик</option>
-                <option value="female">Дівчинка</option>
-              </select>
-              <div className="relative">
-                <IconPalette size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input type="text" placeholder="Колір" value={formData.color} onChange={(e) => setFormData({ ...formData, color: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
-              </div>
-              <select value={formData.size} onChange={(e) => setFormData({ ...formData, size: e.target.value })} className="px-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm text-foreground">
-                <option value="">Розмір</option>
-                <option value="small">Малий</option>
-                <option value="medium">Середній</option>
-                <option value="large">Великий</option>
-              </select>
-            </div>
 
-            {/* Location */}
-            <div className="relative">
-              <IconMapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type="text" placeholder="Район проживання *" required value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
+              {/* Type + Color */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <p className="text-xs text-gray-medium mb-1.5">Вид</p>
+                  <select value={formData.animal_type} onChange={(e) => setFormData({ ...formData, animal_type: e.target.value })} className="w-full px-3 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm">
+                    <option value="">Оберіть</option>
+                    <option value="Собака">🐕 Собака</option>
+                    <option value="Кіт">🐈 Кіт</option>
+                    <option value="Інше">🐾 Інше</option>
+                  </select>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-medium mb-1.5">Колір</p>
+                  <input type="text" placeholder="Рудий, сірий..." value={formData.color} onChange={(e) => setFormData({ ...formData, color: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
+                </div>
+              </div>
+
+              {/* Where */}
+              <div>
+                <p className="text-xs text-gray-medium mb-1.5">Де востаннє бачили? *</p>
+                <div className="relative">
+                  <IconMapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input type="text" placeholder="Адреса або район" required value={formData.last_seen_location || formData.location} onChange={(e) => setFormData({ ...formData, last_seen_location: e.target.value, location: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
+                </div>
+              </div>
+
+              {/* When */}
+              <div>
+                <p className="text-xs text-gray-medium mb-1.5">Коли?</p>
+                <input type="date" value={formData.last_seen_date} onChange={(e) => setFormData({ ...formData, last_seen_date: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
+              </div>
+
+              {/* Description */}
+              <div>
+                <p className="text-xs text-gray-medium mb-1.5">Опис та прикмети *</p>
+                <textarea placeholder="Зовнішність, нашийник, особливі прикмети..." required rows={2} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm resize-none" />
+              </div>
+
+              {/* Contact */}
+              <div className="pt-1 border-t border-gray-border">
+                <p className="text-xs text-gray-medium mb-1.5 mt-2">Ваші контакти *</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="relative">
+                    <IconUser size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input type="text" placeholder="Ім'я" required value={formData.contact_name} onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
+                  </div>
+                  <div className="relative">
+                    <IconPhone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input type="tel" placeholder="Телефон" required value={formData.contact_phone} onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" disabled={submitting} className="w-full bg-red-500 text-white py-3 rounded-xl font-semibold hover:bg-red-600 transition-colors disabled:opacity-50">
+                {submitting ? "Публікація..." : "Опублікувати оголошення"}
+              </button>
             </div>
-
-            {/* Last seen */}
-            <p className="text-xs font-medium text-gray-medium pt-1">Де востаннє бачили?</p>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="relative">
-                <IconEye size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input type="text" placeholder="Місце" value={formData.last_seen_location} onChange={(e) => setFormData({ ...formData, last_seen_location: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
-              </div>
-              <div className="relative">
-                <IconCalendar size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input type="date" value={formData.last_seen_date} onChange={(e) => setFormData({ ...formData, last_seen_date: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
-              </div>
-            </div>
-
-            <textarea placeholder="Опис (зовнішність, особливі прикмети) *" required rows={3} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm resize-none" />
-
-            <div className="grid grid-cols-2 gap-2">
-              <div className="relative">
-                <IconUser size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input type="text" placeholder="Ваше ім'я *" required value={formData.contact_name} onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
-              </div>
-              <div className="relative">
-                <IconPhone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input type="tel" placeholder="Телефон *" required value={formData.contact_phone} onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
-              </div>
-            </div>
-
-            <button type="submit" disabled={submitting} className="w-full bg-[#ced48c] text-foreground py-3 rounded-xl font-semibold hover:bg-[#b8be72] transition-colors disabled:opacity-50">
-              {submitting ? "Публікація..." : "Опублікувати"}
-            </button>
           </form>
         </div>
       )}

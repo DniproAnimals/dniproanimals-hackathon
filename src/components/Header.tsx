@@ -11,6 +11,7 @@ const navItems = [
   { href: "/about", label: "Про нас" },
   { href: "/", label: "Тварини" },
   { href: "/lost", label: "Загублені" },
+  { href: "/organizations", label: "Організації" },
   { href: "/donate", label: "Допомогти" },
 ];
 
