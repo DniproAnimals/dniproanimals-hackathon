@@ -10,7 +10,7 @@ import {
   IconMapPinFilled, IconPhoneFilled, IconMailFilled,
   IconBrandInstagram, IconBrandTelegram, IconBrandFacebook,
   IconWorldWww, IconChevronLeft, IconUsersGroup, IconPawFilled,
-  IconCalendarFilled, IconShieldCheckFilled,
+  IconCalendarFilled, IconShieldCheckFilled, IconHeartHandshake,
 } from "@tabler/icons-react";
 
 type Org = {
@@ -18,6 +18,7 @@ type Org = {
   location: string | null; phone: string | null; email: string | null;
   instagram: string | null; telegram: string | null; facebook: string | null;
   website: string | null; owner_id: number; status: string; created_at: string;
+  monobank_jar_id: string | null;
 };
 
 type Volunteer = {
@@ -163,6 +164,48 @@ export default function OrganizationPage() {
           )}
         </div>
       </div>
+
+      {/* Donate */}
+      {org.monobank_jar_id && (
+        <div className="mb-10 p-6 rounded-3xl bg-gradient-to-br from-[#f2f4e4] to-[#e8ebd4] border border-[#ced48c]/40 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-[#ced48c] rounded-full opacity-10 -translate-y-1/2 translate-x-1/2 blur-[60px]" />
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-2xl bg-[#5b7765] flex items-center justify-center">
+                <IconHeartHandshake size={22} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-[#0c1014]">Допомогти організації</h2>
+                <p className="text-xs text-[#5b7765]">Кожна гривня рятує життя тварин</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Ви можете підтримати <b>{org.name}</b> фінансово через Monobank банку. Кошти йдуть на корм, ліки та утримання тварин.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {[100, 250, 500].map((sum) => (
+                <a
+                  key={sum}
+                  href={`https://send.monobank.ua/jar/${org.monobank_jar_id}?amount=${sum}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-2.5 rounded-xl bg-white border-2 border-[#ced48c] text-sm font-bold text-[#5b7765] hover:bg-[#ced48c] hover:text-[#0c1014] transition-all"
+                >
+                  {sum} ₴
+                </a>
+              ))}
+              <a
+                href={`https://send.monobank.ua/jar/${org.monobank_jar_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 rounded-xl bg-[#0c1014] text-sm font-bold text-white hover:bg-[#1a232c] transition-all"
+              >
+                Інша сума
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Volunteers */}
       {volunteers.length > 0 && (

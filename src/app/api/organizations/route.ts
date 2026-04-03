@@ -92,7 +92,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "Тільки власник може редагувати організацію" }, { status: 403 });
   }
 
-  const { name, description, location, phone, email, instagram, telegram, facebook, website } = await request.json();
+  const { name, description, photo, location, phone, email, instagram, telegram, facebook, website } = await request.json();
   if (!name) return NextResponse.json({ error: "Назва обов'язкова" }, { status: 400 });
 
   await supabase
@@ -100,6 +100,7 @@ export async function PUT(request: NextRequest) {
     .update({
       name,
       description: description || null,
+      photo: photo || null,
       location: location || null,
       phone: phone || null,
       email: email || null,

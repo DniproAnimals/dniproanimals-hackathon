@@ -119,6 +119,7 @@ export type Organization = {
   website: string | null;
   owner_id: number;
   status: string | null;
+  monobank_jar_id: string | null;
   created_at: string;
 };
 

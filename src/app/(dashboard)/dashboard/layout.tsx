@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useUser } from "@/lib/UserContext";
 import Image from "next/image";
 import Link from "next/link";
-import { IconLayoutDashboardFilled, IconUsersGroup, IconPawFilled, IconFileTextFilled, IconSettingsFilled, IconExternalLink, IconMenu2 } from "@tabler/icons-react";
+import { IconLayoutDashboardFilled, IconUsersGroup, IconPawFilled, IconFileTextFilled, IconSettingsFilled, IconExternalLink, IconMenu2, IconCoin } from "@tabler/icons-react";
 
 type Organization = {
   id: number;
@@ -21,6 +21,7 @@ type Organization = {
   website: string | null;
   owner_id: number;
   status: "pending" | "approved" | "rejected";
+  monobank_jar_id: string | null;
 };
 
 type DashboardContextType = {
@@ -59,6 +60,12 @@ const navItems = [
     href: "/dashboard/requests",
     label: "Анкети",
     icon: (<IconFileTextFilled size={18} />),
+  },
+  {
+    href: "/dashboard/donations",
+    label: "Пожертви",
+    ownerOnly: true,
+    icon: (<IconCoin size={18} />),
   },
   {
     href: "/dashboard/settings",

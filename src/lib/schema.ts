@@ -93,8 +93,10 @@ export const organizations = pgTable("organizations", {
   website: text("website"),
   owner_id: integer("owner_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   status: text("status").default("pending"),
+  monobank_jar_id: text("monobank_jar_id"),
   created_at: timestamp("created_at").defaultNow(),
 });
+
 
 export const volunteers = pgTable("volunteers", {
   id: serial("id").primaryKey(),

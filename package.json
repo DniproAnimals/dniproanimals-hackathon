@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "npx tsx --env-file=.env scripts/seed.ts",
-    "db:drop": "npx tsx --env-file=.env scripts/drop.ts"
+    "db:drop": "npx tsx --env-file=.env scripts/drop.ts",
+    "stripe": "stripe listen --forward-to localhost:3000/api/stripe/webhook"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.0",

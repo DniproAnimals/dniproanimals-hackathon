@@ -28,16 +28,17 @@ const PawIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-type Organization = { id: number; name: string };
+type Organization = { id: number; name: string; monobank_jar_id: string | null };
 
 export default function DonatePage() {
+
   const [amount, setAmount] = useState<number | null>(500);
-  const [customAmount, setCustomAmount] = useState<string>("");
-  const [showCheckout, setShowCheckout] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<"idle" | "processing" | "success">("idle");
+  const [customAmount, setCustomAmount] = useState<string>("500");
+  const [checkoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [selectedOrg, setSelectedOrg] = useState<string>("general");
-  const [organizations, setOrganizations] = useState<{ id: string; name: string }[]>([
-    { id: "general", name: "DniproAnimals (Загальний фонд)" },
+  const [organizations, setOrganizations] = useState<{ id: string; name: string; jarId: string | null }[]>([
+    { id: "general", name: "DniproAnimals (Загальний фонд)", jarId: "jjJbZRhoQ" },
   ]);
   const [orgSearch, setOrgSearch] = useState("");
   const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
@@ -47,8 +48,8 @@ export default function DonatePage() {
       .then((r) => r.json())
       .then((orgs: Organization[]) => {
         setOrganizations([
-          { id: "general", name: "DniproAnimals (Загальний фонд)" },
-          ...orgs.map((o) => ({ id: String(o.id), name: o.name })),
+          { id: "general", name: "DniproAnimals (Загальний фонд)", jarId: "jjJbZRhoQ" },
+          ...orgs.map((o) => ({ id: String(o.id), name: o.name, jarId: o.monobank_jar_id })),
         ]);
       })
       .catch(() => {});
@@ -93,22 +94,20 @@ export default function DonatePage() {
 
   const handleCheckout = () => {
     const finalAmount = amount || parseInt(customAmount) || 0;
-    if (finalAmount > 0) {
-      setShowCheckout(true);
+    if (finalAmount < 10) {
+      setCheckoutError("Мінімальна сума — 10 ₴");
+      return;
     }
-  };
 
-  const simulatePayment = () => {
-    setPaymentStatus("processing");
-    setTimeout(() => {
-      setPaymentStatus("success");
-      setTimeout(() => {
-        setShowCheckout(false);
-        setPaymentStatus("idle");
-        setAmount(500);
-        setCustomAmount("");
-      }, 3000);
-    }, 2000);
+    const org = organizations.find((o) => o.id === selectedOrg);
+    const jarId = org?.jarId;
+
+    if (!jarId) {
+      setCheckoutError("Ця організація ще не підключила Monobank банку");
+      return;
+    }
+
+    window.open(`https://send.monobank.ua/jar/${jarId}?amount=${finalAmount}`, "_blank");
   };
 
   return (
@@ -228,16 +227,22 @@ export default function DonatePage() {
               />
             </div>
 
-            <button 
+            {checkoutError && (
+              <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm text-center relative z-10">
+                {checkoutError}
+              </div>
+            )}
+
+            <button
               onClick={handleCheckout}
-              disabled={!(amount || parseInt(customAmount) > 0)}
+              disabled={checkoutLoading || !(amount || parseInt(customAmount) > 0)}
               className="w-full py-5 rounded-2xl bg-[#0c1014] text-white text-xl font-bold uppercase tracking-wide hover:shadow-xl hover:bg-[#1a232c] hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none relative z-10"
             >
               Допомогти хвостатим
             </button>
             <p className="text-xs text-center text-gray-400 mt-4 flex items-center justify-center gap-1 relative z-10">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              Безпечний платіж
+              Безпечний платіж через Monobank
             </p>
           </div>
         </div>
