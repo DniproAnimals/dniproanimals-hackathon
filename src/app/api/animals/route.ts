@@ -5,8 +5,23 @@ import { getSession } from "@/lib/auth";
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const supabase = await createClient();
+  const user = await getSession();
+
+  // Only show animals from approved organizations (or without org)
+  let approvedOrgIds: number[] | null = null;
+  if (!user || user.role !== "superadmin") {
+    const { data: approvedOrgs } = await supabase
+      .from("organizations")
+      .select("id")
+      .eq("status", "approved");
+    approvedOrgIds = (approvedOrgs || []).map((o: { id: number }) => o.id);
+  }
 
   let query = supabase.from("animals").select("*");
+
+  if (approvedOrgIds !== null) {
+    query = query.or(`org_id.is.null,org_id.in.(${approvedOrgIds.join(",")})`);
+  }
 
   const type = params.get("type");
   if (type) {

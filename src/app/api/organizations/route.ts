@@ -3,12 +3,16 @@ import { createClient } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
 export async function GET() {
+  const user = await getSession();
   const supabase = await createClient();
-  const { data: orgs } = await supabase
-    .from("organizations")
-    .select("*")
-    .order("created_at", { ascending: false });
 
+  let query = supabase.from("organizations").select("*").order("created_at", { ascending: false });
+
+  if (!user || user.role !== "superadmin") {
+    query = query.eq("status", "approved");
+  }
+
+  const { data: orgs } = await query;
   return NextResponse.json(orgs || []);
 }
 

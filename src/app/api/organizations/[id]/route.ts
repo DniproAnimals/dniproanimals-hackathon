@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 
 export async function GET(
   _request: NextRequest,
@@ -15,5 +16,11 @@ export async function GET(
     .single();
 
   if (!org) return NextResponse.json(null, { status: 404 });
+
+  const user = await getSession();
+  if (org.status !== "approved" && (!user || user.role !== "superadmin")) {
+    return NextResponse.json(null, { status: 404 });
+  }
+
   return NextResponse.json(org);
 }
