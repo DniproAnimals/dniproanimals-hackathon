@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import ImageFallback from "@/components/ImageFallback";
 import { IconX } from "@tabler/icons-react";
+import Link from "next/link";
 
 type Animal = {
   id: number;
@@ -115,9 +116,9 @@ export default function AnimalsPage() {
     <div className="max-w-5xl">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">Тварини</h1>
-        <button onClick={openAdd} className="px-4 py-2 rounded-xl text-sm font-medium bg-[#ced48c] text-foreground hover:bg-[#b8be72] transition-colors">
+        <Link href='/dashboard/animals/add' className="px-4 py-2 rounded-xl text-sm font-medium bg-[#ced48c] text-foreground hover:bg-[#b8be72] transition-colors">
           Додати тварину
-        </button>
+        </Link>
       </div>
 
       {/* Form modal */}
