@@ -75,7 +75,7 @@ export default function AboutPage() {
               <Link href="/donate" className="bg-[#0c1014] text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-gray-800 transition-colors shadow-lg hover:-translate-y-1">
                 Допомогти притулку
               </Link>
-              <Link href="/" className="bg-white border-2 border-gray-200 text-[#0c1014] px-8 py-4 rounded-2xl font-bold text-lg hover:border-[#ced48c] hover:bg-gray-50 transition-colors">
+              <Link href="/animals" className="bg-white border-2 border-gray-200 text-[#0c1014] px-8 py-4 rounded-2xl font-bold text-lg hover:border-[#ced48c] hover:bg-gray-50 transition-colors">
                 Знайти друга
               </Link>
             </div>
@@ -91,7 +91,7 @@ export default function AboutPage() {
               </div>
               <div className="space-y-4">
                 <Image src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?q=80&w=600&auto=format&fit=crop" alt="Кошеня" width={300} height={300} className="rounded-3xl object-cover shadow-lg border-4 border-white h-64 w-full" />
-                <Image src="https://images.unsplash.com/photo-1537151608804-ea6d11542125?q=80&w=600&auto=format&fit=crop" alt="Щасливий собака" width={300} height={400} className="rounded-3xl object-cover shadow-lg border-4 border-white h-48 w-full" />
+                <Image src="/happy-dog.jpg" alt="Щасливий собака" width={300} height={400} className="rounded-3xl object-cover shadow-lg border-4 border-white h-48 w-full" />
               </div>
             </div>
           </div>

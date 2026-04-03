@@ -6,6 +6,7 @@ import AnimalCard from "@/components/AnimalCard";
 import { useUser } from "@/lib/UserContext";
 import type { Animal } from "@/lib/db";
 import { IconHeartFilled } from "@tabler/icons-react";
+import Link from "next/link";
 
 export default function ProfilePage() {
   const { user, loading, refresh } = useUser();
@@ -86,7 +87,7 @@ export default function ProfilePage() {
             <IconHeartFilled size={24} className="text-gray-400" />
           </div>
           <p className="text-sm text-gray-medium mb-2">Ви ще не додали тварин до обраного</p>
-          <a href="/" className="text-sm font-medium text-foreground hover:underline">Переглянути каталог →</a>
+          <Link href="/" className="text-sm font-medium text-foreground hover:underline">Переглянути каталог →</Link>
         </div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">

@@ -6,6 +6,7 @@ import {
   IconBrandInstagram, IconBrandTelegram, IconBrandFacebook,
   IconMessageFilled, IconPawFilled, IconCheck, IconBan,
 } from "@tabler/icons-react";
+import Link from "next/link";
 
 type Request = {
   id: number;
@@ -164,7 +165,7 @@ export default function RequestsPage() {
                   <p className="text-xs text-gray-medium">Тварина</p>
                   <p className="text-sm font-semibold">{selected.animal_name} · {typeLabel(selected.animal_type)}</p>
                 </div>
-                <a href={`/animals/${selected.animal_id}`} target="_blank" className="ml-auto text-xs text-[#5b7765] font-medium hover:underline">Переглянути →</a>
+                <Link href={`/animals/${selected.animal_id}`} target="_blank" className="ml-auto text-xs text-[#5b7765] font-medium hover:underline">Переглянути →</Link>
               </div>
 
               {/* Contact details */}

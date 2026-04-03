@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { IconBrandInstagram, IconBrandFacebookFilled, IconBrandTelegram, IconHeartFilled } from "@tabler/icons-react";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -28,9 +29,9 @@ export default function Footer() {
             <div>
               <p className="text-xs font-semibold text-foreground/40 uppercase tracking-wider mb-3">Навігація</p>
               <div className="space-y-2">
-                <a href="/" className="block text-sm text-foreground/70 hover:text-foreground transition-colors">Тварини</a>
-                <a href="/lost" className="block text-sm text-foreground/70 hover:text-foreground transition-colors">Загублені</a>
-                <a href="/donate" className="block text-sm text-foreground/70 hover:text-foreground transition-colors">Допомогти</a>
+                <Link href="/animals" className="block text-sm text-foreground/70 hover:text-foreground transition-colors">Тварини</Link>
+                <Link href="/lost" className="block text-sm text-foreground/70 hover:text-foreground transition-colors">Загублені</Link>
+                <Link href="/donate" className="block text-sm text-foreground/70 hover:text-foreground transition-colors">Допомогти</Link>
               </div>
             </div>
             <div>

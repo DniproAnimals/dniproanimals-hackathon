@@ -5,6 +5,7 @@ import { useDashboard } from "../layout";
 import {
   IconCoin, IconCheck, IconExternalLink, IconCopy,
 } from "@tabler/icons-react";
+import Link from "next/link";
 
 export default function DonationsPage() {
   const { org, isOwner } = useDashboard();
@@ -154,7 +155,7 @@ export default function DonationsPage() {
                 {copied ? <><IconCheck size={14} /> Скопійовано</> : <><IconCopy size={14} /> Копіювати</>}
               </button>
             </div>
-            <a
+            <Link
               href={`/organizations/${org?.id}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -162,7 +163,7 @@ export default function DonationsPage() {
             >
               <IconExternalLink size={14} />
               Переглянути сторінку організації
-            </a>
+            </Link>
           </div>
         </>
       )}
