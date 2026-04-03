@@ -30,6 +30,7 @@ export default function Footer() {
                 <a href="/" className="block text-sm text-foreground/70 hover:text-foreground transition-colors">Тварини</a>
                 <a href="/lost" className="block text-sm text-foreground/70 hover:text-foreground transition-colors">Загублені</a>
                 <a href="/donate" className="block text-sm text-foreground/70 hover:text-foreground transition-colors">Допомогти</a>
+                <a href="/organizations/create" className="block text-sm text-foreground/70 hover:text-foreground transition-colors">Створити організацію</a>
               </div>
             </div>
             <div>

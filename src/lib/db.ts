@@ -86,7 +86,62 @@ function initSchema(db: Database.Database) {
       name TEXT NOT NULL,
       email TEXT NOT NULL UNIQUE,
       password TEXT NOT NULL,
-      role TEXT DEFAULT 'user' CHECK(role IN ('user', 'admin')),
+      role TEXT DEFAULT 'user' CHECK(role IN ('user', 'admin', 'superadmin')),
+      photo TEXT,
+      description TEXT,
+      phone TEXT,
+      instagram TEXT,
+      telegram TEXT,
+      facebook TEXT,
+      org_id INTEGER,
+      created_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (org_id) REFERENCES organizations(id) ON DELETE SET NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS organizations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      description TEXT,
+      photo TEXT,
+      location TEXT,
+      phone TEXT,
+      email TEXT,
+      instagram TEXT,
+      telegram TEXT,
+      facebook TEXT,
+      website TEXT,
+      owner_id INTEGER NOT NULL,
+      status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected')),
+      created_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS volunteers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      org_id INTEGER NOT NULL,
+      user_id INTEGER,
+      name TEXT NOT NULL,
+      surname TEXT,
+      photo TEXT,
+      description TEXT,
+      phone TEXT,
+      email TEXT,
+      instagram TEXT,
+      telegram TEXT,
+      invite_token TEXT UNIQUE,
+      created_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (org_id) REFERENCES organizations(id) ON DELETE CASCADE,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS notifications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      org_id INTEGER,
+      type TEXT NOT NULL,
+      title TEXT NOT NULL,
+      message TEXT,
+      link TEXT,
+      is_read INTEGER DEFAULT 0,
       created_at TEXT DEFAULT (datetime('now'))
     );
 
@@ -172,6 +227,41 @@ export type User = {
   name: string;
   email: string;
   password: string;
-  role: "user" | "admin";
+  role: "user" | "admin" | "superadmin";
+  photo: string | null;
+  description: string | null;
+  phone: string | null;
+  instagram: string | null;
+  telegram: string | null;
+  facebook: string | null;
+  org_id: number | null;
+  created_at: string;
+};
+
+export type Organization = {
+  id: number;
+  name: string;
+  description: string | null;
+  photo: string | null;
+  location: string | null;
+  phone: string | null;
+  email: string | null;
+  instagram: string | null;
+  telegram: string | null;
+  facebook: string | null;
+  website: string | null;
+  owner_id: number;
+  status: "pending" | "approved" | "rejected";
+  created_at: string;
+};
+
+export type Notification = {
+  id: number;
+  org_id: number | null;
+  type: string;
+  title: string;
+  message: string | null;
+  link: string | null;
+  is_read: number;
   created_at: string;
 };

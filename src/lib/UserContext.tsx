@@ -6,7 +6,7 @@ type UserData = {
   id: number;
   name: string;
   email: string;
-  role: "user" | "admin";
+  role: "user" | "admin" | "superadmin";
 } | null;
 
 type UserContextType = {

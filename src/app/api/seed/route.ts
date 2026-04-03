@@ -318,11 +318,12 @@ export async function POST() {
     insertLostMany();
   }
 
-  // Seed admin users
+  // Seed users
   const userCount = db.prepare("SELECT COUNT(*) as cnt FROM users").get() as { cnt: number };
   if (userCount.cnt === 0) {
     db.prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)").run("Адмін", "admin@dniproanimals.org", "admin123", "admin");
     db.prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)").run("Vadim", "vadim@dniproanimals.org", "admin123", "admin");
+    db.prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)").run("Superadmin", "super@dniproanimals.org", "super123", "superadmin");
   }
 
   return NextResponse.json({
