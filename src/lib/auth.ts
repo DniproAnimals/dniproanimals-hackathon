@@ -1,14 +1,17 @@
 import { cookies } from "next/headers";
-import { createClient } from "./db";
+import { createClient } from "@supabase/supabase-js";
 
 const SESSION_COOKIE = "da_session";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!;
 
 export async function getSession() {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get(SESSION_COOKIE)?.value;
   if (!sessionId) return null;
 
-  const supabase = await createClient();
+  const supabase = createClient(supabaseUrl, supabaseKey);
   const { data: user } = await supabase
     .from("users")
     .select("*")

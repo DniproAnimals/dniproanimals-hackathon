@@ -1,165 +1,102 @@
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
+import fs from "fs";
+import path from "path";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!;
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-const sampleAnimals = [
-  {
-    name: "Барон",
-    description: "Дуже дружелюбний та активний пес. Любить гуляти та гратися з м'ячиком. Чудово ладнає з дітьми та іншими тваринами.",
-    type: "dog",
-    breed: "Німецька вівчарка",
-    sex: "male",
-    age_months: 36,
-    weight_kg: 32,
-    size: "large",
-    color: "Чорно-рудий",
-    vaccinated: true,
-    sterilized: true,
-    trained: true,
-    photos: JSON.stringify(["/uploads/dog1_1.jpg", "/uploads/dog1_2.jpg", "/uploads/dog1_3.jpg", "/uploads/dog1_4.jpg", "/uploads/dog1_5.jpg"]),
-    contact_name: "Притулок ДніпроAnimals",
-    contact_phone: "+38 (050) 100-00-01",
-    contact_email: "shelter@dniproanimals.org",
-    contact_location: "Дніпро, Лівий берег",
-  },
-  {
-    name: "Мурка",
-    description: "Спокійна та ласкава кішка. Обожнює лежати на колінах та муркотіти. Ідеальна для квартирного утримання.",
-    type: "cat",
-    breed: "Європейська короткошерста",
-    sex: "female",
-    age_months: 24,
-    weight_kg: 4,
-    size: "medium",
-    color: "Сірий",
-    vaccinated: true,
-    sterilized: true,
-    trained: false,
-    photos: JSON.stringify(["/uploads/cat1_1.jpg", "/uploads/cat1_2.jpg", "/uploads/cat1_3.jpg", "/uploads/cat1_4.jpg", "/uploads/cat1_5.jpg"]),
-    contact_name: "Притулок ДніпроAnimals",
-    contact_phone: "+38 (050) 100-00-01",
-    contact_email: "shelter@dniproanimals.org",
-    contact_location: "Дніпро, вул. Героїв Дніпра",
-  },
-  {
-    name: "Рекс",
-    description: "Молодий та енергійний пес. Потребує активного господаря. Дуже розумний, швидко вчиться командам.",
-    type: "dog",
-    breed: "Лабрадор",
-    sex: "male",
-    age_months: 18,
-    weight_kg: 28,
-    size: "large",
-    color: "Золотистий",
-    vaccinated: true,
-    sterilized: false,
-    trained: true,
-    photos: JSON.stringify(["/uploads/dog2_1.jpg", "/uploads/dog2_2.jpg", "/uploads/dog2_3.jpg", "/uploads/dog2_4.jpg"]),
-    contact_name: "Притулок ДніпроAnimals",
-    contact_phone: "+38 (050) 100-00-01",
-    contact_email: "shelter@dniproanimals.org",
-    contact_location: "Дніпро, Лівий берег",
-  },
-  {
-    name: "Лапка",
-    description: "Маленька грайлива кішечка. Любить бігати за іграшками та дряпати когтеточку. Привчена до лотка.",
-    type: "cat",
-    breed: "Мікс",
-    sex: "female",
-    age_months: 8,
-    weight_kg: 2.5,
-    size: "small",
-    color: "Рудий",
-    vaccinated: true,
-    sterilized: false,
-    trained: false,
-    photos: JSON.stringify(["/uploads/cat2_1.jpg", "/uploads/cat2_2.jpg", "/uploads/cat2_3.jpg"]),
-    contact_name: "Притулок ДніпроAnimals",
-    contact_phone: "+38 (050) 100-00-01",
-    contact_email: "shelter@dniproanimals.org",
-    contact_location: "Дніпро, Центр",
-  },
-  {
-    name: "Бім",
-    description: "Вірний та відданий друг. Був знайдений на вулиці після обстрілу. Пройшов реабілітацію, тепер шукає люблячу родину.",
-    type: "dog",
-    breed: "Мікс",
-    sex: "male",
-    age_months: 48,
-    weight_kg: 20,
-    size: "medium",
-    color: "Білий",
-    vaccinated: true,
-    sterilized: true,
-    trained: false,
-    photos: JSON.stringify(["/uploads/dog3_1.jpg", "/uploads/dog3_2.jpg", "/uploads/dog3_3.jpg", "/uploads/dog3_4.jpg"]),
-    contact_name: "Притулок ДніпроAnimals",
-    contact_phone: "+38 (050) 100-00-01",
-    contact_email: "shelter@dniproanimals.org",
-    contact_location: "Дніпро, Перемога",
-  },
-  {
-    name: "Сніжинка",
-    description: "Тиха та ніжна кішка білого кольору. Трохи сором'язлива спочатку, але потім стає дуже ласкавою.",
-    type: "cat",
-    breed: "Ангорська",
-    sex: "female",
-    age_months: 30,
-    weight_kg: 3.5,
-    size: "medium",
-    color: "Білий",
-    vaccinated: true,
-    sterilized: true,
-    trained: false,
-    photos: JSON.stringify(["/uploads/cat3_1.jpg", "/uploads/cat3_2.jpg", "/uploads/cat3_3.jpg", "/uploads/cat3_4.jpg"]),
-    contact_name: "Притулок ДніпроAnimals",
-    contact_phone: "+38 (050) 100-00-01",
-    contact_email: "shelter@dniproanimals.org",
-    contact_location: "Дніпро, Центр",
-  },
-  {
-    name: "Тайсон",
-    description: "Сильний та мужній пес. Не дивлячись на грізний вигляд, дуже добрий та ласкавий. Потребує досвідченого господаря.",
-    type: "dog",
-    breed: "Стаффордширський тер'єр",
-    sex: "male",
-    age_months: 60,
-    weight_kg: 35,
-    size: "large",
-    color: "Тигровий",
-    vaccinated: true,
-    sterilized: true,
-    trained: true,
-    photos: JSON.stringify(["/uploads/dog4_1.jpg", "/uploads/dog4_2.jpg", "/uploads/dog4_3.jpg"]),
-    contact_name: "Притулок ДніпроAnimals",
-    contact_phone: "+38 (050) 100-00-01",
-    contact_email: "shelter@dniproanimals.org",
-    contact_location: "Дніпро, Лівий берег",
-  },
-  {
-    name: "Карамелька",
-    description: "Маленька та чарівна собачка. Ідеальна для квартири. Дуже прив'язується до господаря.",
-    type: "dog",
-    breed: "Мікс (маленька)",
-    sex: "female",
-    age_months: 12,
-    weight_kg: 5,
-    size: "small",
-    color: "Коричневий",
-    vaccinated: true,
-    sterilized: false,
-    trained: false,
-    photos: JSON.stringify(["/uploads/dog5_1.jpg", "/uploads/dog5_2.jpg", "/uploads/dog5_3.jpg", "/uploads/dog5_4.jpg"]),
-    contact_name: "Олена",
-    contact_phone: "+38 (099) 123-45-67",
-    contact_instagram: "olena_pets",
-    contact_location: "Дніпро, Центр",
-  },
-];
+// --- Parse animals_database.json ---
+
+interface RawAnimal {
+  "Вид": string;
+  "Порода": string;
+  "Стать": string;
+  "Вік": string;
+  "Розмір": string;
+  "Вага": string;
+  "Колір": string;
+  "Вакцинація": string;
+  "Стерилізація": string;
+  "Навчено": string;
+  photos: string[];
+  id: string;
+}
+
+const catNames = ["Мурка", "Сніжинка", "Лапка", "Карамелька", "Зірка", "Баська", "Рижик", "Персик", "Ніжка", "Клео", "Соня", "Симба", "Маруся", "Тіша", "Мілка"];
+const dogNames = ["Барон", "Рекс", "Бім", "Тайсон", "Джек", "Граф", "Лорд", "Буся", "Ліра", "Дейзі", "Бадді", "Чарлі", "Мухтар", "Шарік", "Найда"];
+
+function parseAge(ageStr: string): number {
+  const years = parseInt(ageStr);
+  return isNaN(years) ? 12 : years * 12;
+}
+
+function parseWeight(weightStr: string): number {
+  return parseFloat(weightStr) || 5;
+}
+
+function mapType(type: string): string {
+  if (type === "Кіт") return "cat";
+  if (type === "Собака") return "dog";
+  return "other";
+}
+
+function mapSex(sex: string): string {
+  if (sex === "Хлопчик") return "male";
+  if (sex === "Дівчинка") return "female";
+  return "unknown";
+}
+
+function mapSize(size: string): string {
+  if (size === "Великий") return "large";
+  if (size === "Середній") return "medium";
+  if (size === "Малий") return "small";
+  return "medium";
+}
+
+function mapBool(val: string): boolean {
+  return val === "Так";
+}
+
+function loadAnimals() {
+  const jsonPath = path.resolve(__dirname, "../animals_database.json");
+  const raw: RawAnimal[] = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+
+  let catIdx = 0;
+  let dogIdx = 0;
+
+  return raw.map((a) => {
+    const type = mapType(a["Вид"]);
+    let name: string;
+    if (type === "cat") {
+      name = catNames[catIdx % catNames.length];
+      catIdx++;
+    } else {
+      name = dogNames[dogIdx % dogNames.length];
+      dogIdx++;
+    }
+
+    return {
+      name,
+      type,
+      breed: a["Порода"],
+      sex: mapSex(a["Стать"]),
+      age_months: parseAge(a["Вік"]),
+      weight_kg: parseWeight(a["Вага"]),
+      size: mapSize(a["Розмір"]),
+      color: a["Колір"],
+      vaccinated: mapBool(a["Вакцинація"]),
+      sterilized: mapBool(a["Стерилізація"]),
+      trained: mapBool(a["Навчено"]),
+      photos: JSON.stringify(a.photos.map((p) => `/uploads/${p}`)),
+      status: "available",
+    };
+  });
+}
+
+// --- Lost animals (demo) ---
 
 const sampleLostAnimals = [
   {
@@ -176,7 +113,7 @@ const sampleLostAnimals = [
     last_seen_date: "2026-03-28",
     contact_name: "Марія",
     contact_phone: "+38 (067) 555-12-34",
-    photos: JSON.stringify(["/uploads/cat2_1.jpg", "/uploads/cat2_2.jpg", "/uploads/cat2_3.jpg"]),
+    photos: JSON.stringify([]),
   },
   {
     title: "Пропала сіра кішка Муся",
@@ -188,11 +125,11 @@ const sampleLostAnimals = [
     color: "Сірий",
     size: "medium",
     location: "Дніпро, Лівий берег, вул. Калинова",
-    last_seen_location: "Дніпро, вул. Калинова 78, біля підʼїзду",
+    last_seen_location: "Дніпро, вул. Калинова 78, біля під'їзду",
     last_seen_date: "2026-03-25",
     contact_name: "Тетяна",
     contact_phone: "+38 (093) 777-88-99",
-    photos: JSON.stringify(["/uploads/cat1_2.jpg", "/uploads/cat1_3.jpg", "/uploads/cat1_4.jpg"]),
+    photos: JSON.stringify([]),
   },
   {
     title: "Загубився білий пес Сніжок",
@@ -208,7 +145,7 @@ const sampleLostAnimals = [
     last_seen_date: "2026-03-30",
     contact_name: "Андрій",
     contact_phone: "+38 (095) 111-22-33",
-    photos: JSON.stringify(["/uploads/dog3_2.jpg", "/uploads/dog3_3.jpg", "/uploads/dog3_4.jpg"]),
+    photos: JSON.stringify([]),
   },
   {
     title: "Зникла маленька собачка Лола",
@@ -224,9 +161,11 @@ const sampleLostAnimals = [
     last_seen_date: "2026-03-31",
     contact_name: "Ольга",
     contact_phone: "+38 (066) 444-55-66",
-    photos: JSON.stringify(["/uploads/dog5_1.jpg", "/uploads/dog5_2.jpg", "/uploads/dog5_3.jpg", "/uploads/dog5_4.jpg"]),
+    photos: JSON.stringify([]),
   },
 ];
+
+// --- Seed ---
 
 async function seed() {
   console.log("🌱 Seed started...\n");
@@ -315,14 +254,14 @@ async function seed() {
     console.log(`⏭️  Volunteers: already exist (${volCount})`);
   }
 
-  // 4. Animals
+  // 4. Animals from animals_database.json
   const { count: animalCount } = await supabase.from("animals").select("*", { count: "exact", head: true });
 
   if (!animalCount || animalCount === 0) {
-    const animalsWithOrg = sampleAnimals.map((a) => ({ ...a, org_id: orgId }));
-    const { error } = await supabase.from("animals").insert(animalsWithOrg);
+    const animals = loadAnimals().map((a) => ({ ...a, org_id: orgId }));
+    const { error } = await supabase.from("animals").insert(animals);
     if (error) throw new Error(`Animals: ${error.message}`);
-    console.log(`✅ Animals: ${sampleAnimals.length} created (org_id: ${orgId})`);
+    console.log(`✅ Animals: ${animals.length} created from animals_database.json (org_id: ${orgId})`);
   } else {
     console.log(`⏭️  Animals: already exist (${animalCount})`);
   }
@@ -351,7 +290,7 @@ async function seed() {
           name: "Марина Сидоренко",
           email: "marina@gmail.com",
           phone: "+38 (067) 999-88-77",
-          message: "Дуже хочу забрати Барона! У мене приватний будинок з великим двором.",
+          message: "Дуже хочу забрати цю тваринку! У мене приватний будинок з великим двором.",
           status: "pending",
         },
         {
@@ -360,7 +299,7 @@ async function seed() {
           email: "oleg@gmail.com",
           phone: "+38 (050) 666-55-44",
           telegram: "oleg_k",
-          message: "Шукаю кішку для квартири. Мурка ідеально підходить!",
+          message: "Шукаю котика для квартири. Ідеально підходить!",
           status: "pending",
         },
       ]);
@@ -396,8 +335,8 @@ async function seed() {
 
     if (!notifCount || notifCount === 0) {
       const { error } = await supabase.from("notifications").insert([
-        { org_id: orgId, type: "adoption_request", title: "Нова заявка на усиновлення", message: "Марина хоче забрати Барона", link: "/dashboard/requests" },
-        { org_id: orgId, type: "adoption_request", title: "Нова заявка на усиновлення", message: "Олег хоче забрати Мурку", link: "/dashboard/requests" },
+        { org_id: orgId, type: "adoption_request", title: "Нова заявка на усиновлення", message: "Марина хоче забрати тваринку", link: "/dashboard/requests" },
+        { org_id: orgId, type: "adoption_request", title: "Нова заявка на усиновлення", message: "Олег хоче забрати котика", link: "/dashboard/requests" },
         { org_id: orgId, type: "org_created", title: "Організацію схвалено", message: "Вашу організацію було успішно схвалено модератором" },
       ]);
       if (error) throw new Error(`Notifications: ${error.message}`);
