@@ -1,6 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import InstagramFeed from "@/components/InstagramFeed";
+import {
+  IconHeartFilled,
+  IconBrandInstagram,
+  IconBrandTelegram,
+  IconBrandFacebook,
+  IconMapPinFilled,
+  IconPhoneFilled,
+  IconMailFilled,
+  IconCalendarFilled,
+} from "@tabler/icons-react";
 
 export default function AboutPage() {
   return (
@@ -125,7 +135,7 @@ export default function AboutPage() {
         </div>
         <div className="text-center mt-8">
           <Link href="/donate" className="inline-flex items-center gap-2 bg-[#ced48c] text-foreground px-7 py-3.5 rounded-xl font-semibold text-sm hover:bg-[#b8be72] transition-colors">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            <IconHeartFilled size={18} />
             Переглянути список потреб
           </Link>
         </div>
@@ -145,13 +155,13 @@ export default function AboutPage() {
             <p className="text-sm text-gray-medium">Засновниця БО &laquo;Дніпро Енімалс&raquo;</p>
             <div className="flex gap-3 mt-4 justify-center">
               <a href="https://instagram.com/dniproanimals" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-foreground transition-colors">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                <IconBrandInstagram size={20} />
               </a>
               <a href="https://t.me/itsmotherofcats" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-foreground transition-colors">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <IconBrandTelegram size={20} />
               </a>
               <a href="https://facebook.com/dniproanimals" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-foreground transition-colors">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                <IconBrandFacebook size={20} />
               </a>
             </div>
           </div>
@@ -178,10 +188,10 @@ export default function AboutPage() {
           </div>
           <div className="md:w-80 flex-shrink-0 space-y-5">
             {[
-              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>, title: "Адреса", text: "вул. Героїв Дніпра, м. Дніпро, Україна" },
-              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>, title: "Телефон", text: "+380 (96) 660 18 17", href: "tel:+380966601817" },
-              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>, title: "Email", text: "dniproanimals.org@gmail.com", href: "mailto:dniproanimals.org@gmail.com" },
-              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>, title: "Візит", text: "Пишіть в дірект Instagram" },
+              { icon: <IconMapPinFilled size={20} />, title: "Адреса", text: "вул. Героїв Дніпра, м. Дніпро, Україна" },
+              { icon: <IconPhoneFilled size={20} />, title: "Телефон", text: "+380 (96) 660 18 17", href: "tel:+380966601817" },
+              { icon: <IconMailFilled size={20} />, title: "Email", text: "dniproanimals.org@gmail.com", href: "mailto:dniproanimals.org@gmail.com" },
+              { icon: <IconCalendarFilled size={20} />, title: "Візит", text: "Пишіть в дірект Instagram" },
             ].map((item) => (
               <div key={item.title} className="flex items-start gap-3">
                 <span className="text-[#ced48c] flex-shrink-0 mt-0.5">{item.icon}</span>
@@ -196,7 +206,7 @@ export default function AboutPage() {
               </div>
             ))}
             <a href="https://www.google.com/maps/search/?api=1&query=вул.+Героїв+Дніпра,+Дніпро" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-[#ced48c] text-foreground px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#b8be72] transition-colors">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <IconMapPinFilled size={16} />
               Прокласти маршрут
             </a>
           </div>
@@ -213,7 +223,7 @@ export default function AboutPage() {
               <p className="text-sm text-gray-medium mt-1">@dniproanimals · 23K підписників</p>
             </div>
             <a href="https://instagram.com/dniproanimals" target="_blank" rel="noopener noreferrer" className="hidden md:flex items-center gap-2 bg-white px-5 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:bg-[#ced48c]/20 transition-colors border border-gray-border">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              <IconBrandInstagram size={16} />
               Підписатися
             </a>
           </div>

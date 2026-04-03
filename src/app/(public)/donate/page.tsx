@@ -1,4 +1,21 @@
 import Image from "next/image";
+import {
+  IconCreditCardFilled,
+  IconArrowRight,
+  IconCoffee,
+  IconHeartFilled,
+  IconWorld,
+  IconTruckDelivery,
+  IconShoppingBag,
+  IconCircleCheckFilled,
+  IconDropletFilled,
+  IconCirclePlusFilled,
+  IconHomeFilled,
+  IconBrandInstagram,
+  IconBrandFacebook,
+  IconBrandTelegram,
+  IconPhoneFilled,
+} from "@tabler/icons-react";
 
 export default function DonatePage() {
   return (
@@ -22,49 +39,49 @@ export default function DonatePage() {
         {/* Monobank */}
         <a href="https://send.monobank.ua/jar/jjJbZRhoQ" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-[#1a1a1a] text-white rounded-2xl p-5 hover:opacity-90 transition-opacity">
           <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            <IconCreditCardFilled size={22} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm">Monobank</p>
             <p className="text-xs text-white/60">Банка — найшвидший спосіб</p>
           </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/40 flex-shrink-0"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <IconArrowRight size={18} className="text-white/40 flex-shrink-0" />
         </a>
 
         {/* Buy Me a Coffee */}
         <a href="https://buymeacoffee.com/dniproanimals" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-[#FFDD00] text-[#1a1a1a] rounded-2xl p-5 hover:opacity-90 transition-opacity">
           <div className="w-11 h-11 rounded-full bg-black/10 flex items-center justify-center flex-shrink-0">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            <IconCoffee size={22} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm">Buy Me a Coffee</p>
             <p className="text-xs text-black/50">Міжнародні перекази</p>
           </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-black/30 flex-shrink-0"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <IconArrowRight size={18} className="text-black/30 flex-shrink-0" />
         </a>
 
         {/* Patreon */}
         <a href="https://www.patreon.com/foxrescueteam" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-[#FF424D] text-white rounded-2xl p-5 hover:opacity-90 transition-opacity">
           <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            <IconHeartFilled size={22} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm">Patreon</p>
             <p className="text-xs text-white/60">Щомісячна підтримка</p>
           </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/40 flex-shrink-0"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <IconArrowRight size={18} className="text-white/40 flex-shrink-0" />
         </a>
 
         {/* PayPal */}
         <a href="https://paypal.me/dniproanimals" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-[#003087] text-white rounded-2xl p-5 hover:opacity-90 transition-opacity">
           <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+            <IconWorld size={22} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm">PayPal</p>
             <p className="text-xs text-white/60">dniproanimals.org@gmail.com</p>
           </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/40 flex-shrink-0"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <IconArrowRight size={18} className="text-white/40 flex-shrink-0" />
         </a>
       </div>
 
@@ -105,7 +122,7 @@ export default function DonatePage() {
         <div className="md:flex md:items-center md:gap-6">
           <div className="flex items-center gap-3 mb-3 md:mb-0">
             <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              <IconTruckDelivery size={22} />
             </div>
             <div>
               <p className="font-bold text-base">Відправити допомогу Новою Поштою</p>
@@ -127,7 +144,7 @@ export default function DonatePage() {
         <div className="bg-white rounded-2xl border border-gray-border p-5">
           <div className="flex items-center gap-2.5 mb-4">
             <div className="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+              <IconShoppingBag size={18} className="text-amber-600" />
             </div>
             <h3 className="font-semibold">Корми Royal Canin</h3>
           </div>
@@ -173,7 +190,7 @@ export default function DonatePage() {
         <div className="bg-white rounded-2xl border border-gray-border p-5">
           <div className="flex items-center gap-2.5 mb-4">
             <div className="w-9 h-9 rounded-full bg-green-light flex items-center justify-center">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-accent"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+              <IconHeartFilled size={18} className="text-green-accent" />
             </div>
             <h3 className="font-semibold">Корми та смаколики</h3>
           </div>
@@ -217,7 +234,7 @@ export default function DonatePage() {
         <div className="bg-white rounded-2xl border border-gray-border p-5">
           <div className="flex items-center gap-2.5 mb-4">
             <div className="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <IconCircleCheckFilled size={18} className="text-red-500" />
             </div>
             <h3 className="font-semibold">Мед. препарати</h3>
           </div>
@@ -236,7 +253,7 @@ export default function DonatePage() {
         <div className="bg-white rounded-2xl border border-gray-border p-5">
           <div className="flex items-center gap-2.5 mb-4">
             <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>
+              <IconDropletFilled size={18} className="text-blue-500" />
             </div>
             <h3 className="font-semibold">Побутова хімія</h3>
           </div>
@@ -256,7 +273,7 @@ export default function DonatePage() {
         <div className="bg-white rounded-2xl border border-gray-border p-5">
           <div className="flex items-center gap-2.5 mb-4">
             <div className="w-9 h-9 rounded-full bg-purple-50 flex items-center justify-center">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+              <IconCirclePlusFilled size={18} className="text-purple-500" />
             </div>
             <h3 className="font-semibold">Інше важливе</h3>
           </div>
@@ -271,7 +288,7 @@ export default function DonatePage() {
         <div className="bg-white rounded-2xl border border-gray-border p-5">
           <div className="flex items-center gap-2.5 mb-4">
             <div className="w-9 h-9 rounded-full bg-orange-50 flex items-center justify-center">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange-500"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+              <IconHomeFilled size={18} className="text-orange-500" />
             </div>
             <h3 className="font-semibold">Для утеплення</h3>
           </div>
@@ -309,19 +326,19 @@ export default function DonatePage() {
         <p className="font-semibold text-sm mb-3">Зв&apos;язатися з нами</p>
         <div className="flex justify-center gap-3 flex-wrap">
           <a href="https://instagram.com/dniproanimals" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-gray-light px-4 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-[#ced48c]/30 transition-colors">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            <IconBrandInstagram size={16} />
             Instagram
           </a>
           <a href="https://facebook.com/dniproanimals" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-gray-light px-4 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-[#ced48c]/30 transition-colors">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+            <IconBrandFacebook size={16} />
             Facebook
           </a>
           <a href="https://t.me/itsmotherofcats" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-gray-light px-4 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-[#ced48c]/30 transition-colors">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <IconBrandTelegram size={16} />
             Telegram
           </a>
           <a href="tel:+380966601817" className="flex items-center gap-2 bg-gray-light px-4 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-[#ced48c]/30 transition-colors">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            <IconPhoneFilled size={16} />
             +380 (96) 660 18 17
           </a>
         </div>

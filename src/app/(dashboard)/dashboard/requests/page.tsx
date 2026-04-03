@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { IconChevronDown } from "@tabler/icons-react";
 
 type Request = {
   id: number;
@@ -139,9 +140,7 @@ export default function RequestsPage() {
                       </button>
                     </>
                   )}
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`text-gray-300 transition-transform ${expandedId === r.id ? "rotate-180" : ""}`}>
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
+                  <IconChevronDown size={16} className={`text-gray-300 transition-transform ${expandedId === r.id ? "rotate-180" : ""}`} />
                 </div>
               </div>
 

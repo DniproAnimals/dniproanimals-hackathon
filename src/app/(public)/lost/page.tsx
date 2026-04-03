@@ -3,6 +3,22 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import type { LostAnimal } from "@/lib/db";
+import {
+  IconSearch,
+  IconMapPin,
+  IconPaw,
+  IconX,
+  IconPencil,
+  IconTag,
+  IconPalette,
+  IconEye,
+  IconCalendar,
+  IconUser,
+  IconPhone,
+  IconChevronLeft,
+  IconChevronRight,
+  IconPackage,
+} from "@tabler/icons-react";
 
 export default function LostAnimalsPage() {
   const [items, setItems] = useState<LostAnimal[]>([]);
@@ -83,7 +99,7 @@ export default function LostAnimalsPage() {
           onClick={() => { setFormData({ ...formData, type: "lost" }); setShowForm(true); }}
           className="bg-red-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-red-600 transition-colors flex items-center gap-1.5"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+          <IconSearch size={14} />
           Загубив тварину
         </button>
       </div>
@@ -157,13 +173,13 @@ export default function LostAnimalsPage() {
                   <div className="flex items-center gap-3 text-[11px] text-gray-400">
                     {item.location && (
                       <span className="flex items-center gap-1">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <IconMapPin size={11} />
                         {item.location}
                       </span>
                     )}
                     {item.animal_type && (
                       <span className="flex items-center gap-1">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20"/></svg>
+                        <IconPaw size={11} />
                         {item.animal_type}
                       </span>
                     )}
@@ -189,12 +205,12 @@ export default function LostAnimalsPage() {
                 <h3 className="font-semibold text-lg">Загубив тварину</h3>
               </div>
               <button type="button" onClick={() => setShowForm(false)} className="text-gray-400 hover:text-foreground transition-colors">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <IconX size={20} />
               </button>
             </div>
 
             <div className="relative">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <IconPencil size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
               <input type="text" placeholder="Заголовок *" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
             </div>
 
@@ -207,7 +223,7 @@ export default function LostAnimalsPage() {
                 <option value="Інше">Інше</option>
               </select>
               <div className="relative">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                <IconTag size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input type="text" placeholder="Порода" value={formData.breed} onChange={(e) => setFormData({ ...formData, breed: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
               </div>
             </div>
@@ -218,7 +234,7 @@ export default function LostAnimalsPage() {
                 <option value="female">Дівчинка</option>
               </select>
               <div className="relative">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20"/></svg>
+                <IconPalette size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input type="text" placeholder="Колір" value={formData.color} onChange={(e) => setFormData({ ...formData, color: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
               </div>
               <select value={formData.size} onChange={(e) => setFormData({ ...formData, size: e.target.value })} className="px-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm text-foreground">
@@ -231,7 +247,7 @@ export default function LostAnimalsPage() {
 
             {/* Location */}
             <div className="relative">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <IconMapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
               <input type="text" placeholder="Район проживання *" required value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
             </div>
 
@@ -239,11 +255,11 @@ export default function LostAnimalsPage() {
             <p className="text-xs font-medium text-gray-medium pt-1">Де востаннє бачили?</p>
             <div className="grid grid-cols-2 gap-2">
               <div className="relative">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <IconEye size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input type="text" placeholder="Місце" value={formData.last_seen_location} onChange={(e) => setFormData({ ...formData, last_seen_location: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
               </div>
               <div className="relative">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <IconCalendar size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input type="date" value={formData.last_seen_date} onChange={(e) => setFormData({ ...formData, last_seen_date: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
               </div>
             </div>
@@ -252,11 +268,11 @@ export default function LostAnimalsPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <div className="relative">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <IconUser size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input type="text" placeholder="Ваше ім'я *" required value={formData.contact_name} onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
               </div>
               <div className="relative">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                <IconPhone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input type="tel" placeholder="Телефон *" required value={formData.contact_phone} onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
               </div>
             </div>
@@ -283,10 +299,10 @@ export default function LostAnimalsPage() {
                       {detailPhotos.length > 1 && (
                         <>
                           <button onClick={() => setDetailPhoto((p) => (p - 1 + detailPhotos.length) % detailPhotos.length)} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm shadow flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-white">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                            <IconChevronLeft size={16} color="#1a1a1a" stroke={2.5} />
                           </button>
                           <button onClick={() => setDetailPhoto((p) => (p + 1) % detailPhotos.length)} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm shadow flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-white">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                            <IconChevronRight size={16} color="#1a1a1a" stroke={2.5} />
                           </button>
                           <div className="absolute bottom-2 right-2 bg-black/50 backdrop-blur-sm text-white text-[11px] px-2 py-0.5 rounded-full">
                             {detailPhoto + 1}/{detailPhotos.length}
@@ -316,7 +332,7 @@ export default function LostAnimalsPage() {
                       </span>
                     </div>
                     <button onClick={() => { setSelectedItem(null); setDetailPhoto(0); }} className="text-gray-400 hover:text-foreground transition-colors flex-shrink-0 mt-0.5">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      <IconX size={20} />
                     </button>
                   </div>
                   <p className="text-sm text-gray-600 leading-relaxed mb-4">{selectedItem.description}</p>
@@ -325,48 +341,48 @@ export default function LostAnimalsPage() {
                   <div className="divide-y divide-gray-border mb-4">
                     {selectedItem.animal_type && (
                       <div className="flex items-center gap-2.5 py-2">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                        <IconPaw size={15} className="text-gray-400 flex-shrink-0" />
                         <span className="text-sm font-medium">Вид</span>
                         <span className="text-sm text-gray-medium ml-auto">{selectedItem.animal_type}</span>
                       </div>
                     )}
                     {selectedItem.breed && (
                       <div className="flex items-center gap-2.5 py-2">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                        <IconTag size={15} className="text-gray-400 flex-shrink-0" />
                         <span className="text-sm font-medium">Порода</span>
                         <span className="text-sm text-gray-medium ml-auto">{selectedItem.breed}</span>
                       </div>
                     )}
                     {selectedItem.sex && (
                       <div className="flex items-center gap-2.5 py-2">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <IconUser size={15} className="text-gray-400 flex-shrink-0" />
                         <span className="text-sm font-medium">Стать</span>
                         <span className="text-sm text-gray-medium ml-auto">{selectedItem.sex === "male" ? "Хлопчик" : "Дівчинка"}</span>
                       </div>
                     )}
                     {selectedItem.color && (
                       <div className="flex items-center gap-2.5 py-2">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20"/></svg>
+                        <IconPalette size={15} className="text-gray-400 flex-shrink-0" />
                         <span className="text-sm font-medium">Колір</span>
                         <span className="text-sm text-gray-medium ml-auto">{selectedItem.color}</span>
                       </div>
                     )}
                     {selectedItem.size && (
                       <div className="flex items-center gap-2.5 py-2">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+                        <IconPackage size={15} className="text-gray-400 flex-shrink-0" />
                         <span className="text-sm font-medium">Розмір</span>
                         <span className="text-sm text-gray-medium ml-auto">{selectedItem.size === "small" ? "Малий" : selectedItem.size === "medium" ? "Середній" : "Великий"}</span>
                       </div>
                     )}
                     {selectedItem.location && (
                       <div className="flex items-center gap-2.5 py-2">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <IconMapPin size={15} className="text-gray-400 flex-shrink-0" />
                         <span className="text-sm font-medium">Місцезнаходження</span>
                         <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedItem.location)}`} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-medium ml-auto hover:underline">{selectedItem.location}</a>
                       </div>
                     )}
                     <div className="flex items-center gap-2.5 py-2">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                      <IconCalendar size={15} className="text-gray-400 flex-shrink-0" />
                       <span className="text-sm font-medium">Опубліковано</span>
                       <span className="text-sm text-gray-medium ml-auto">{new Date(selectedItem.created_at).toLocaleDateString("uk-UA")}</span>
                     </div>
@@ -379,13 +395,13 @@ export default function LostAnimalsPage() {
                       <div className="bg-red-50 rounded-xl p-3 space-y-1.5">
                         {selectedItem.last_seen_location && (
                           <div className="flex items-center gap-2 text-sm">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-400 flex-shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <IconEye size={14} className="text-red-400 flex-shrink-0" />
                             <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedItem.last_seen_location)}`} target="_blank" rel="noopener noreferrer" className="text-foreground hover:underline">{selectedItem.last_seen_location}</a>
                           </div>
                         )}
                         {selectedItem.last_seen_date && (
                           <div className="flex items-center gap-2 text-sm">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-400 flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            <IconCalendar size={14} className="text-red-400 flex-shrink-0" />
                             <span className="text-foreground">{new Date(selectedItem.last_seen_date).toLocaleDateString("uk-UA")}</span>
                           </div>
                         )}
@@ -398,11 +414,11 @@ export default function LostAnimalsPage() {
                     <p className="text-xs font-semibold text-gray-medium uppercase tracking-wider mb-2">Контакти</p>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2.5 text-sm">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <IconUser size={15} className="text-gray-400 flex-shrink-0" />
                         <span className="font-medium">{selectedItem.contact_name}</span>
                       </div>
                       <div className="flex items-center gap-2.5 text-sm">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                        <IconPhone size={15} className="text-gray-400 flex-shrink-0" />
                         <a href={`tel:${selectedItem.contact_phone}`} className="hover:underline">{selectedItem.contact_phone}</a>
                       </div>
                     </div>

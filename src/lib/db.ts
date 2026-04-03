@@ -162,6 +162,10 @@ function seedIfEmpty(db: Database.Database) {
   const count = db.prepare("SELECT COUNT(*) as cnt FROM animals").get() as { cnt: number };
   if (count.cnt > 0) return;
 
+  // Don't seed if users already exist (someone registered before demo data was needed)
+  const userCount = db.prepare("SELECT COUNT(*) as cnt FROM users").get() as { cnt: number };
+  if (userCount.cnt > 0) return;
+
   const sampleAnimals = [
     { name: "Барон", description: "Дуже дружелюбний та активний пес. Любить гуляти та гратися з м'ячиком. Чудово ладнає з дітьми та іншими тваринами.", type: "dog", breed: "Німецька вівчарка", sex: "male", age_months: 36, weight_kg: 32, size: "large", color: "Чорно-рудий", vaccinated: 1, sterilized: 1, trained: 1, photos: JSON.stringify(["/uploads/dog1_1.jpg","/uploads/dog1_2.jpg","/uploads/dog1_3.jpg","/uploads/dog1_4.jpg","/uploads/dog1_5.jpg"]), contact_name: null, contact_phone: null, contact_email: null, contact_instagram: null, contact_telegram: null, contact_facebook: null, contact_location: "Дніпро, Лівий берег" },
     { name: "Мурка", description: "Спокійна та ласкава кішка. Обожнює лежати на колінах та муркотіти. Ідеальна для квартирного утримання.", type: "cat", breed: "Європейська короткошерста", sex: "female", age_months: 24, weight_kg: 4, size: "medium", color: "Сірий", vaccinated: 1, sterilized: 1, trained: 0, photos: JSON.stringify(["/uploads/cat1_1.jpg","/uploads/cat1_2.jpg","/uploads/cat1_3.jpg","/uploads/cat1_4.jpg","/uploads/cat1_5.jpg"]), contact_name: "Інесса", contact_phone: "+38 (050) 111-22-33", contact_email: "inessa@dniproanimals.org", contact_instagram: "dniproanimals", contact_telegram: "itsmotherofcats", contact_facebook: "dniproanimals", contact_location: "Дніпро, вул. Героїв Дніпра" },

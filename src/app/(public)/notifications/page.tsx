@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/lib/UserContext";
+import { IconBellFilled, IconHeartFilled, IconSearch } from "@tabler/icons-react";
 
 type Notif = { id: number; type: string; title: string; message: string | null; link: string | null; is_read: number; created_at: string };
 
@@ -55,7 +56,7 @@ export default function NotificationsPage() {
       {filtered.length === 0 ? (
         <div className="text-center py-16">
           <div className="w-16 h-16 rounded-full bg-gray-light mx-auto flex items-center justify-center mb-3">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <IconBellFilled size={24} className="text-gray-400" />
           </div>
           <p className="text-sm text-gray-medium">Немає повідомлень</p>
         </div>
@@ -66,9 +67,9 @@ export default function NotificationsPage() {
               <div className="flex items-start gap-3">
                 <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${item.type === "adoption" ? "bg-[#ced48c]/20" : "bg-red-50"}`}>
                   {item.type === "adoption" ? (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#ced48c]"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                    <IconHeartFilled size={16} className="text-[#ced48c]" />
                   ) : (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+                    <IconSearch size={16} className="text-red-500" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">

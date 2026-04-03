@@ -5,6 +5,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { useUser } from "@/lib/UserContext";
 import type { Animal } from "@/lib/db";
+import {
+  IconMapPinFilled,
+  IconRuler,
+  IconPalette,
+  IconCircleCheckFilled,
+  IconForbidFilled,
+  IconBookFilled,
+  IconPawFilled,
+  IconPaw,
+  IconRefresh,
+} from "@tabler/icons-react";
 
 function getAgeLabel(months: number | null): string {
   if (!months) return "Невідомо";
@@ -151,24 +162,24 @@ export default function AnimalCard({ animal, index = 0 }: { animal: Animal; inde
 
               <div className="flex-1 flex flex-col justify-center divide-y divide-foreground/10">
                 <div className="flex items-center gap-2 py-1.5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/60 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <IconMapPinFilled width={14} height={14} className="text-foreground/60 flex-shrink-0" />
                   <span className="text-[11px] font-semibold text-foreground">Місце</span>
                   <span className="text-[11px] text-foreground/70 ml-auto truncate max-w-[45%] text-right">{animal.contact_location || "Дніпро"}</span>
                 </div>
                 <div className="flex items-center gap-2 py-1.5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/60 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <IconRuler width={14} height={14} className="text-foreground/60 flex-shrink-0" />
                   <span className="text-[11px] font-semibold text-foreground">Розмір</span>
                   <span className="text-[11px] text-foreground/70 ml-auto">{getSizeLabel(animal.size)}{animal.weight_kg ? ` · ${animal.weight_kg} кг` : ""}</span>
                 </div>
                 {animal.color && (
                   <div className="flex items-center gap-2 py-1.5">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/60 flex-shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20"/></svg>
+                    <IconPalette width={14} height={14} className="text-foreground/60 flex-shrink-0" />
                     <span className="text-[11px] font-semibold text-foreground">Колір</span>
                     <span className="text-[11px] text-foreground/70 ml-auto">{animal.color}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-2 py-1.5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/60 flex-shrink-0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  <IconCircleCheckFilled width={14} height={14} className="text-foreground/60 flex-shrink-0" />
                   <span className="text-[11px] font-semibold text-foreground">Вакцинація</span>
                   <span className="text-[11px] text-foreground/70 ml-auto">{animal.vaccinated ? "Так" : "Ні"}</span>
                 </div>

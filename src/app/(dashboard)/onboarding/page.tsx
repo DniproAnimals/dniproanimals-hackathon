@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/lib/UserContext";
 import Image from "next/image";
+import { IconUserFilled, IconHomeFilled, IconChevronLeft } from "@tabler/icons-react";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -67,7 +68,7 @@ export default function OnboardingPage() {
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-gray-light flex items-center justify-center shrink-0 group-hover:bg-[#ced48c]/20 transition-colors">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <IconUserFilled size={24} className="text-gray-500" />
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">Особисте використання</p>
@@ -82,7 +83,7 @@ export default function OnboardingPage() {
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-gray-light flex items-center justify-center shrink-0 group-hover:bg-[#ced48c]/20 transition-colors">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  <IconHomeFilled size={24} className="text-gray-500" />
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">Створити організацію</p>
@@ -103,7 +104,7 @@ export default function OnboardingPage() {
       <div className="w-full max-w-lg">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => setStep("choose")} className="p-1.5 rounded-lg hover:bg-gray-light transition-colors">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            <IconChevronLeft size={20} />
           </button>
           <h1 className="text-xl font-bold text-foreground">Створити організацію</h1>
         </div>

@@ -5,6 +5,32 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useUser } from "@/lib/UserContext";
 import type { Animal } from "@/lib/db";
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconHeart,
+  IconHeartFilled,
+  IconPencil,
+  IconTrash,
+  IconPaw,
+  IconTag,
+  IconUser,
+  IconCalendar,
+  IconMapPin,
+  IconPackage,
+  IconPalette,
+  IconCircleCheck,
+  IconCircleOff,
+  IconBook,
+  IconPhone,
+  IconMail,
+  IconBrandInstagram,
+  IconBrandTelegram,
+  IconBrandFacebook,
+  IconX,
+  IconCirclePlus,
+  IconWeight,
+} from "@tabler/icons-react";
 
 function getAgeLabel(months: number | null): string {
   if (!months) return "Невідомо";
@@ -150,9 +176,7 @@ export default function AnimalDetailPage() {
         onClick={() => router.back()}
         className="flex items-center gap-2 text-gray-medium hover:text-foreground mb-5 transition-colors text-sm"
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M15 18l-6-6 6-6"/>
-        </svg>
+        <IconChevronLeft size={18} />
         Назад
       </button>
 
@@ -176,13 +200,13 @@ export default function AnimalDetailPage() {
                       onClick={() => setActivePhoto((prev) => (prev - 1 + photos.length) % photos.length)}
                       className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-white"
                     >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                      <IconChevronLeft size={18} color="#1a1a1a" stroke={2.5} />
                     </button>
                     <button
                       onClick={() => setActivePhoto((prev) => (prev + 1) % photos.length)}
                       className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-white"
                     >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                      <IconChevronRight size={18} color="#1a1a1a" stroke={2.5} />
                     </button>
                     <div className="absolute bottom-2 right-2 bg-black/50 backdrop-blur-sm text-white text-[11px] px-2 py-0.5 rounded-full">
                       {activePhoto + 1}/{photos.length}
@@ -238,10 +262,11 @@ export default function AnimalDetailPage() {
                   className="p-1 transition-colors"
                   aria-label={isFav ? "Прибрати з обраного" : "Додати до обраного"}
                 >
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill={isFav ? "#ced48c" : "none"} stroke={isFav ? "#ced48c" : "#ccc"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 21c-1.5 0-5-2.5-7.5-6C2 11 2 7.5 4 5.5S9 3 12 6c3-3 6-2.5 8-0.5s2 5.5-.5 9.5C17 19 13.5 21 12 21z"/>
-                    <circle cx="7.5" cy="7" r="1.5"/><circle cx="16.5" cy="7" r="1.5"/><circle cx="10" cy="4.5" r="1.5"/><circle cx="14" cy="4.5" r="1.5"/>
-                  </svg>
+                  {isFav ? (
+                    <IconHeartFilled size={22} color="#ced48c" />
+                  ) : (
+                    <IconHeart size={22} color="#ccc" />
+                  )}
                 </button>
               )}
             </div>
@@ -249,7 +274,7 @@ export default function AnimalDetailPage() {
               {user?.role === "admin" && (
                 <>
                   <a href={`/admin/add?edit=${animal.id}`} className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center justify-center" title="Редагувати">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    <IconPencil size={14} />
                   </a>
                   <button
                     onClick={async () => {
@@ -260,7 +285,7 @@ export default function AnimalDetailPage() {
                     className="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors flex items-center justify-center"
                     title="Видалити"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                    <IconTrash size={14} />
                   </button>
                 </>
               )}
@@ -291,42 +316,42 @@ export default function AnimalDetailPage() {
           {/* Metadata — list */}
           <div className="divide-y divide-gray-border mb-6">
             <div className="flex items-center gap-2.5 py-3">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+              <IconPaw size={16} className="text-gray-400 flex-shrink-0" />
               <span className="text-sm font-medium text-foreground">Вид</span>
               <span className="text-sm text-gray-medium ml-auto">{getTypeLabel(animal.type)}</span>
             </div>
             {animal.breed && (
               <div className="flex items-center gap-2.5 py-3">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                <IconTag size={16} className="text-gray-400 flex-shrink-0" />
                 <span className="text-sm font-medium text-foreground">Порода</span>
                 <span className="text-sm text-gray-medium ml-auto">{animal.breed}</span>
               </div>
             )}
             <div className="flex items-center gap-2.5 py-3">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <IconUser size={16} className="text-gray-400 flex-shrink-0" />
               <span className="text-sm font-medium text-foreground">Стать</span>
               <span className="text-sm text-gray-medium ml-auto">{animal.sex === "male" ? "Хлопчик" : "Дівчинка"}</span>
             </div>
             <div className="flex items-center gap-2.5 py-3">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <IconCalendar size={16} className="text-gray-400 flex-shrink-0" />
               <span className="text-sm font-medium text-foreground">Вік</span>
               <span className="text-sm text-gray-medium ml-auto">{getAgeLabel(animal.age_months)}</span>
             </div>
             <div className="flex items-center gap-2.5 py-3">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <IconPackage size={16} className="text-gray-400 flex-shrink-0" />
               <span className="text-sm font-medium text-foreground">Розмір</span>
               <span className="text-sm text-gray-medium ml-auto">{getSizeLabel(animal.size)}</span>
             </div>
             {animal.weight_kg && (
               <div className="flex items-center gap-2.5 py-3">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+                <IconWeight size={16} className="text-gray-400 flex-shrink-0" />
                 <span className="text-sm font-medium text-foreground">Вага</span>
                 <span className="text-sm text-gray-medium ml-auto">{animal.weight_kg} кг</span>
               </div>
             )}
             {animal.color && (
               <div className="flex items-center gap-2.5 py-3">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20"/></svg>
+                <IconPalette size={16} className="text-gray-400 flex-shrink-0" />
                 <span className="text-sm font-medium text-foreground">Колір</span>
                 <span className="flex items-center gap-2 text-sm text-gray-medium ml-auto">
                   {animal.color}
@@ -338,17 +363,17 @@ export default function AnimalDetailPage() {
               </div>
             )}
             <div className="flex items-center gap-2.5 py-3">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <IconCircleCheck size={16} className="text-gray-400 flex-shrink-0" />
               <span className="text-sm font-medium text-foreground">Вакцинація</span>
               <span className="text-sm text-gray-medium ml-auto">{animal.vaccinated ? "Так" : "Ні"}</span>
             </div>
             <div className="flex items-center gap-2.5 py-3">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+              <IconCircleOff size={16} className="text-gray-400 flex-shrink-0" />
               <span className="text-sm font-medium text-foreground">Стерилізація</span>
               <span className="text-sm text-gray-medium ml-auto">{animal.sterilized ? "Так" : "Ні"}</span>
             </div>
             <div className="flex items-center gap-2.5 py-3">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+              <IconBook size={16} className="text-gray-400 flex-shrink-0" />
               <span className="text-sm font-medium text-foreground">Навчено</span>
               <span className="text-sm text-gray-medium ml-auto">{animal.trained ? "Так" : "Ні"}</span>
             </div>
@@ -361,44 +386,44 @@ export default function AnimalDetailPage() {
               <div className="space-y-2.5">
                 {animal.contact_name && (
                   <div className="flex items-center gap-2.5 text-sm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <IconUser size={16} className="text-gray-400 flex-shrink-0" />
                     <span className="text-foreground font-medium">{animal.contact_name}</span>
                   </div>
                 )}
                 {animal.contact_phone && (
                   <div className="flex items-center gap-2.5 text-sm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                    <IconPhone size={16} className="text-gray-400 flex-shrink-0" />
                     <a href={`tel:${animal.contact_phone}`} className="text-foreground hover:underline">{animal.contact_phone}</a>
                   </div>
                 )}
                 {animal.contact_email && (
                   <div className="flex items-center gap-2.5 text-sm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    <IconMail size={16} className="text-gray-400 flex-shrink-0" />
                     <a href={`mailto:${animal.contact_email}`} className="text-foreground hover:underline">{animal.contact_email}</a>
                   </div>
                 )}
                 {animal.contact_instagram && (
                   <div className="flex items-center gap-2.5 text-sm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                    <IconBrandInstagram size={16} className="text-gray-400 flex-shrink-0" />
                     <a href={`https://instagram.com/${animal.contact_instagram}`} target="_blank" rel="noopener noreferrer" className="text-foreground hover:underline">@{animal.contact_instagram}</a>
                   </div>
                 )}
                 {animal.contact_telegram && (
                   <div className="flex items-center gap-2.5 text-sm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    <IconBrandTelegram size={16} className="text-gray-400 flex-shrink-0" />
                     <a href={`https://t.me/${animal.contact_telegram}`} target="_blank" rel="noopener noreferrer" className="text-foreground hover:underline">@{animal.contact_telegram}</a>
                   </div>
                 )}
                 {animal.contact_facebook && (
                   <div className="flex items-center gap-2.5 text-sm">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                    <IconBrandFacebook size={16} className="text-gray-400 flex-shrink-0" />
                     <a href={`https://facebook.com/${animal.contact_facebook}`} target="_blank" rel="noopener noreferrer" className="text-foreground hover:underline">{animal.contact_facebook}</a>
                   </div>
                 )}
                 {animal.contact_location && (
                   <div className="pt-1">
                     <div className="flex items-center gap-2.5 text-sm mb-2">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      <IconMapPin size={16} className="text-gray-400 flex-shrink-0" />
                       <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(animal.contact_location)}`} target="_blank" rel="noopener noreferrer" className="text-foreground hover:underline">{animal.contact_location}</a>
                     </div>
                     <a
@@ -417,7 +442,7 @@ export default function AnimalDetailPage() {
                         src={`https://maps.google.com/maps?q=${encodeURIComponent(animal.contact_location)}&output=embed&z=13`}
                       />
                       <div className="px-3 py-1.5 flex items-center gap-1.5 text-xs text-gray-medium">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <IconMapPin size={12} />
                         Відкрити в Google Maps
                       </div>
                     </a>
@@ -442,14 +467,14 @@ export default function AnimalDetailPage() {
             <div className="flex items-center justify-between mb-1">
               <h3 className="font-semibold text-lg">Заявка на усиновлення</h3>
               <button type="button" onClick={() => setShowAdoptForm(false)} className="text-gray-400 hover:text-foreground transition-colors">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <IconX size={20} />
               </button>
             </div>
             <p className="text-sm text-gray-medium mb-2">Вкажіть як з вами зв&apos;язатися</p>
 
             {/* Name */}
             <div className="relative">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <IconUser size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Ваше ім'я *"
@@ -462,7 +487,7 @@ export default function AnimalDetailPage() {
 
             {/* Phone */}
             <div className="relative">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+              <IconPhone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="tel"
                 placeholder="Телефон *"
@@ -475,7 +500,7 @@ export default function AnimalDetailPage() {
 
             {/* Місто */}
             <div className="relative">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <IconMapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Місто / район"
@@ -498,23 +523,23 @@ export default function AnimalDetailPage() {
             {visibleContacts.map((type) => (
               <div key={type} className="relative animate-modal-in">
                 {type === "email" && <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  <IconMail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
                 </>}
                 {type === "instagram" && <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                  <IconBrandInstagram size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input type="text" placeholder="Instagram" value={formData.instagram} onChange={(e) => setFormData({ ...formData, instagram: e.target.value })} className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
                 </>}
                 {type === "telegram" && <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  <IconBrandTelegram size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input type="text" placeholder="Telegram" value={formData.telegram} onChange={(e) => setFormData({ ...formData, telegram: e.target.value })} className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
                 </>}
                 {type === "facebook" && <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                  <IconBrandFacebook size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input type="text" placeholder="Facebook" value={formData.facebook} onChange={(e) => setFormData({ ...formData, facebook: e.target.value })} className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
                 </>}
                 <button type="button" onClick={() => setVisibleContacts(visibleContacts.filter((c) => c !== type))} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-foreground">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  <IconX size={14} />
                 </button>
               </div>
             ))}
@@ -531,31 +556,31 @@ export default function AnimalDetailPage() {
                   }}
                   className="flex items-center gap-1.5 text-[13px] text-gray-medium hover:text-foreground transition-colors py-1"
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                  <IconCirclePlus size={14} />
                   Додати спосіб зв&apos;язку
                 </button>
                 <div className="hidden absolute left-0 bottom-full mb-1 bg-white rounded-xl border border-gray-border shadow-lg z-10 py-1 w-48 animate-modal-in">
                   {!visibleContacts.includes("email") && (
                     <button type="button" onClick={(e) => { setVisibleContacts([...visibleContacts, "email"]); (e.currentTarget.parentElement as HTMLElement).classList.add("hidden"); }} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light transition-colors">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                      <IconMail size={14} className="text-gray-400" />
                       Email
                     </button>
                   )}
                   {!visibleContacts.includes("instagram") && (
                     <button type="button" onClick={(e) => { setVisibleContacts([...visibleContacts, "instagram"]); (e.currentTarget.parentElement as HTMLElement).classList.add("hidden"); }} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light transition-colors">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                      <IconBrandInstagram size={14} className="text-gray-400" />
                       Instagram
                     </button>
                   )}
                   {!visibleContacts.includes("telegram") && (
                     <button type="button" onClick={(e) => { setVisibleContacts([...visibleContacts, "telegram"]); (e.currentTarget.parentElement as HTMLElement).classList.add("hidden"); }} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light transition-colors">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                      <IconBrandTelegram size={14} className="text-gray-400" />
                       Telegram
                     </button>
                   )}
                   {!visibleContacts.includes("facebook") && (
                     <button type="button" onClick={(e) => { setVisibleContacts([...visibleContacts, "facebook"]); (e.currentTarget.parentElement as HTMLElement).classList.add("hidden"); }} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light transition-colors">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                      <IconBrandFacebook size={14} className="text-gray-400" />
                       Facebook
                     </button>
                   )}

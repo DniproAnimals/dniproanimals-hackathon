@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
+import { IconX } from "@tabler/icons-react";
 
 type Animal = {
   id: number;
@@ -126,7 +127,7 @@ export default function AnimalsPage() {
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-lg font-semibold">{editingId ? "Редагувати" : "Додати тварину"}</h2>
               <button type="button" onClick={() => { setShowForm(false); setEditingId(null); }} className="text-gray-400 hover:text-foreground">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                <IconX size={20} />
               </button>
             </div>
 
