@@ -28,19 +28,31 @@ const PawIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+type Organization = { id: number; name: string };
+
 export default function DonatePage() {
   const [amount, setAmount] = useState<number | null>(500);
   const [customAmount, setCustomAmount] = useState<string>("");
   const [showCheckout, setShowCheckout] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "processing" | "success">("idle");
   const [selectedOrg, setSelectedOrg] = useState<string>("general");
-  
-  const organizations = [
+  const [organizations, setOrganizations] = useState<{ id: string; name: string }[]>([
     { id: "general", name: "DniproAnimals (Загальний фонд)" },
-    { id: "1", name: "Притулок 'Вірний друг'" },
-    { id: "2", name: "Ковчег" },
-    { id: "3", name: "Реабілітаційний центр 'Шанс'" },
-  ];
+  ]);
+  const [orgSearch, setOrgSearch] = useState("");
+  const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/organizations")
+      .then((r) => r.json())
+      .then((orgs: Organization[]) => {
+        setOrganizations([
+          { id: "general", name: "DniproAnimals (Загальний фонд)" },
+          ...orgs.map((o) => ({ id: String(o.id), name: o.name })),
+        ]);
+      })
+      .catch(() => {});
+  }, []);
 
   const [needs, setNeeds] = useState<OrganizationNeed[]>([
     {
@@ -78,9 +90,6 @@ export default function DonatePage() {
   ]);
   const [loadingNeeds, setLoadingNeeds] = useState(false);
 
-  useEffect(() => {
-    // Змінено на мок-дані для демонстрації
-  }, []);
 
   const handleCheckout = () => {
     const finalAmount = amount || parseInt(customAmount) || 0;
@@ -134,26 +143,52 @@ export default function DonatePage() {
           </div>
 
           {/* Right: The Billing Widget */}
-          <div className="w-full lg:w-[480px] bg-white rounded-[2.5rem] p-8 md:p-10 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] border border-gray-100 relative overflow-hidden flex-shrink-0">
+          <div className="w-full lg:w-[480px] bg-white rounded-[2.5rem] p-8 md:p-10 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] border border-gray-100 relative flex-shrink-0">
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#ced48c] rounded-full mix-blend-multiply opacity-20 -translate-y-1/2 translate-x-1/2 blur-[40px]" />
             
             <h2 className="text-2xl md:text-3xl font-extrabold mb-6 text-center text-[#0c1014]">Швидка пожертва онлайн</h2>
             
-            <div className="mb-5 relative z-10">
+            <div className={`mb-5 relative ${orgDropdownOpen ? "z-40" : "z-10"}`}>
               <label className="block text-sm font-bold text-gray-700 mb-2">Кому допомагаємо?</label>
               <div className="relative">
-                <select
-                  value={selectedOrg}
-                  onChange={(e) => setSelectedOrg(e.target.value)}
-                  className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl py-3 pl-4 pr-10 text-foreground outline-none focus:border-[#ced48c] focus:bg-white transition-colors font-medium appearance-none cursor-pointer"
+                <button
+                  type="button"
+                  onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
+                  className={`w-full flex items-center justify-between bg-gray-50 border-2 rounded-2xl py-3 pl-4 pr-10 text-left outline-none transition-colors font-medium cursor-pointer ${orgDropdownOpen ? "border-[#ced48c] bg-white" : "border-gray-200 hover:border-gray-300"}`}
                 >
-                  {organizations.map(org => (
-                    <option key={org.id} value={org.id}>{org.name}</option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
+                  <span className="truncate">{organizations.find((o) => o.id === selectedOrg)?.name || "Оберіть організацію"}</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`absolute right-4 text-gray-500 transition-transform ${orgDropdownOpen ? "rotate-180" : ""}`}><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                {orgDropdownOpen && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-2xl border-2 border-gray-200 shadow-lg z-30 py-1 max-h-60 overflow-auto">
+                    <div className="p-2 border-b border-gray-100">
+                      <input
+                        type="text"
+                        placeholder="Пошук організації..."
+                        value={orgSearch}
+                        onChange={(e) => setOrgSearch(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-gray-50 border-none outline-none text-sm"
+                        autoFocus
+                      />
+                    </div>
+                    {organizations
+                      .filter((o) => o.name.toLowerCase().includes(orgSearch.toLowerCase()))
+                      .map((org) => (
+                        <button
+                          key={org.id}
+                          type="button"
+                          onClick={() => { setSelectedOrg(org.id); setOrgSearch(""); setOrgDropdownOpen(false); }}
+                          className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                        >
+                          <span className={selectedOrg === org.id ? "font-bold text-[#5b7765]" : ""}>{org.name}</span>
+                          {selectedOrg === org.id && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ced48c" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                        </button>
+                      ))}
+                    {organizations.filter((o) => o.name.toLowerCase().includes(orgSearch.toLowerCase())).length === 0 && (
+                      <p className="px-4 py-2 text-xs text-gray-400">Не знайдено</p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -161,7 +196,7 @@ export default function DonatePage() {
               {[100, 500, 1000].map(val => (
                 <button
                   key={val}
-                  onClick={() => { setAmount(val); setCustomAmount(""); }}
+                  onClick={() => { setAmount(val); setCustomAmount(String(val)); }}
                   className={`py-4 text-xl font-bold rounded-2xl border-2 transition-all duration-300 ${
                     amount === val 
                       ? "bg-[#ced48c] text-[#0c1014] border-[#ced48c] shadow-[0_8px_20px_-6px_rgba(206,212,140,0.6)] scale-[1.02]" 
@@ -332,117 +367,143 @@ export default function DonatePage() {
           </div>)} 
 
 
-        {/* Корми та смаколики */}
-        <div className="bg-white rounded-2xl border border-gray-border p-5">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-9 h-9 rounded-full bg-green-light flex items-center justify-center">
-              <IconHeartFilled size={18} className="text-green-accent" />
-            </div>
-            <h3 className="font-semibold">Корми та смаколики</h3>
+        {/* Що потрібно притулкам */}
+        <div className="mb-16">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="h-8 w-1.5 bg-[#7c4b22] rounded-full"></div>
+            <h2 className="text-3xl font-extrabold text-[#0c1014]">Що потрібно притулкам</h2>
           </div>
-          <div className="space-y-3">
-            <div>
-              <p className="text-xs font-semibold text-gray-medium uppercase tracking-wider mb-1.5">Вологі корми для котів</p>
-              {[
-                { name: "Клуб 4 лапи", price: "~25 грн/шт" },
-                { name: "Фелікс", price: "~20 грн/шт" },
-                { name: "Гурме", price: "~35 грн/шт" },
-              ].map((i) => (
-                <div key={i.name} className="flex items-center justify-between text-sm text-gray-600 py-0.5">
-                  <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#ced48c] flex-shrink-0" />{i.name}</div>
-                  <span className="text-xs text-gray-400">{i.price}</span>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Корми та смаколики */}
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#ced48c] to-[#5b7765]" />
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-2xl bg-[#f2f4e4] flex items-center justify-center">
+                  <IconHeartFilled size={20} className="text-[#5b7765]" />
                 </div>
-              ))}
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-gray-medium uppercase tracking-wider mb-1.5">Сухий корм 4 лапи</p>
-              {[
-                { name: "Для цуценят всіх порід", price: "~120 грн/кг" },
-                { name: "Для собак середніх порід", price: "~100 грн/кг" },
-              ].map((i) => (
-                <div key={i.name} className="flex items-center justify-between text-sm text-gray-600 py-0.5">
-                  <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#ced48c] flex-shrink-0" />{i.name}</div>
-                  <span className="text-xs text-gray-400">{i.price}</span>
+                <h3 className="font-bold text-lg">Корми та смаколики</h3>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-[10px] font-bold text-[#5b7765] uppercase tracking-wider mb-2">Вологі корми для котів</p>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { name: "Клуб 4 лапи", price: "~25₴" },
+                      { name: "Фелікс", price: "~20₴" },
+                      { name: "Гурме", price: "~35₴" },
+                    ].map((i) => (
+                      <span key={i.name} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 text-sm text-gray-700 border border-gray-100">
+                        {i.name} <span className="text-xs text-[#5b7765] font-semibold">{i.price}</span>
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              ))}
+                <div>
+                  <p className="text-[10px] font-bold text-[#5b7765] uppercase tracking-wider mb-2">Сухий корм 4 лапи</p>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { name: "Для цуценят всіх порід", price: "~120₴/кг" },
+                      { name: "Для собак середніх порід", price: "~100₴/кг" },
+                    ].map((i) => (
+                      <span key={i.name} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 text-sm text-gray-700 border border-gray-100">
+                        {i.name} <span className="text-xs text-[#5b7765] font-semibold">{i.price}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-[#5b7765] uppercase tracking-wider mb-2">Проплан</p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 text-sm text-gray-700 border border-gray-100">
+                      Ренал паштети <span className="text-xs text-[#5b7765] font-semibold">~95₴</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="text-xs font-semibold text-gray-medium uppercase tracking-wider mb-1.5">Проплан</p>
-              <div className="flex items-center justify-between text-sm text-gray-600 py-0.5">
-                <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#ced48c] flex-shrink-0" />Ренал паштети</div>
-                <span className="text-xs text-gray-400">~95 грн/шт</span>
+
+            {/* Мед. препарати */}
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-300 to-red-500" />
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-2xl bg-red-50 flex items-center justify-center">
+                  <IconCircleCheckFilled size={20} className="text-red-500" />
+                </div>
+                <h3 className="font-bold text-lg">Мед. препарати</h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  "Серенія", "Кладакса 40 мг", "РеналВет (таблетки / флакони)",
+                  "Епобіокорін2000", "Гепадол міні", "Віракса, гептрал",
+                  "Ферум лек, мільгама (в ампулах)", "Квамател і омез (у флаконах)",
+                ].map((i) => (
+                  <span key={i} className="inline-flex items-center px-3 py-1.5 rounded-full bg-red-50/50 text-sm text-gray-700 border border-red-100">
+                    {i}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Побутова хімія */}
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-300 to-blue-500" />
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center">
+                  <IconDropletFilled size={20} className="text-blue-500" />
+                </div>
+                <h3 className="font-bold text-lg">Побутова хімія</h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  "Гель для прання Перволь", "Фері для посуду", "Доместос",
+                  "Містер пропер для підлоги", "Пакети для сміття 120 л",
+                  "Чисте ганчір'я з натуральних тканин",
+                  "Одноразові рушники", "Одноразові пелюшки 60x60, 90x60",
+                ].map((i) => (
+                  <span key={i} className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-50/50 text-sm text-gray-700 border border-blue-100">
+                    {i}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Інше важливе */}
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-300 to-purple-500" />
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-2xl bg-purple-50 flex items-center justify-center">
+                  <IconCirclePlusFilled size={20} className="text-purple-500" />
+                </div>
+                <h3 className="font-bold text-lg">Інше важливе</h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {["Іграшки для котів та собак", "Лежанки", "Дряпки", "Комплекси для котиків"].map((i) => (
+                  <span key={i} className="inline-flex items-center px-3 py-1.5 rounded-full bg-purple-50/50 text-sm text-gray-700 border border-purple-100">
+                    {i}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Для утеплення */}
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-300 to-orange-500" />
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-2xl bg-orange-50 flex items-center justify-center">
+                  <IconHomeFilled size={20} className="text-orange-500" />
+                </div>
+                <h3 className="font-bold text-lg">Для утеплення</h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {["Великі покривала", "Пледи", "Ковдри"].map((i) => (
+                  <span key={i} className="inline-flex items-center px-3 py-1.5 rounded-full bg-orange-50/50 text-sm text-gray-700 border border-orange-100">
+                    {i}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Мед. препарати */}
-        <div className="bg-white rounded-2xl border border-gray-border p-5">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center">
-              <IconCircleCheckFilled size={18} className="text-red-500" />
-            </div>
-            <h3 className="font-semibold">Мед. препарати</h3>
-          </div>
-          {[
-            "Серенія", "Кладакса 40 мг", "РеналВет (таблетки / флакони)",
-            "Епобіокорін2000", "Гепадол міні", "Віракса, гептрал",
-            "Ферум лек, мільгама (в ампулах)", "Квамател і омез (у флаконах)",
-          ].map((i) => (
-            <div key={i} className="flex items-center gap-2 text-sm text-gray-600 py-0.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#ced48c] flex-shrink-0" />{i}
-            </div>
-          ))}
-        </div>
-
-        {/* Побутова хімія */}
-        <div className="bg-white rounded-2xl border border-gray-border p-5">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center">
-              <IconDropletFilled size={18} className="text-blue-500" />
-            </div>
-            <h3 className="font-semibold">Побутова хімія</h3>
-          </div>
-          {[
-            "Гель для прання Перволь", "Фері для посуду", "Доместос",
-            "Містер пропер для підлоги", "Пакети для сміття 120 л",
-            "Чисте ганчір'я з натуральних тканин",
-            "Одноразові рушники", "Одноразові пелюшки 60x60, 90x60",
-          ].map((i) => (
-            <div key={i} className="flex items-center gap-2 text-sm text-gray-600 py-0.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#ced48c] flex-shrink-0" />{i}
-            </div>
-          ))}
-        </div>
-
-        {/* Інше */}
-        <div className="bg-white rounded-2xl border border-gray-border p-5">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-9 h-9 rounded-full bg-purple-50 flex items-center justify-center">
-              <IconCirclePlusFilled size={18} className="text-purple-500" />
-            </div>
-            <h3 className="font-semibold">Інше важливе</h3>
-          </div>
-          {["Іграшки для котів та собак", "Лежанки", "Дряпки", "Комплекси для котиків"].map((i) => (
-            <div key={i} className="flex items-center gap-2 text-sm text-gray-600 py-0.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#ced48c] flex-shrink-0" />{i}
-            </div>
-          ))}
-        </div>
-
-        {/* Для утеплення */}
-        <div className="bg-white rounded-2xl border border-gray-border p-5">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-9 h-9 rounded-full bg-orange-50 flex items-center justify-center">
-              <IconHomeFilled size={18} className="text-orange-500" />
-            </div>
-            <h3 className="font-semibold">Для утеплення</h3>
-          </div>
-          {["Великі покривала", "Пледи", "Ковдри"].map((i) => (
-            <div key={i} className="flex items-center gap-2 text-sm text-gray-600 py-0.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#ced48c] flex-shrink-0" />{i}
-            </div>
-          ))}
         </div>
       </div>
 
