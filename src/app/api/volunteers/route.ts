@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import getDb from "@/lib/db";
+import { createClient } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import crypto from "crypto";
 
@@ -9,12 +9,14 @@ export async function GET() {
     return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
   }
 
-  const db = getDb();
-  const volunteers = db
-    .prepare("SELECT * FROM volunteers WHERE org_id = ? ORDER BY created_at DESC")
-    .all(user.org_id);
+  const supabase = await createClient();
+  const { data: result } = await supabase
+    .from("volunteers")
+    .select("*")
+    .eq("org_id", user.org_id)
+    .order("created_at", { ascending: false });
 
-  return NextResponse.json(volunteers);
+  return NextResponse.json(result || []);
 }
 
 export async function POST(request: NextRequest) {
@@ -23,9 +25,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
   }
 
-  // Only org owner can add volunteers
-  const db = getDb();
-  const org = db.prepare("SELECT owner_id FROM organizations WHERE id = ?").get(user.org_id) as { owner_id: number } | undefined;
+  const supabase = await createClient();
+
+  const { data: org } = await supabase
+    .from("organizations")
+    .select("owner_id")
+    .eq("id", user.org_id)
+    .single();
+
   if (!org || org.owner_id !== user.id) {
     return NextResponse.json({ error: "Тільки власник організації може додавати волонтерів" }, { status: 403 });
   }
@@ -37,16 +44,29 @@ export async function POST(request: NextRequest) {
 
   const invite_token = crypto.randomBytes(24).toString("hex");
 
-  const result = db.prepare(
-    `INSERT INTO volunteers (org_id, name, surname, photo, description, phone, email, instagram, telegram, invite_token)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).run(
-    user.org_id, name, surname || null, photo || null, description || null,
-    phone || null, email || null, instagram || null, telegram || null, invite_token
-  );
+  const { data: result, error } = await supabase
+    .from("volunteers")
+    .insert({
+      org_id: user.org_id,
+      name,
+      surname: surname || null,
+      photo: photo || null,
+      description: description || null,
+      phone: phone || null,
+      email: email || null,
+      instagram: instagram || null,
+      telegram: telegram || null,
+      invite_token,
+    })
+    .select()
+    .single();
+
+  if (error || !result) {
+    return NextResponse.json({ error: "Помилка створення" }, { status: 500 });
+  }
 
   return NextResponse.json({
-    id: result.lastInsertRowid,
+    id: result.id,
     invite_token,
   }, { status: 201 });
 }
@@ -55,16 +75,33 @@ export async function PUT(request: NextRequest) {
   const user = await getSession();
   if (!user || !user.org_id) return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
 
-  const db = getDb();
-  const org = db.prepare("SELECT owner_id FROM organizations WHERE id = ?").get(user.org_id) as { owner_id: number } | undefined;
+  const supabase = await createClient();
+
+  const { data: org } = await supabase
+    .from("organizations")
+    .select("owner_id")
+    .eq("id", user.org_id)
+    .single();
+
   if (!org || org.owner_id !== user.id) return NextResponse.json({ error: "Недостатньо прав" }, { status: 403 });
 
   const { id, name, surname, photo, description, phone, email, instagram, telegram } = await request.json();
   if (!id || !name) return NextResponse.json({ error: "Невірні дані" }, { status: 400 });
 
-  db.prepare(
-    `UPDATE volunteers SET name=?, surname=?, photo=?, description=?, phone=?, email=?, instagram=?, telegram=? WHERE id=? AND org_id=?`
-  ).run(name, surname || null, photo || null, description || null, phone || null, email || null, instagram || null, telegram || null, id, user.org_id);
+  await supabase
+    .from("volunteers")
+    .update({
+      name,
+      surname: surname || null,
+      photo: photo || null,
+      description: description || null,
+      phone: phone || null,
+      email: email || null,
+      instagram: instagram || null,
+      telegram: telegram || null,
+    })
+    .eq("id", id)
+    .eq("org_id", user.org_id);
 
   return NextResponse.json({ success: true });
 }
@@ -75,20 +112,39 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
   }
 
-  const db = getDb();
-  const org = db.prepare("SELECT owner_id FROM organizations WHERE id = ?").get(user.org_id) as { owner_id: number } | undefined;
+  const supabase = await createClient();
+
+  const { data: org } = await supabase
+    .from("organizations")
+    .select("owner_id")
+    .eq("id", user.org_id)
+    .single();
+
   if (!org || org.owner_id !== user.id) {
     return NextResponse.json({ error: "Тільки власник організації може видаляти волонтерів" }, { status: 403 });
   }
 
   const { id } = await request.json();
 
-  // Unlink user account if connected
-  const volunteer = db.prepare("SELECT user_id FROM volunteers WHERE id = ? AND org_id = ?").get(id, user.org_id) as { user_id: number | null } | undefined;
+  const { data: volunteer } = await supabase
+    .from("volunteers")
+    .select("user_id")
+    .eq("id", id)
+    .eq("org_id", user.org_id)
+    .single();
+
   if (volunteer?.user_id) {
-    db.prepare("UPDATE users SET role = 'user', org_id = NULL WHERE id = ?").run(volunteer.user_id);
+    await supabase
+      .from("users")
+      .update({ role: "user", org_id: null })
+      .eq("id", volunteer.user_id);
   }
 
-  db.prepare("DELETE FROM volunteers WHERE id = ? AND org_id = ?").run(id, user.org_id);
+  await supabase
+    .from("volunteers")
+    .delete()
+    .eq("id", id)
+    .eq("org_id", user.org_id);
+
   return NextResponse.json({ success: true });
 }

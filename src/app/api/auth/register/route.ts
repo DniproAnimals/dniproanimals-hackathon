@@ -1,25 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
-import getDb from "@/lib/db";
+import { createClient } from "@/lib/db";
 import { setSessionCookie } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
-  const db = getDb();
   const { name, email, password } = await request.json();
 
   if (!name || !email || !password) {
     return NextResponse.json({ error: "Всі поля обов'язкові" }, { status: 400 });
   }
 
-  const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
+  const supabase = await createClient();
+
+  const { data: existing } = await supabase
+    .from("users")
+    .select("id")
+    .eq("email", email)
+    .single();
+
   if (existing) {
     return NextResponse.json({ error: "Цей email вже зареєстровано" }, { status: 409 });
   }
 
-  const result = db
-    .prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)")
-    .run(name, email, password);
+  const { data: result, error } = await supabase
+    .from("users")
+    .insert({ name, email, password })
+    .select()
+    .single();
 
-  const res = NextResponse.json({ id: result.lastInsertRowid, name, email, role: "user" }, { status: 201 });
-  res.cookies.set(setSessionCookie(Number(result.lastInsertRowid)));
+  if (error || !result) {
+    return NextResponse.json({ error: "Помилка реєстрації" }, { status: 500 });
+  }
+
+  const res = NextResponse.json({ id: result.id, name, email, role: "user" }, { status: 201 });
+  res.cookies.set(setSessionCookie(result.id));
   return res;
 }

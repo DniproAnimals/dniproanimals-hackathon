@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import getDb, { type User } from "@/lib/db";
+import { createClient } from "@/lib/db";
 import { setSessionCookie } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
-  const db = getDb();
   const { email, password } = await request.json();
 
   if (!email || !password) {
     return NextResponse.json({ error: "Email та пароль обов'язкові" }, { status: 400 });
   }
 
-  const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email) as User | undefined;
+  const supabase = await createClient();
+  const { data: user } = await supabase
+    .from("users")
+    .select("*")
+    .eq("email", email)
+    .single();
+
   if (!user || user.password !== password) {
     return NextResponse.json({ error: "Невірний email або пароль" }, { status: 401 });
   }

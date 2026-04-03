@@ -1,18 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import getDb from "@/lib/db";
+import { createClient } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
 export async function GET() {
   const user = await getSession();
   if (!user) return NextResponse.json([]);
 
-  const db = getDb();
-  const favorites = db
-    .prepare(
-      `SELECT a.* FROM favorites f JOIN animals a ON f.animal_id = a.id WHERE f.user_id = ? ORDER BY f.created_at DESC`
-    )
-    .all(user.id);
-  return NextResponse.json(favorites);
+  const supabase = await createClient();
+
+  const { data: favs } = await supabase
+    .from("favorites")
+    .select("animal_id, animals(*)")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  const result = (favs || []).map((f: Record<string, unknown>) => f.animals).filter(Boolean);
+  return NextResponse.json(result);
 }
 
 export async function POST(request: NextRequest) {
@@ -20,17 +23,26 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
 
   const { animal_id } = await request.json();
-  const db = getDb();
+  const supabase = await createClient();
 
-  const existing = db
-    .prepare("SELECT id FROM favorites WHERE user_id = ? AND animal_id = ?")
-    .get(user.id, animal_id);
+  const { data: existing } = await supabase
+    .from("favorites")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("animal_id", animal_id)
+    .single();
 
   if (existing) {
-    db.prepare("DELETE FROM favorites WHERE user_id = ? AND animal_id = ?").run(user.id, animal_id);
+    await supabase
+      .from("favorites")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("animal_id", animal_id);
     return NextResponse.json({ favorited: false });
   } else {
-    db.prepare("INSERT INTO favorites (user_id, animal_id) VALUES (?, ?)").run(user.id, animal_id);
+    await supabase
+      .from("favorites")
+      .insert({ user_id: user.id, animal_id });
     return NextResponse.json({ favorited: true });
   }
 }

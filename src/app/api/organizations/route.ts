@@ -1,36 +1,61 @@
 import { NextRequest, NextResponse } from "next/server";
-import getDb from "@/lib/db";
+import { createClient } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
 export async function GET() {
-  const db = getDb();
-  const orgs = db.prepare("SELECT * FROM organizations ORDER BY created_at DESC").all();
-  return NextResponse.json(orgs);
+  const supabase = await createClient();
+  const { data: orgs } = await supabase
+    .from("organizations")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  return NextResponse.json(orgs || []);
 }
 
 export async function POST(request: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
 
-  const db = getDb();
   const { name, description, photo, location, phone, email, instagram, telegram, facebook, website } = await request.json();
-
   if (!name) return NextResponse.json({ error: "Назва обов'язкова" }, { status: 400 });
 
-  const result = db.prepare(
-    `INSERT INTO organizations (name, description, photo, location, phone, email, instagram, telegram, facebook, website, owner_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).run(name, description || null, photo || null, location || null, phone || null, email || null, instagram || null, telegram || null, facebook || null, website || null, user.id);
+  const supabase = await createClient();
 
-  // Update user role to admin and link to org
-  db.prepare("UPDATE users SET role = 'admin', org_id = ? WHERE id = ?").run(result.lastInsertRowid, user.id);
+  const { data: result, error } = await supabase
+    .from("organizations")
+    .insert({
+      name,
+      description: description || null,
+      photo: photo || null,
+      location: location || null,
+      phone: phone || null,
+      email: email || null,
+      instagram: instagram || null,
+      telegram: telegram || null,
+      facebook: facebook || null,
+      website: website || null,
+      owner_id: user.id,
+    })
+    .select()
+    .single();
 
-  // Create notification
-  db.prepare("INSERT INTO notifications (org_id, type, title, message) VALUES (?, ?, ?, ?)").run(
-    result.lastInsertRowid, "org_created", `Нова організація: ${name}`, "Організація очікує модерації"
-  );
+  if (error || !result) {
+    return NextResponse.json({ error: "Помилка створення" }, { status: 500 });
+  }
 
-  return NextResponse.json({ id: result.lastInsertRowid }, { status: 201 });
+  await supabase
+    .from("users")
+    .update({ role: "admin", org_id: result.id })
+    .eq("id", user.id);
+
+  await supabase.from("notifications").insert({
+    org_id: result.id,
+    type: "org_created",
+    title: `Нова організація: ${name}`,
+    message: "Організація очікує модерації",
+  });
+
+  return NextResponse.json({ id: result.id }, { status: 201 });
 }
 
 export async function PATCH(request: NextRequest) {
@@ -39,14 +64,13 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Недостатньо прав" }, { status: 403 });
   }
 
-  const db = getDb();
   const { id, status } = await request.json();
-
   if (!id || !["approved", "rejected"].includes(status)) {
     return NextResponse.json({ error: "Невірні дані" }, { status: 400 });
   }
 
-  db.prepare("UPDATE organizations SET status = ? WHERE id = ?").run(status, id);
+  const supabase = await createClient();
+  await supabase.from("organizations").update({ status }).eq("id", id);
   return NextResponse.json({ success: true });
 }
 
@@ -56,8 +80,14 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
   }
 
-  const db = getDb();
-  const org = db.prepare("SELECT owner_id FROM organizations WHERE id = ?").get(user.org_id) as { owner_id: number } | undefined;
+  const supabase = await createClient();
+
+  const { data: org } = await supabase
+    .from("organizations")
+    .select("owner_id")
+    .eq("id", user.org_id)
+    .single();
+
   if (!org || org.owner_id !== user.id) {
     return NextResponse.json({ error: "Тільки власник може редагувати організацію" }, { status: 403 });
   }
@@ -65,9 +95,20 @@ export async function PUT(request: NextRequest) {
   const { name, description, location, phone, email, instagram, telegram, facebook, website } = await request.json();
   if (!name) return NextResponse.json({ error: "Назва обов'язкова" }, { status: 400 });
 
-  db.prepare(
-    `UPDATE organizations SET name = ?, description = ?, location = ?, phone = ?, email = ?, instagram = ?, telegram = ?, facebook = ?, website = ? WHERE id = ?`
-  ).run(name, description || null, location || null, phone || null, email || null, instagram || null, telegram || null, facebook || null, website || null, user.org_id);
+  await supabase
+    .from("organizations")
+    .update({
+      name,
+      description: description || null,
+      location: location || null,
+      phone: phone || null,
+      email: email || null,
+      instagram: instagram || null,
+      telegram: telegram || null,
+      facebook: facebook || null,
+      website: website || null,
+    })
+    .eq("id", user.org_id);
 
   return NextResponse.json({ success: true });
 }

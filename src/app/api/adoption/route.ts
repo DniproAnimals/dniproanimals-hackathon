@@ -1,22 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import getDb from "@/lib/db";
+import { createClient } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
 export async function GET() {
-  const db = getDb();
-  const requests = db
-    .prepare(
-      `SELECT ar.*, a.name as animal_name, a.type as animal_type
-       FROM adoption_requests ar
-       JOIN animals a ON ar.animal_id = a.id
-       ORDER BY ar.created_at DESC`
-    )
-    .all();
-  return NextResponse.json(requests);
+  const supabase = await createClient();
+
+  const { data: result } = await supabase
+    .from("adoption_requests")
+    .select("*, animals(name, type)")
+    .order("created_at", { ascending: false });
+
+  const formatted = (result || []).map((r: Record<string, unknown>) => {
+    const animals = r.animals as { name: string; type: string } | null;
+    return {
+      ...r,
+      animal_name: animals?.name,
+      animal_type: animals?.type,
+      animals: undefined,
+    };
+  });
+
+  return NextResponse.json(formatted);
 }
 
 export async function POST(request: NextRequest) {
-  const db = getDb();
   const body = await request.json();
   const { animal_id, name, email, phone, instagram, telegram, facebook, location, message } = body;
 
@@ -27,22 +34,40 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const animal = db
-    .prepare("SELECT * FROM animals WHERE id = ?")
-    .get(animal_id);
+  const supabase = await createClient();
+
+  const { data: animal } = await supabase
+    .from("animals")
+    .select("id")
+    .eq("id", animal_id)
+    .single();
+
   if (!animal) {
     return NextResponse.json({ error: "Тварину не знайдено" }, { status: 404 });
   }
 
-  const result = db
-    .prepare(
-      `INSERT INTO adoption_requests (animal_id, name, email, phone, instagram, telegram, facebook, location, message)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    )
-    .run(animal_id, name, email, phone, instagram || null, telegram || null, facebook || null, location || null, message || null);
+  const { data: result, error } = await supabase
+    .from("adoption_requests")
+    .insert({
+      animal_id,
+      name,
+      email,
+      phone,
+      instagram: instagram || null,
+      telegram: telegram || null,
+      facebook: facebook || null,
+      location: location || null,
+      message: message || null,
+    })
+    .select()
+    .single();
+
+  if (error || !result) {
+    return NextResponse.json({ error: "Помилка створення заявки" }, { status: 500 });
+  }
 
   return NextResponse.json(
-    { id: result.lastInsertRowid, success: true },
+    { id: result.id, success: true },
     { status: 201 }
   );
 }
@@ -53,13 +78,17 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
   }
 
-  const db = getDb();
   const { id, status } = await request.json();
 
   if (!id || !["approved", "rejected"].includes(status)) {
     return NextResponse.json({ error: "Невірні дані" }, { status: 400 });
   }
 
-  db.prepare("UPDATE adoption_requests SET status = ? WHERE id = ?").run(status, id);
+  const supabase = await createClient();
+  await supabase
+    .from("adoption_requests")
+    .update({ status })
+    .eq("id", id);
+
   return NextResponse.json({ success: true });
 }

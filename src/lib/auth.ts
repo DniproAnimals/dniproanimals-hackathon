@@ -1,17 +1,20 @@
 import { cookies } from "next/headers";
-import getDb, { type User } from "./db";
+import { createClient } from "./db";
 
 const SESSION_COOKIE = "da_session";
 
-export async function getSession(): Promise<User | null> {
+export async function getSession() {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get(SESSION_COOKIE)?.value;
   if (!sessionId) return null;
 
-  const db = getDb();
-  const user = db
-    .prepare("SELECT * FROM users WHERE id = ?")
-    .get(sessionId) as User | undefined;
+  const supabase = await createClient();
+  const { data: user } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", Number(sessionId))
+    .single();
+
   return user || null;
 }
 
