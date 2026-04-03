@@ -134,7 +134,7 @@ export default function AnimalsPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">Тварини</h1>
         <Link
-          href="/dashboard/animals/add"
+          href="/dashboard/animals/edit"
           className="px-4 py-2 rounded-xl text-sm font-medium bg-[#ced48c] text-foreground hover:bg-[#b8be72] transition-colors"
         >
           Додати тварину
