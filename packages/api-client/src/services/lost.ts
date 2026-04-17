@@ -1,0 +1,36 @@
+import type {
+  CreateLostBody,
+  CreateLostResponse,
+  ListLostQuery,
+  ListLostResponse,
+  UpdateLostBody,
+  UpdateLostResponse,
+} from "@dniproanimals/contracts";
+import { endpoints } from "@dniproanimals/endpoints";
+import type { HttpFn } from "../createHttp";
+
+const JSON_HEADERS = { "Content-Type": "application/json" };
+
+export function createLostApiService(http: HttpFn) {
+  return {
+    list: (query?: ListLostQuery) =>
+      http<ListLostResponse>({
+        endpoint: endpoints.lost.list(),
+        query,
+      }),
+    create: (body: CreateLostBody) =>
+      http<CreateLostResponse>({
+        endpoint: endpoints.lost.create(),
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: JSON_HEADERS,
+      }),
+    update: (id: number, body: UpdateLostBody) =>
+      http<UpdateLostResponse>({
+        endpoint: endpoints.lost.update({ id }),
+        method: "PUT",
+        body: JSON.stringify(body),
+        headers: JSON_HEADERS,
+      }),
+  };
+}

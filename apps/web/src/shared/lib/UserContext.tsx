@@ -1,4 +1,6 @@
 "use client";
+import { useMeQuery } from "@/shared/query-hooks";
+import type { AuthUserResponse } from "@dniproanimals/contracts";
 import {
   createContext,
   useCallback,
@@ -7,19 +9,11 @@ import {
   useState,
 } from "react";
 
-type UserData = {
-  id: number;
-  name: string;
-  email: string;
-  role: "user" | "admin" | "volunteer" | "superadmin";
-  org_id: number | null;
-} | null;
-
 type UserContextType = {
-  user: UserData;
+  user: AuthUserResponse | null;
   loading: boolean;
   favoriteIds: number[];
-  refresh: () => void;
+  refresh: () => Promise<unknown>;
   toggleFavorite: (animalId: number) => Promise<void>;
 };
 
@@ -27,39 +21,28 @@ const UserContext = createContext<UserContextType>({
   user: null,
   loading: true,
   favoriteIds: [],
-  refresh: () => {},
+  refresh: async () => {},
   toggleFavorite: async () => {},
 });
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserData>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: user, isLoading, refetch } = useMeQuery();
   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
 
-  const refresh = useCallback(() => {
-    fetch("/api/auth/me")
+  useEffect(() => {
+    if (!user) {
+      setFavoriteIds([]);
+      return;
+    }
+    fetch("/api/favorites")
       .then((r) => r.json())
-      .then((data) => {
-        setUser(data);
-        setLoading(false);
-        if (data) {
-          fetch("/api/favorites")
-            .then((r) => r.json())
-            .then((favs) => {
-              if (Array.isArray(favs)) {
-                setFavoriteIds(favs.map((f: { id: number }) => f.id));
-              }
-            });
-        } else {
-          setFavoriteIds([]);
+      .then((favs) => {
+        if (Array.isArray(favs)) {
+          setFavoriteIds(favs.map((f: { id: number }) => f.id));
         }
       })
-      .catch(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+      .catch(() => {});
+  }, [user]);
 
   const toggleFavorite = useCallback(
     async (animalId: number) => {
@@ -83,7 +66,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <UserContext.Provider
-      value={{ user, loading, favoriteIds, refresh, toggleFavorite }}
+      value={{
+        user: user ?? null,
+        loading: isLoading,
+        favoriteIds,
+        refresh: refetch,
+        toggleFavorite,
+      }}
     >
       {children}
     </UserContext.Provider>

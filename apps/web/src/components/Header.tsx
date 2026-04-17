@@ -1,6 +1,7 @@
 "use client";
 import { useUser } from "@/shared/lib/UserContext";
 import { cn } from "@/shared/lib/utils";
+import { useLogoutMutation } from "@/shared/query-hooks";
 import {
   IconChevronDown,
   IconHomeFilled,
@@ -35,7 +36,7 @@ const navItems = [
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, refresh } = useUser();
+  const { user } = useUser();
   const [lostCount, setLostCount] = useState(0);
 
   useEffect(() => {
@@ -47,11 +48,12 @@ export default function Header() {
       .catch(() => {});
   }, [pathname]);
 
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    refresh();
-    router.push("/");
-  };
+  const logoutMutation = useLogoutMutation({
+    onSuccess: () => {
+      router.push("/");
+    },
+  });
+  const handleLogout = () => logoutMutation.mutate();
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -121,7 +123,7 @@ export default function Header() {
                     </Link>
                   </DropdownMenuItem>
                 )}
-                {user.org_id && (
+                {user.orgId && (
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard">
                       <IconHomeFilled className="text-green-secondary" />

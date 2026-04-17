@@ -1,31 +1,38 @@
-import { SUPABASE_KEY, SUPABASE_URL } from "@/shared/constants/env";
+import { env } from "@dniproanimals/env";
 import { createServerClient } from "@supabase/ssr";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 /** Public client without cookies — safe for static generation and ISR */
 export function createPublicClient() {
-  return createSupabaseClient(SUPABASE_URL, SUPABASE_KEY);
+  return createSupabaseClient(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY,
+  );
 }
 
 export async function createClient() {
   const cookieStore = await cookies();
-  return createServerClient(SUPABASE_URL, SUPABASE_KEY, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll();
-      },
-      setAll(cookiesToSet) {
-        try {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options),
-          );
-        } catch {
-          // Called from Server Component — safe to ignore
-        }
+  return createServerClient(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options),
+            );
+          } catch {
+            // Called from Server Component — safe to ignore
+          }
+        },
       },
     },
-  });
+  );
 }
 
 // Types for client-side usage

@@ -1,4 +1,4 @@
-import { SUPABASE_KEY, SUPABASE_URL } from "@/shared/constants/env";
+import { env } from "@dniproanimals/env";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
@@ -9,7 +9,10 @@ export async function getSession() {
   const sessionId = cookieStore.get(SESSION_COOKIE)?.value;
   if (!sessionId) return null;
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const supabase = createClient(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY,
+  );
   const { data: user } = await supabase
     .from("users")
     .select("*")

@@ -104,8 +104,8 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const refreshOrg = useCallback(async () => {
-    if (!user?.org_id) return;
-    const res = await fetch(`/api/organizations/${user.org_id}`);
+    if (!user?.orgId) return;
+    const res = await fetch(`/api/organizations/${user.orgId}`);
     if (!res.ok) return;
     const myOrg = await res.json();
     if (myOrg) {
@@ -120,15 +120,15 @@ export default function DashboardLayout({
       router.replace("/auth");
       return;
     }
-    if (!user.org_id) {
+    if (!user.orgId) {
       router.replace("/");
     }
   }, [user, loading, router]);
 
   useEffect(() => {
-    if (!user?.org_id) return;
+    if (!user?.orgId) return;
     let cancelled = false;
-    fetch(`/api/organizations/${user.org_id}`)
+    fetch(`/api/organizations/${user.orgId}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((myOrg) => {
         if (cancelled || !myOrg) return;

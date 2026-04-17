@@ -2,6 +2,24 @@
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
   "globalEnv": [
+    "NODE_ENV",
+    "DATABASE_URL",
+    "DB_HOST",
+    "DB_PORT",
+    "DB_USER",
+    "DB_PASS",
+    "DB_NAME",
+    "REDIS_HOST",
+    "REDIS_PORT",
+    "SESSION_SECRET",
+    "SERVER_PORT",
+    "WEB_ORIGIN",
+    "NEXT_PUBLIC_API_URL",
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_USER",
+    "SMTP_PASS",
+    "SMTP_FROM",
     "NEXT_PUBLIC_SUPABASE_URL",
     "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY"
   ],
@@ -21,11 +39,12 @@
       "cache": false,
       "persistent": true
     },
-    "seed": {
-      "cache": false
-    },
-    "db:drop": {
-      "cache": false
-    }
+    "db:generate": { "cache": false },
+    "db:migrate": { "cache": false },
+    "db:push": { "cache": false },
+    "db:reset": { "cache": false },
+    "db:studio": { "cache": false, "persistent": true },
+    "seed": { "cache": false },
+    "db:drop": { "cache": false }
   }
 }

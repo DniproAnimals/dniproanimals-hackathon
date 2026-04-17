@@ -1,4 +1,4 @@
-import "@dniproanimals/env";
+import "@dniproanimals/env/load";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {

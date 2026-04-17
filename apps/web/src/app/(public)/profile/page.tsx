@@ -2,6 +2,7 @@
 import AnimalCard from "@/components/AnimalCard";
 import { useUser } from "@/shared/lib/UserContext";
 import type { Animal } from "@/shared/lib/db";
+import { useLogoutMutation } from "@/shared/query-hooks";
 import { IconHeartFilled } from "@dniproanimals/icons";
 import {
   Avatar,
@@ -16,8 +17,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ProfilePage() {
-  const { user, loading, refresh } = useUser();
+  const { user, loading } = useUser();
   const router = useRouter();
+  const logoutMutation = useLogoutMutation({
+    onSuccess: () => router.push("/"),
+  });
   const [favorites, setFavorites] = useState<Animal[]>([]);
   const [loadingFavs, setLoadingFavs] = useState(true);
 
@@ -38,11 +42,7 @@ export default function ProfilePage() {
     }
   }, [user]);
 
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    refresh();
-    router.push("/");
-  };
+  const handleLogout = () => logoutMutation.mutate();
 
   if (loading || !user) {
     return (

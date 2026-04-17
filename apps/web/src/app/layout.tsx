@@ -1,5 +1,6 @@
 import { UserProvider } from "@/shared/lib/UserContext";
 import { cn } from "@/shared/lib/utils";
+import { ReactQueryProvider } from "@/shared/providers/ReactQueryProvider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
@@ -45,9 +46,11 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-white">
-        <NuqsAdapter>
-          <UserProvider>{children}</UserProvider>
-        </NuqsAdapter>
+        <ReactQueryProvider>
+          <NuqsAdapter>
+            <UserProvider>{children}</UserProvider>
+          </NuqsAdapter>
+        </ReactQueryProvider>
       </body>
     </html>
   );

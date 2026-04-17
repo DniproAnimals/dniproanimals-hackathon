@@ -28,7 +28,7 @@ type Org = {
 
 export default function OrganizationsPage() {
   const { user } = useUser();
-  const hasOrg = !!user?.org_id;
+  const hasOrg = !!user?.orgId;
   const [orgs, setOrgs] = useState<Org[]>([]);
   const [loading, setLoading] = useState(true);
 

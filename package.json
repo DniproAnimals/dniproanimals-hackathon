@@ -9,9 +9,18 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "type-check": "turbo run type-check",
     "prepare": "husky",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "infra:logs": "docker compose logs -f",
+    "mail:studio": "open http://localhost:8025",
+    "db:generate": "turbo run db:generate",
+    "db:migrate": "turbo run db:migrate",
+    "db:push": "turbo run db:push",
+    "db:reset": "turbo run db:reset",
+    "db:studio": "turbo run db:studio",
     "seed": "turbo run seed",
     "db:drop": "turbo run db:drop",
-    "storybook": "turbo run dev --filter=@dniproanimals/storybook"
+    "storybook": "turbo run start --filter=@dniproanimals/storybook"
   },
   "devDependencies": {
     "husky": "^9.1.7",

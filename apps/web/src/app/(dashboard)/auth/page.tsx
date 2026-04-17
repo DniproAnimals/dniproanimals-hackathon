@@ -1,5 +1,6 @@
 "use client";
 import { useUser } from "@/shared/lib/UserContext";
+import { useLoginMutation, useRegisterMutation } from "@/shared/query-hooks";
 import {
   IconLockFilled,
   IconMailFilled,
@@ -12,53 +13,45 @@ import { useEffect, useState } from "react";
 
 export default function AuthPage() {
   const router = useRouter();
-  const { user, refresh } = useUser();
+  const { user } = useUser();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
       if (user.role === "superadmin") router.replace("/admin");
-      else if (user.org_id) router.replace("/dashboard");
+      else if (user.orgId) router.replace("/dashboard");
       else router.replace("/onboarding");
     }
   }, [user, router]);
 
+  const loginMutation = useLoginMutation({
+    onSuccess: (data) => {
+      if (data.role === "superadmin") router.push("/admin");
+      else if (data.orgId) router.push("/dashboard");
+      else router.push("/onboarding");
+    },
+    onError: (err) => setError(err.message || "Помилка"),
+  });
+
+  const registerMutation = useRegisterMutation({
+    onSuccess: () => router.push("/onboarding"),
+    onError: (err) => setError(err.message || "Помилка"),
+  });
+
   if (user) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const loading = loginMutation.isPending || registerMutation.isPending;
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
-
-    const url = mode === "login" ? "/api/auth/login" : "/api/auth/register";
-    const body =
-      mode === "login" ? { email: form.email, password: form.password } : form;
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error || "Помилка");
+    if (mode === "login") {
+      loginMutation.mutate({ email: form.email, password: form.password });
     } else {
-      if (mode === "register") {
-        router.push("/onboarding");
-        refresh();
-      } else {
-        refresh();
-        const { role, org_id } = data;
-        if (role === "superadmin") router.push("/admin");
-        else if (org_id) router.push("/dashboard");
-        else router.push("/onboarding");
-      }
+      registerMutation.mutate(form);
     }
-    setLoading(false);
   };
 
   return (
