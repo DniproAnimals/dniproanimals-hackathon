@@ -1,0 +1,24 @@
+{
+  "name": "@dniproanimals/storybook",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "storybook dev -p 6006",
+    "build": "storybook build"
+  },
+  "dependencies": {
+    "@dniproanimals/ui": "*",
+    "next": "16.2.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@dniproanimals/tailwind": "*",
+    "@dniproanimals/typescript-config": "*",
+    "@storybook/nextjs-vite": "^10.3.3",
+    "@storybook/react": "^10.3.3",
+    "storybook": "^10.3.3",
+    "typescript": "^5.9.2",
+    "vite": "^6.3.5"
+  }
+}

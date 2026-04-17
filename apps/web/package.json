@@ -1,0 +1,44 @@
+{
+  "name": "@dniproanimals/web",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "type-check": "tsc --noEmit",
+    "seed": "npx tsx scripts/seed.ts",
+    "db:drop": "npx tsx scripts/drop.ts",
+    "stripe": "stripe listen --forward-to localhost:3000/api/stripe/webhook"
+  },
+  "dependencies": {
+    "@dniproanimals/api-client": "*",
+    "@dniproanimals/dayjs": "*",
+    "@dniproanimals/endpoints": "*",
+    "@dniproanimals/env": "*",
+    "@dniproanimals/icons": "*",
+    "@dniproanimals/ui": "*",
+    "@supabase/ssr": "^0.10.0",
+    "@supabase/supabase-js": "^2.101.1",
+    "motion": "^12.38.0",
+    "next": "16.2.1",
+    "nuqs": "^2.8.9",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@dniproanimals/eslint-config": "*",
+    "@dniproanimals/tailwind": "*",
+    "@dniproanimals/typescript-config": "*",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "dotenv": "^17.4.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  }
+}

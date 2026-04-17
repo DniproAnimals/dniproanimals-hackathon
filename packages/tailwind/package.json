@@ -1,0 +1,12 @@
+{
+  "name": "@dniproanimals/tailwind",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./postcss": "./postcss.config.mjs"
+  },
+  "dependencies": {
+    "tailwindcss": "^4",
+    "@tailwindcss/postcss": "^4"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@dniproanimals/endpoints",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@dniproanimals/typescript-config": "*",
+    "typescript": "^5.9.2"
+  }
+}
