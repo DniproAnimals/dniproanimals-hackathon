@@ -1,1 +1,0 @@
-ALTER TABLE "organizations" ADD COLUMN "monobank_jar_id" text;
