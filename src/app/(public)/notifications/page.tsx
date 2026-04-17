@@ -1,19 +1,47 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import {
+  Badge,
+  Card,
+  EmptyState,
+  Skeleton,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui";
+import { useUser } from "@/shared/lib/UserContext";
+import { cn } from "@/shared/lib/utils";
+import {
+  IconBellFilled,
+  IconHeartFilled,
+  IconSearch,
+} from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@/lib/UserContext";
-import { motion } from "motion/react";
-import { IconBellFilled, IconHeartFilled, IconSearch } from "@tabler/icons-react";
-
-type Notif = { id: number; type: string; title: string; message: string | null; link: string | null; is_read: number; created_at: string };
+import { useEffect, useState } from "react";
 
 export default function NotificationsPage() {
   const { user, loading } = useUser();
   const router = useRouter();
-  const [notifications, setNotifications] = useState<Notif[]>([]);
-  const [requests, setRequests] = useState<{ id: number; name: string; phone: string; email: string; animal_name: string; message: string | null; status: string; created_at: string }[]>([]);
-  const [lostItems, setLostItems] = useState<{ id: number; title: string; type: string; contact_name: string; created_at: string }[]>([]);
+  const [requests, setRequests] = useState<
+    {
+      id: number;
+      name: string;
+      phone: string;
+      email: string;
+      animal_name: string;
+      message: string | null;
+      status: string;
+      created_at: string;
+    }[]
+  >([]);
+  const [lostItems, setLostItems] = useState<
+    {
+      id: number;
+      title: string;
+      type: string;
+      contact_name: string;
+      created_at: string;
+    }[]
+  >([]);
   const [tab, setTab] = useState<"all" | "requests" | "lost">("all");
 
   useEffect(() => {
@@ -22,79 +50,161 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (!user || user.role === "user") return;
-    fetch("/api/adoption").then((r) => r.json()).then(setRequests);
-    fetch("/api/lost").then((r) => r.json()).then(setLostItems);
-    fetch("/api/notifications").then((r) => r.json()).then((d: Notif[]) => { if (Array.isArray(d)) setNotifications(d); });
+    fetch("/api/adoption")
+      .then((r) => r.json())
+      .then(setRequests);
+    fetch("/api/lost")
+      .then((r) => r.json())
+      .then(setLostItems);
   }, [user]);
 
-  if (loading || !user) return <div className="max-w-3xl mx-auto px-6 py-20 text-center"><div className="w-10 h-10 bg-gray-light rounded-full animate-pulse mx-auto" /></div>;
+  if (loading || !user)
+    return (
+      <div className="max-w-3xl mx-auto px-6 py-20 text-center">
+        <Skeleton className="size-10 rounded-full mx-auto" />
+      </div>
+    );
 
   const allItems = [
-    ...requests.map((r) => ({ id: `req-${r.id}`, type: "adoption" as const, title: `Заявка від ${r.name}`, sub: `на ${r.animal_name}`, date: r.created_at, status: r.status, data: r })),
-    ...lostItems.map((l) => ({ id: `lost-${l.id}`, type: "lost" as const, title: l.title, sub: l.contact_name, date: l.created_at, status: l.type, data: l })),
+    ...requests.map((r) => ({
+      id: `req-${r.id}`,
+      type: "adoption" as const,
+      title: `Заявка від ${r.name}`,
+      sub: `на ${r.animal_name}`,
+      date: r.created_at,
+      status: r.status,
+      data: r,
+    })),
+    ...lostItems.map((l) => ({
+      id: `lost-${l.id}`,
+      type: "lost" as const,
+      title: l.title,
+      sub: l.contact_name,
+      date: l.created_at,
+      status: l.type,
+      data: l,
+    })),
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  const filtered = tab === "requests" ? allItems.filter((i) => i.type === "adoption") : tab === "lost" ? allItems.filter((i) => i.type === "lost") : allItems;
+  const filtered =
+    tab === "requests"
+      ? allItems.filter((i) => i.type === "adoption")
+      : tab === "lost"
+        ? allItems.filter((i) => i.type === "lost")
+        : allItems;
+
+  const badgeVariantFor = (
+    item: (typeof allItems)[number],
+  ): "warning" | "success" | "danger" => {
+    if (item.type === "adoption") {
+      if (item.status === "pending") return "warning";
+      if (item.status === "approved") return "success";
+      return "danger";
+    }
+    return "danger";
+  };
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-6 pb-24 md:pb-6">
       <h1 className="text-2xl font-bold mb-1">Повідомлення</h1>
-      <p className="text-sm text-gray-medium mb-5">{allItems.length} повідомлень</p>
+      <p className="text-sm text-gray-medium mb-5">
+        {allItems.length} повідомлень
+      </p>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-5">
-        {[
-          { value: "all" as const, label: "Всі" },
-          { value: "requests" as const, label: `Заявки (${requests.length})` },
-          { value: "lost" as const, label: `Загублені (${lostItems.length})` },
-        ].map((t) => (
-          <button key={t.value} onClick={() => setTab(t.value)} className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${tab === t.value ? "bg-[#ced48c] text-foreground" : "bg-gray-light text-foreground"}`}>
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        value={tab}
+        onValueChange={(v) => setTab(v as "all" | "requests" | "lost")}
+        className="mb-5"
+      >
+        <TabsList className="bg-transparent p-0 gap-2">
+          {[
+            { value: "all" as const, label: "Всі" },
+            {
+              value: "requests" as const,
+              label: `Заявки (${requests.length})`,
+            },
+            {
+              value: "lost" as const,
+              label: `Загублені (${lostItems.length})`,
+            },
+          ].map((t) => (
+            <TabsTrigger
+              key={t.value}
+              value={t.value}
+              className="rounded-full px-4 py-2 text-sm font-medium bg-gray-light text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              {t.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-16">
-          <div className="w-16 h-16 rounded-full bg-gray-light mx-auto flex items-center justify-center mb-3">
-            <IconBellFilled size={24} className="text-gray-400" />
-          </div>
-          <p className="text-sm text-gray-medium">Немає повідомлень</p>
-        </div>
+        <EmptyState icon={<IconBellFilled />} description="Немає повідомлень" />
       ) : (
         <div className="space-y-2">
           {filtered.map((item) => (
-            <div key={item.id} className="bg-white rounded-2xl border border-gray-border p-4 hover:border-[#ced48c] transition-colors">
+            <Card
+              key={item.id}
+              className="bg-white p-4 hover:border-primary transition-colors"
+            >
               <div className="flex items-start gap-3">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${item.type === "adoption" ? "bg-[#ced48c]/20" : "bg-red-50"}`}>
+                <div
+                  className={cn(
+                    "size-9 rounded-full flex items-center justify-center shrink-0",
+                    item.type === "adoption" ? "bg-green-light" : "bg-red-50",
+                  )}
+                >
                   {item.type === "adoption" ? (
-                    <IconHeartFilled size={16} className="text-[#ced48c]" />
+                    <IconHeartFilled size={16} className="text-primary" />
                   ) : (
                     <IconSearch size={16} className="text-red-500" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
-                    <p className="text-sm font-semibold truncate">{item.title}</p>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${
-                      item.type === "adoption"
-                        ? item.status === "pending" ? "bg-yellow-100 text-yellow-700" : item.status === "approved" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
-                        : "bg-red-100 text-red-600"
-                    }`}>
-                      {item.type === "adoption" ? (item.status === "pending" ? "Очікує" : item.status === "approved" ? "Схвалено" : "Відхилено") : "Загублено"}
-                    </span>
+                    <p className="text-sm font-semibold truncate">
+                      {item.title}
+                    </p>
+                    <Badge
+                      variant={badgeVariantFor(item)}
+                      size="sm"
+                      className="shrink-0"
+                    >
+                      {item.type === "adoption"
+                        ? item.status === "pending"
+                          ? "Очікує"
+                          : item.status === "approved"
+                            ? "Схвалено"
+                            : "Відхилено"
+                        : "Загублено"}
+                    </Badge>
                   </div>
                   <p className="text-xs text-gray-medium">{item.sub}</p>
-                  <p className="text-[10px] text-gray-400 mt-1">{new Date(item.date).toLocaleDateString("uk-UA")} · {new Date(item.date).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit" })}</p>
+                  <p className="text-[10px] text-gray-400 mt-1">
+                    {new Date(item.date).toLocaleDateString("uk-UA")} ·{" "}
+                    {new Date(item.date).toLocaleTimeString("uk-UA", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
                   {item.type === "adoption" && (
                     <div className="mt-2 text-xs text-gray-600 space-y-0.5">
-                      <p>📧 {(item.data as typeof requests[0]).email} · 📞 {(item.data as typeof requests[0]).phone}</p>
-                      {(item.data as typeof requests[0]).message && <p className="bg-gray-light rounded-lg p-2 mt-1">{(item.data as typeof requests[0]).message}</p>}
+                      <p>
+                        📧 {(item.data as (typeof requests)[0]).email} · 📞{" "}
+                        {(item.data as (typeof requests)[0]).phone}
+                      </p>
+                      {(item.data as (typeof requests)[0]).message && (
+                        <p className="bg-gray-light rounded-lg p-2 mt-1">
+                          {(item.data as (typeof requests)[0]).message}
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}

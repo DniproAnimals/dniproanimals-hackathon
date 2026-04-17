@@ -1,6 +1,6 @@
+import { setSessionCookie } from "@/shared/lib/auth";
+import { createClient } from "@/shared/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/db";
-import { setSessionCookie } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token");
@@ -17,11 +17,17 @@ export async function GET(request: NextRequest) {
     .single();
 
   if (!volunteer) {
-    return NextResponse.json({ error: "Невірне або застаріле запрошення" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Невірне або застаріле запрошення" },
+      { status: 404 },
+    );
   }
 
   if (volunteer.user_id) {
-    return NextResponse.json({ error: "Це запрошення вже використано" }, { status: 409 });
+    return NextResponse.json(
+      { error: "Це запрошення вже використано" },
+      { status: 409 },
+    );
   }
 
   const org = volunteer.organizations as unknown as { name: string } | null;
@@ -37,7 +43,10 @@ export async function POST(request: NextRequest) {
   const { token, email, password } = await request.json();
 
   if (!token || !email || !password) {
-    return NextResponse.json({ error: "Всі поля обов'язкові" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Всі поля обов'язкові" },
+      { status: 400 },
+    );
   }
 
   const supabase = await createClient();
@@ -49,11 +58,17 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (!volunteer) {
-    return NextResponse.json({ error: "Невірне або застаріле запрошення" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Невірне або застаріле запрошення" },
+      { status: 404 },
+    );
   }
 
   if (volunteer.user_id) {
-    return NextResponse.json({ error: "Це запрошення вже використано" }, { status: 409 });
+    return NextResponse.json(
+      { error: "Це запрошення вже використано" },
+      { status: 409 },
+    );
   }
 
   const { data: existing } = await supabase
@@ -63,10 +78,15 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (existing) {
-    return NextResponse.json({ error: "Цей email вже зареєстровано" }, { status: 409 });
+    return NextResponse.json(
+      { error: "Цей email вже зареєстровано" },
+      { status: 409 },
+    );
   }
 
-  const fullName = [volunteer.name, volunteer.surname].filter(Boolean).join(" ");
+  const fullName = [volunteer.name, volunteer.surname]
+    .filter(Boolean)
+    .join(" ");
 
   const { data: newUser, error } = await supabase
     .from("users")
@@ -89,13 +109,16 @@ export async function POST(request: NextRequest) {
     .update({ user_id: newUser.id })
     .eq("id", volunteer.id);
 
-  const res = NextResponse.json({
-    id: newUser.id,
-    name: fullName,
-    email,
-    role: "volunteer",
-    org_id: volunteer.org_id,
-  }, { status: 201 });
+  const res = NextResponse.json(
+    {
+      id: newUser.id,
+      name: fullName,
+      email,
+      role: "volunteer",
+      org_id: volunteer.org_id,
+    },
+    { status: 201 },
+  );
   res.cookies.set(setSessionCookie(newUser.id));
   return res;
 }

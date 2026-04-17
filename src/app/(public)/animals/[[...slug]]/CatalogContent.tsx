@@ -1,17 +1,35 @@
 "use client";
-
-import { useEffect, useState, Suspense } from "react";
-import { useRouter } from "next/navigation";
-import { useQueryStates, parseAsString } from "nuqs";
-import { motion, AnimatePresence } from "motion/react";
-import Link from "next/link";
 import AnimalCard from "@/components/AnimalCard";
 import FilterBar from "@/components/FilterBar";
-import { useUser } from "@/lib/UserContext";
-import type { Animal } from "@/lib/db";
-import { IconPlus, IconAdjustmentsHorizontal, IconSortDescending } from "@tabler/icons-react";
+import {
+  Badge,
+  Button,
+  EmptyState,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Skeleton,
+} from "@/components/ui";
+import { useUser } from "@/shared/lib/UserContext";
+import type { Animal } from "@/shared/lib/db";
+import {
+  IconAdjustmentsHorizontal,
+  IconPlus,
+  IconSortDescending,
+} from "@tabler/icons-react";
+import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { parseAsString, useQueryStates } from "nuqs";
+import { Suspense, useEffect, useState, useTransition } from "react";
 
-const typeValueToSlug: Record<string, string> = { dog: "dogs", cat: "cats", other: "other" };
+const typeValueToSlug: Record<string, string> = {
+  dog: "dogs",
+  cat: "cats",
+  other: "other",
+};
 
 type Props = {
   initialAnimals: Animal[];
@@ -32,10 +50,17 @@ const secondaryParsers = {
   sort: parseAsString,
 };
 
-function CatalogInner({ initialAnimals, slugType, slugSex, slugSize, seoH1, seoDescription }: Props) {
+function CatalogInner({
+  initialAnimals,
+  slugType,
+  slugSex,
+  slugSize,
+  seoH1,
+  seoDescription,
+}: Props) {
   const router = useRouter();
-  const [animals, setAnimals] = useState(initialAnimals);
-  const [loading, setLoading] = useState(false);
+  const [fetchedAnimals, setFetchedAnimals] = useState<Animal[] | null>(null);
+  const [loading, startTransition] = useTransition();
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const { user } = useUser();
 
@@ -47,39 +72,49 @@ function CatalogInner({ initialAnimals, slugType, slugSex, slugSize, seoH1, seoD
     if (slugType) p.set("type", slugType);
     if (slugSex) p.set("sex", slugSex);
     if (slugSize) p.set("size", slugSize);
-    Object.entries(secondary).forEach(([k, v]) => { if (v) p.set(k, v); });
+    Object.entries(secondary).forEach(([k, v]) => {
+      if (v) p.set(k, v);
+    });
     return p.toString();
   })();
 
   // Re-fetch when secondary filters change
-  const hasSecondary = Object.values(secondary).some(v => v != null);
+  const hasSecondary = Object.values(secondary).some((v) => v != null);
+
+  const animals =
+    hasSecondary && fetchedAnimals ? fetchedAnimals : initialAnimals;
 
   useEffect(() => {
-    if (!hasSecondary) {
-      setAnimals(initialAnimals);
-      return;
-    }
-    setLoading(true);
-    fetch(`/api/animals?${apiQuery}`)
-      .then((r) => r.json())
-      .then((data) => { setAnimals(data); setLoading(false); })
-      .catch(() => setLoading(false));
-  }, [apiQuery, hasSecondary, initialAnimals]);
-
-  // Sync when SSR data changes (slug navigation)
-  useEffect(() => {
-    if (!hasSecondary) setAnimals(initialAnimals);
-  }, [initialAnimals, hasSecondary]);
+    if (!hasSecondary) return;
+    let cancelled = false;
+    startTransition(async () => {
+      try {
+        const r = await fetch(`/api/animals?${apiQuery}`);
+        const data = await r.json();
+        if (!cancelled) setFetchedAnimals(data);
+      } catch {
+        /* ignore */
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [apiQuery, hasSecondary]);
 
   // Navigate to slug URL when type/sex/size change
   const handlePrimaryChange = (key: string, value: string | null) => {
-    let t = slugType, s = slugSex, sz = slugSize;
+    let t = slugType,
+      s = slugSex,
+      sz = slugSize;
     if (key === "type") t = t === value ? null : value;
     if (key === "sex") s = s === value ? null : value;
     if (key === "size") sz = sz === value ? null : value;
 
     // If type is deselected, also clear sex/size (they depend on type for slug)
-    if (!t) { s = null; sz = null; }
+    if (!t) {
+      s = null;
+      sz = null;
+    }
 
     const parts: string[] = [];
     if (t) parts.push(typeValueToSlug[t]);
@@ -88,7 +123,10 @@ function CatalogInner({ initialAnimals, slugType, slugSex, slugSize, seoH1, seoD
 
     // Preserve secondary query params
     const query = new URLSearchParams(
-      Object.entries(secondary).filter(([, v]) => v != null) as [string, string][]
+      Object.entries(secondary).filter(([, v]) => v != null) as [
+        string,
+        string,
+      ][],
     ).toString();
 
     const url = `/animals${parts.length ? `/${parts.join("/")}` : ""}${query ? `?${query}` : ""}`;
@@ -108,8 +146,6 @@ function CatalogInner({ initialAnimals, slugType, slugSex, slugSize, seoH1, seoD
   if (secondary.sterilized === "1") mobileFilterCount++;
   if (secondary.trained === "1") mobileFilterCount++;
 
-  const isFiltered = !!seoH1;
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -128,28 +164,37 @@ function CatalogInner({ initialAnimals, slugType, slugSex, slugSize, seoH1, seoD
             {seoH1 || "Наші хвостики"}
           </h1>
           <p className="text-sm text-gray-medium">
-            {seoDescription || "Знайдіть свого нового друга серед наших підопічних"}
+            {seoDescription ||
+              "Знайдіть свого нового друга серед наших підопічних"}
           </p>
         </motion.div>
         <div className="flex items-center gap-2">
           {user?.role === "admin" && (
-            <Link href="/dashboard/animals" className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#ced48c] text-foreground text-sm font-medium hover:bg-[#b8be72] transition-colors">
-              <IconPlus size={14} />
-              Додати
-            </Link>
+            <Button asChild variant="primary" size="sm">
+              <Link href="/dashboard/animals">
+                <IconPlus size={14} />
+                Додати
+              </Link>
+            </Button>
           )}
-          <button
+          <Button
+            variant="subtle"
+            size="sm"
             onClick={() => setShowMobileFilters(!showMobileFilters)}
-            className="md:hidden flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gray-light text-sm font-medium"
+            className="md:hidden"
           >
             <IconAdjustmentsHorizontal size={14} />
             Фільтри
             {mobileFilterCount > 0 && (
-              <span className="w-5 h-5 rounded-full bg-[#ced48c] text-foreground text-[10px] font-bold flex items-center justify-center">
+              <Badge
+                variant="brand"
+                size="xs"
+                className="size-5 p-0 justify-center text-[10px] font-bold"
+              >
                 {mobileFilterCount}
-              </span>
+              </Badge>
             )}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -187,25 +232,38 @@ function CatalogInner({ initialAnimals, slugType, slugSex, slugSize, seoH1, seoD
               className="flex items-center justify-between mb-4"
             >
               <p className="text-sm text-gray-medium">
-                Знайдено <span className="font-semibold text-foreground">{animals.length}</span>{" "}
-                {animals.length === 1 ? "тварину" : animals.length < 5 ? "тварини" : "тварин"}
+                Знайдено{" "}
+                <span className="font-semibold text-foreground">
+                  {animals.length}
+                </span>{" "}
+                {animals.length === 1
+                  ? "тварину"
+                  : animals.length < 5
+                    ? "тварини"
+                    : "тварин"}
               </p>
               <div className="flex items-center gap-1.5">
                 <IconSortDescending size={14} className="text-gray-medium" />
-                <select
-                  value={secondary.sort || ""}
-                  onChange={(e) => setSecondary({ sort: e.target.value || null })}
-                  className="text-sm bg-transparent border-none outline-none text-gray-medium cursor-pointer font-medium pr-1"
+                <Select
+                  value={secondary.sort || "newest"}
+                  onValueChange={(v) =>
+                    setSecondary({ sort: v === "newest" ? null : v })
+                  }
                 >
-                  <option value="">Нові спочатку</option>
-                  <option value="oldest">Старі спочатку</option>
-                  <option value="name_asc">А → Я</option>
-                  <option value="name_desc">Я → А</option>
-                  <option value="age_asc">Наймолодші</option>
-                  <option value="age_desc">Найстарші</option>
-                  <option value="weight_asc">Легкі спочатку</option>
-                  <option value="weight_desc">Важкі спочатку</option>
-                </select>
+                  <SelectTrigger className="h-auto border-none bg-transparent px-0 text-sm text-gray-medium font-medium w-auto gap-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Нові спочатку</SelectItem>
+                    <SelectItem value="oldest">Старі спочатку</SelectItem>
+                    <SelectItem value="name_asc">А → Я</SelectItem>
+                    <SelectItem value="name_desc">Я → А</SelectItem>
+                    <SelectItem value="age_asc">Наймолодші</SelectItem>
+                    <SelectItem value="age_desc">Найстарші</SelectItem>
+                    <SelectItem value="weight_asc">Легкі спочатку</SelectItem>
+                    <SelectItem value="weight_desc">Важкі спочатку</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </motion.div>
           )}
@@ -222,9 +280,9 @@ function CatalogInner({ initialAnimals, slugType, slugSex, slugSize, seoH1, seoD
               >
                 {[...Array(6)].map((_, i) => (
                   <div key={i}>
-                    <div className="bg-gray-light rounded-2xl animate-pulse aspect-square" />
-                    <div className="mt-2.5 h-4 bg-gray-light rounded-lg w-2/3" />
-                    <div className="mt-1.5 h-3 bg-gray-light rounded-lg w-1/2" />
+                    <Skeleton className="rounded-2xl aspect-square" />
+                    <Skeleton className="mt-2.5 h-4 rounded-lg w-2/3" />
+                    <Skeleton className="mt-1.5 h-3 rounded-lg w-1/2" />
                   </div>
                 ))}
               </motion.div>
@@ -235,13 +293,16 @@ function CatalogInner({ initialAnimals, slugType, slugSex, slugSize, seoH1, seoD
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3 }}
-                className="text-center py-20"
               >
-                <div className="w-20 h-20 rounded-full bg-green-light mx-auto flex items-center justify-center mb-4">
-                  <span className="text-4xl">🐾</span>
-                </div>
-                <p className="text-lg font-semibold text-foreground mb-1">Тварин поки немає</p>
-                <p className="text-sm text-gray-medium">Скоро тут з&#39;являться хвостики, які шукають дім</p>
+                <EmptyState
+                  icon={
+                    <div className="size-20 rounded-full bg-green-light mx-auto flex items-center justify-center">
+                      <span className="text-4xl">🐾</span>
+                    </div>
+                  }
+                  title="Тварин поки немає"
+                  description="Скоро тут з'являться хвостики, які шукають дім"
+                />
               </motion.div>
             ) : (
               <motion.div
@@ -257,7 +318,11 @@ function CatalogInner({ initialAnimals, slugType, slugSex, slugSize, seoH1, seoD
                     key={animal.id}
                     initial={{ opacity: 0, y: 24 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: i * 0.05, ease: "easeOut" }}
+                    transition={{
+                      duration: 0.35,
+                      delay: i * 0.05,
+                      ease: "easeOut",
+                    }}
                   >
                     <AnimalCard animal={animal} index={i} />
                   </motion.div>
@@ -279,15 +344,15 @@ export default function CatalogContent(props: Props) {
           <div className="md:flex md:gap-8">
             <aside className="hidden md:block w-56 shrink-0">
               <div className="space-y-3">
-                <div className="h-10 bg-gray-light rounded-xl animate-pulse" />
-                <div className="h-32 bg-gray-light rounded-xl animate-pulse" />
+                <Skeleton className="h-10 rounded-xl" />
+                <Skeleton className="h-32 rounded-xl" />
               </div>
             </aside>
             <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-5">
               {[...Array(6)].map((_, i) => (
                 <div key={i}>
-                  <div className="bg-gray-light rounded-2xl animate-pulse aspect-square" />
-                  <div className="mt-2.5 h-4 bg-gray-light rounded-lg w-2/3" />
+                  <Skeleton className="rounded-2xl aspect-square" />
+                  <Skeleton className="mt-2.5 h-4 rounded-lg w-2/3" />
                 </div>
               ))}
             </div>

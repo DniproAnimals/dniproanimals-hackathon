@@ -1,9 +1,9 @@
+import { createClient } from "@/shared/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/db";
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const supabase = await createClient();
@@ -33,7 +33,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const body = await request.json();
@@ -50,10 +50,27 @@ export async function PUT(
   }
 
   const {
-    name, description, type, breed, sex, age_months, weight_kg,
-    size, color, vaccinated, sterilized, trained, photos, status,
-    contact_name, contact_phone, contact_email, contact_instagram,
-    contact_telegram, contact_facebook, contact_location,
+    name,
+    description,
+    type,
+    breed,
+    sex,
+    age_months,
+    weight_kg,
+    size,
+    color,
+    vaccinated,
+    sterilized,
+    trained,
+    photos,
+    status,
+    contact_name,
+    contact_phone,
+    contact_email,
+    contact_instagram,
+    contact_telegram,
+    contact_facebook,
+    contact_location,
   } = body;
 
   const { data: updated } = await supabase
@@ -91,7 +108,7 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const supabase = await createClient();

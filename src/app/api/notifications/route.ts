@@ -1,6 +1,6 @@
+import { getSession } from "@/shared/lib/auth";
+import { createClient } from "@/shared/lib/db";
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/db";
-import { getSession } from "@/lib/auth";
 
 export async function GET() {
   const user = await getSession();

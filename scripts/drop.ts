@@ -26,7 +26,10 @@ async function drop() {
 
     if (error) {
       // fallback: delete all rows if can't drop
-      const { error: deleteErr } = await supabase.from(table).delete().gte("id", 0);
+      const { error: deleteErr } = await supabase
+        .from(table)
+        .delete()
+        .gte("id", 0);
       if (deleteErr) {
         console.log(`❌ ${table}: ${deleteErr.message}`);
       } else {

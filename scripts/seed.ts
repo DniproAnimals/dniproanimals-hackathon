@@ -11,22 +11,54 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // --- Parse animals_database.json ---
 
 interface RawAnimal {
-  "Вид": string;
-  "Порода": string;
-  "Стать": string;
-  "Вік": string;
-  "Розмір": string;
-  "Вага": string;
-  "Колір": string;
-  "Вакцинація": string;
-  "Стерилізація": string;
-  "Навчено": string;
+  Вид: string;
+  Порода: string;
+  Стать: string;
+  Вік: string;
+  Розмір: string;
+  Вага: string;
+  Колір: string;
+  Вакцинація: string;
+  Стерилізація: string;
+  Навчено: string;
   photos: string[];
   id: string;
 }
 
-const catNames = ["Мурка", "Сніжинка", "Лапка", "Карамелька", "Зірка", "Баська", "Рижик", "Персик", "Ніжка", "Клео", "Соня", "Симба", "Маруся", "Тіша", "Мілка"];
-const dogNames = ["Барон", "Рекс", "Бім", "Тайсон", "Джек", "Граф", "Лорд", "Буся", "Ліра", "Дейзі", "Бадді", "Чарлі", "Мухтар", "Шарік", "Найда"];
+const catNames = [
+  "Мурка",
+  "Сніжинка",
+  "Лапка",
+  "Карамелька",
+  "Зірка",
+  "Баська",
+  "Рижик",
+  "Персик",
+  "Ніжка",
+  "Клео",
+  "Соня",
+  "Симба",
+  "Маруся",
+  "Тіша",
+  "Мілка",
+];
+const dogNames = [
+  "Барон",
+  "Рекс",
+  "Бім",
+  "Тайсон",
+  "Джек",
+  "Граф",
+  "Лорд",
+  "Буся",
+  "Ліра",
+  "Дейзі",
+  "Бадді",
+  "Чарлі",
+  "Мухтар",
+  "Шарік",
+  "Найда",
+];
 
 function parseAge(ageStr: string): number {
   const years = parseInt(ageStr);
@@ -101,7 +133,8 @@ function loadAnimals() {
 const sampleLostAnimals = [
   {
     title: "Загубився рудий кіт Рижик",
-    description: "Зник 28 березня біля парку Шевченка. Рудий кіт, середній розмір, має нашийник синього кольору.",
+    description:
+      "Зник 28 березня біля парку Шевченка. Рудий кіт, середній розмір, має нашийник синього кольору.",
     type: "lost",
     animal_type: "Кіт",
     breed: "Мікс",
@@ -117,7 +150,8 @@ const sampleLostAnimals = [
   },
   {
     title: "Пропала сіра кішка Муся",
-    description: "Втекла з балкону 25 березня. Сіра короткошерста кішка, 3 роки, стерилізована. Має мікрочіп.",
+    description:
+      "Втекла з балкону 25 березня. Сіра короткошерста кішка, 3 роки, стерилізована. Має мікрочіп.",
     type: "lost",
     animal_type: "Кіт",
     breed: "Європейська короткошерста",
@@ -133,7 +167,8 @@ const sampleLostAnimals = [
   },
   {
     title: "Загубився білий пес Сніжок",
-    description: "Зірвався з повідка під час прогулянки 30 березня. Білий пес середнього розміру, порода мікс.",
+    description:
+      "Зірвався з повідка під час прогулянки 30 березня. Білий пес середнього розміру, порода мікс.",
     type: "lost",
     animal_type: "Собака",
     breed: "Мікс",
@@ -149,7 +184,8 @@ const sampleLostAnimals = [
   },
   {
     title: "Зникла маленька собачка Лола",
-    description: "Маленька коричнева собачка, приблизно 2 роки. Зникла біля ТЦ Мост-Сіті.",
+    description:
+      "Маленька коричнева собачка, приблизно 2 роки. Зникла біля ТЦ Мост-Сіті.",
     type: "lost",
     animal_type: "Собака",
     breed: "Чихуахуа",
@@ -171,14 +207,21 @@ async function seed() {
   console.log("🌱 Seed started...\n");
 
   // 1. Users
-  const { count: userCount } = await supabase.from("users").select("*", { count: "exact", head: true });
+  const { count: userCount } = await supabase
+    .from("users")
+    .select("*", { count: "exact", head: true });
   let adminUser: { id: number } | null = null;
   let regularUser: { id: number } | null = null;
 
   if (!userCount || userCount === 0) {
     const { data: admin, error: adminErr } = await supabase
       .from("users")
-      .insert({ name: "Admin", email: "admin@gmail.com", password: "admin", role: "superadmin" })
+      .insert({
+        name: "Admin",
+        email: "admin@gmail.com",
+        password: "admin",
+        role: "superadmin",
+      })
       .select("id")
       .single();
     if (adminErr) throw new Error(`Users: ${adminErr.message}`);
@@ -186,7 +229,12 @@ async function seed() {
 
     const { data: user, error: userErr } = await supabase
       .from("users")
-      .insert({ name: "Іван Петренко", email: "user@gmail.com", password: "user", role: "user" })
+      .insert({
+        name: "Іван Петренко",
+        email: "user@gmail.com",
+        password: "user",
+        role: "user",
+      })
       .select("id")
       .single();
     if (userErr) throw new Error(`Users: ${userErr.message}`);
@@ -194,15 +242,25 @@ async function seed() {
 
     console.log("✅ Users: admin@gmail.com / admin, user@gmail.com / user");
   } else {
-    const { data: a } = await supabase.from("users").select("id").eq("email", "admin@gmail.com").single();
-    const { data: u } = await supabase.from("users").select("id").eq("email", "user@gmail.com").single();
+    const { data: a } = await supabase
+      .from("users")
+      .select("id")
+      .eq("email", "admin@gmail.com")
+      .single();
+    const { data: u } = await supabase
+      .from("users")
+      .select("id")
+      .eq("email", "user@gmail.com")
+      .single();
     adminUser = a;
     regularUser = u;
     console.log(`⏭️  Users: already exist (${userCount})`);
   }
 
   // 2. Organization
-  const { count: orgCount } = await supabase.from("organizations").select("*", { count: "exact", head: true });
+  const { count: orgCount } = await supabase
+    .from("organizations")
+    .select("*", { count: "exact", head: true });
   let orgId: number | null = null;
 
   if ((!orgCount || orgCount === 0) && adminUser) {
@@ -210,7 +268,8 @@ async function seed() {
       .from("organizations")
       .insert({
         name: "Притулок ДніпроAnimals",
-        description: "Міський притулок для безпритульних тварин у Дніпрі. Ми рятуємо, лікуємо та шукаємо новий дім для котиків і песиків.",
+        description:
+          "Міський притулок для безпритульних тварин у Дніпрі. Ми рятуємо, лікуємо та шукаємо новий дім для котиків і песиків.",
         location: "Дніпро, вул. Набережна Перемоги 50",
         phone: "+38 (050) 100-00-01",
         email: "shelter@dniproanimals.org",
@@ -226,27 +285,56 @@ async function seed() {
     if (orgErr) throw new Error(`Organizations: ${orgErr.message}`);
 
     orgId = org!.id;
-    await supabase.from("users").update({ role: "admin", org_id: orgId }).eq("id", adminUser.id);
+    await supabase
+      .from("users")
+      .update({ role: "admin", org_id: orgId })
+      .eq("id", adminUser.id);
     console.log(`✅ Organization: "Притулок ДніпроAnimals" (id: ${orgId})`);
   } else {
-    const { data: existing } = await supabase.from("organizations").select("id").limit(1).single();
+    const { data: existing } = await supabase
+      .from("organizations")
+      .select("id")
+      .limit(1)
+      .single();
     orgId = existing?.id ?? null;
     console.log(`⏭️  Organizations: already exist (${orgCount})`);
   }
 
   // 3. Volunteers
-  const { count: volCount } = await supabase.from("volunteers").select("*", { count: "exact", head: true });
+  const { count: volCount } = await supabase
+    .from("volunteers")
+    .select("*", { count: "exact", head: true });
 
   if ((!volCount || volCount === 0) && orgId) {
     const volunteersData = [
-      { name: "Олена", surname: "Коваленко", phone: "+38 (067) 111-11-11", email: "olena@gmail.com", description: "Досвід роботи з собаками 5 років" },
-      { name: "Максим", surname: "Шевченко", phone: "+38 (093) 222-22-22", email: "maxim@gmail.com", description: "Ветеринар-волонтер" },
-      { name: "Анна", surname: "Бондаренко", phone: "+38 (095) 333-33-33", email: "anna@gmail.com", description: "Фотограф-волонтер, робить фото для оголошень" },
+      {
+        name: "Олена",
+        surname: "Коваленко",
+        phone: "+38 (067) 111-11-11",
+        email: "olena@gmail.com",
+        description: "Досвід роботи з собаками 5 років",
+      },
+      {
+        name: "Максим",
+        surname: "Шевченко",
+        phone: "+38 (093) 222-22-22",
+        email: "maxim@gmail.com",
+        description: "Ветеринар-волонтер",
+      },
+      {
+        name: "Анна",
+        surname: "Бондаренко",
+        phone: "+38 (095) 333-33-33",
+        email: "anna@gmail.com",
+        description: "Фотограф-волонтер, робить фото для оголошень",
+      },
     ];
 
     for (const vol of volunteersData) {
       const invite_token = crypto.randomBytes(24).toString("hex");
-      const { error } = await supabase.from("volunteers").insert({ org_id: orgId, ...vol, invite_token });
+      const { error } = await supabase
+        .from("volunteers")
+        .insert({ org_id: orgId, ...vol, invite_token });
       if (error) throw new Error(`Volunteers: ${error.message}`);
     }
     console.log(`✅ Volunteers: ${volunteersData.length} created`);
@@ -255,22 +343,30 @@ async function seed() {
   }
 
   // 4. Animals from animals_database.json
-  const { count: animalCount } = await supabase.from("animals").select("*", { count: "exact", head: true });
+  const { count: animalCount } = await supabase
+    .from("animals")
+    .select("*", { count: "exact", head: true });
 
   if (!animalCount || animalCount === 0) {
     const animals = loadAnimals().map((a) => ({ ...a, org_id: orgId }));
     const { error } = await supabase.from("animals").insert(animals);
     if (error) throw new Error(`Animals: ${error.message}`);
-    console.log(`✅ Animals: ${animals.length} created from animals_database.json (org_id: ${orgId})`);
+    console.log(
+      `✅ Animals: ${animals.length} created from animals_database.json (org_id: ${orgId})`,
+    );
   } else {
     console.log(`⏭️  Animals: already exist (${animalCount})`);
   }
 
   // 5. Lost animals
-  const { count: lostCount } = await supabase.from("lost_animals").select("*", { count: "exact", head: true });
+  const { count: lostCount } = await supabase
+    .from("lost_animals")
+    .select("*", { count: "exact", head: true });
 
   if (!lostCount || lostCount === 0) {
-    const { error } = await supabase.from("lost_animals").insert(sampleLostAnimals);
+    const { error } = await supabase
+      .from("lost_animals")
+      .insert(sampleLostAnimals);
     if (error) throw new Error(`Lost animals: ${error.message}`);
     console.log(`✅ Lost animals: ${sampleLostAnimals.length} created`);
   } else {
@@ -278,10 +374,16 @@ async function seed() {
   }
 
   // 6. Adoption requests
-  const { count: adoptionCount } = await supabase.from("adoption_requests").select("*", { count: "exact", head: true });
+  const { count: adoptionCount } = await supabase
+    .from("adoption_requests")
+    .select("*", { count: "exact", head: true });
 
   if (!adoptionCount || adoptionCount === 0) {
-    const { data: firstAnimals } = await supabase.from("animals").select("id").order("id", { ascending: true }).limit(2);
+    const { data: firstAnimals } = await supabase
+      .from("animals")
+      .select("id")
+      .order("id", { ascending: true })
+      .limit(2);
 
     if (firstAnimals && firstAnimals.length >= 2) {
       const { error } = await supabase.from("adoption_requests").insert([
@@ -290,7 +392,8 @@ async function seed() {
           name: "Марина Сидоренко",
           email: "marina@gmail.com",
           phone: "+38 (067) 999-88-77",
-          message: "Дуже хочу забрати цю тваринку! У мене приватний будинок з великим двором.",
+          message:
+            "Дуже хочу забрати цю тваринку! У мене приватний будинок з великим двором.",
           status: "pending",
         },
         {
@@ -312,14 +415,23 @@ async function seed() {
 
   // 7. Favorites
   if (regularUser) {
-    const { count: favCount } = await supabase.from("favorites").select("*", { count: "exact", head: true });
+    const { count: favCount } = await supabase
+      .from("favorites")
+      .select("*", { count: "exact", head: true });
 
     if (!favCount || favCount === 0) {
-      const { data: someAnimals } = await supabase.from("animals").select("id").order("id", { ascending: true }).limit(3);
+      const { data: someAnimals } = await supabase
+        .from("animals")
+        .select("id")
+        .order("id", { ascending: true })
+        .limit(3);
 
       if (someAnimals && someAnimals.length > 0) {
         const { error } = await supabase.from("favorites").insert(
-          someAnimals.map((a) => ({ user_id: regularUser!.id, animal_id: a.id }))
+          someAnimals.map((a) => ({
+            user_id: regularUser!.id,
+            animal_id: a.id,
+          })),
         );
         if (error) throw new Error(`Favorites: ${error.message}`);
         console.log(`✅ Favorites: ${someAnimals.length} created for user`);
@@ -331,13 +443,32 @@ async function seed() {
 
   // 8. Notifications
   if (orgId) {
-    const { count: notifCount } = await supabase.from("notifications").select("*", { count: "exact", head: true });
+    const { count: notifCount } = await supabase
+      .from("notifications")
+      .select("*", { count: "exact", head: true });
 
     if (!notifCount || notifCount === 0) {
       const { error } = await supabase.from("notifications").insert([
-        { org_id: orgId, type: "adoption_request", title: "Нова заявка на усиновлення", message: "Марина хоче забрати тваринку", link: "/dashboard/requests" },
-        { org_id: orgId, type: "adoption_request", title: "Нова заявка на усиновлення", message: "Олег хоче забрати котика", link: "/dashboard/requests" },
-        { org_id: orgId, type: "org_created", title: "Організацію схвалено", message: "Вашу організацію було успішно схвалено модератором" },
+        {
+          org_id: orgId,
+          type: "adoption_request",
+          title: "Нова заявка на усиновлення",
+          message: "Марина хоче забрати тваринку",
+          link: "/dashboard/requests",
+        },
+        {
+          org_id: orgId,
+          type: "adoption_request",
+          title: "Нова заявка на усиновлення",
+          message: "Олег хоче забрати котика",
+          link: "/dashboard/requests",
+        },
+        {
+          org_id: orgId,
+          type: "org_created",
+          title: "Організацію схвалено",
+          message: "Вашу організацію було успішно схвалено модератором",
+        },
       ]);
       if (error) throw new Error(`Notifications: ${error.message}`);
       console.log("✅ Notifications: 3 created");

@@ -1,30 +1,36 @@
+import { getSession } from "@/shared/lib/auth";
+import { createClient } from "@/shared/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/db";
-import { getSession } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const orgId = request.nextUrl.searchParams.get("org_id");
 
-  let query = supabase
+  const { data: result } = await supabase
     .from("adoption_requests")
     .select("*, animals(name, type, org_id)")
     .order("created_at", { ascending: false });
-
-  const { data: result } = await query;
 
   let filtered = result || [];
 
   // If org_id param is set, filter to only that org's animals
   if (orgId) {
     filtered = filtered.filter((r: Record<string, unknown>) => {
-      const animal = r.animals as { name: string; type: string; org_id: number | null } | null;
+      const animal = r.animals as {
+        name: string;
+        type: string;
+        org_id: number | null;
+      } | null;
       return animal?.org_id === Number(orgId);
     });
   }
 
   const formatted = filtered.map((r: Record<string, unknown>) => {
-    const animals = r.animals as { name: string; type: string; org_id?: number | null } | null;
+    const animals = r.animals as {
+      name: string;
+      type: string;
+      org_id?: number | null;
+    } | null;
     return {
       ...r,
       animal_name: animals?.name,
@@ -38,12 +44,22 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { animal_id, name, email, phone, instagram, telegram, facebook, location, message } = body;
+  const {
+    animal_id,
+    name,
+    email,
+    phone,
+    instagram,
+    telegram,
+    facebook,
+    location,
+    message,
+  } = body;
 
   if (!animal_id || !name || !email || !phone) {
     return NextResponse.json(
       { error: "Всі обов'язкові поля мають бути заповнені" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -76,13 +92,13 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error || !result) {
-    return NextResponse.json({ error: "Помилка створення заявки" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Помилка створення заявки" },
+      { status: 500 },
+    );
   }
 
-  return NextResponse.json(
-    { id: result.id, success: true },
-    { status: 201 }
-  );
+  return NextResponse.json({ id: result.id, success: true }, { status: 201 });
 }
 
 export async function PATCH(request: NextRequest) {
@@ -98,10 +114,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   const supabase = await createClient();
-  await supabase
-    .from("adoption_requests")
-    .update({ status })
-    .eq("id", id);
+  await supabase.from("adoption_requests").update({ status }).eq("id", id);
 
   if (status === "approved") {
     const { data: req } = await supabase

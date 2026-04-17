@@ -1,5 +1,6 @@
 "use client";
-
+import { FilterChip } from "@/components/ui/filter-chip";
+import { IconAdjustmentsHorizontal } from "@tabler/icons-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
@@ -25,7 +26,6 @@ export default function ActiveFilters() {
 
   const active: ActiveFilter[] = [];
 
-  // Multi-value params
   for (const key of ["type", "sex", "size"]) {
     const raw = searchParams.get(key);
     if (raw) {
@@ -34,7 +34,6 @@ export default function ActiveFilters() {
       }
     }
   }
-  // Boolean params
   for (const key of ["vaccinated", "sterilized", "trained"]) {
     if (searchParams.get(key) === "1") {
       active.push({ key, value: "1", label: filterLabels[key] });
@@ -48,7 +47,9 @@ export default function ActiveFilters() {
       if (["vaccinated", "sterilized", "trained"].includes(filter.key)) {
         params.delete(filter.key);
       } else {
-        const current = (params.get(filter.key) || "").split(",").filter(Boolean);
+        const current = (params.get(filter.key) || "")
+          .split(",")
+          .filter(Boolean);
         const updated = current.filter((v) => v !== filter.value);
         if (updated.length > 0) {
           params.set(filter.key, updated.join(","));
@@ -59,7 +60,7 @@ export default function ActiveFilters() {
 
       router.push(`/?${params.toString()}`);
     },
-    [router, searchParams]
+    [router, searchParams],
   );
 
   const clearAll = useCallback(() => {
@@ -73,33 +74,24 @@ export default function ActiveFilters() {
 
   return (
     <div className="flex items-center gap-2 flex-wrap mb-4">
-      {/* Total badge */}
-      <div className="flex items-center gap-1.5 mr-1">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-medium">
-          <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/>
-          <circle cx="6" cy="6" r="2" fill="currentColor"/><circle cx="10" cy="12" r="2" fill="currentColor"/><circle cx="14" cy="18" r="2" fill="currentColor"/>
-        </svg>
-        <span className="text-xs font-medium text-gray-medium">Фільтри</span>
-        <span className="w-5 h-5 rounded-full bg-[#ced48c] text-foreground text-[10px] font-bold flex items-center justify-center">
+      <div className="flex items-center gap-1.5 mr-1 text-gray-medium">
+        <IconAdjustmentsHorizontal className="size-3.5" />
+        <span className="text-xs font-medium">Фільтри</span>
+        <span className="inline-flex size-5 items-center justify-center rounded-full bg-primary text-foreground text-[10px] font-bold">
           {active.length}
         </span>
       </div>
 
-      {/* Active filter chips */}
       {active.map((f, i) => (
-        <button
+        <FilterChip
           key={`${f.key}-${f.value}-${i}`}
           onClick={() => removeFilter(f)}
-          className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#ced48c]/20 text-xs font-medium text-foreground hover:bg-[#ced48c]/40 transition-colors group"
+          onRemove={() => removeFilter(f)}
         >
           {f.label}
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-gray-400 group-hover:text-foreground transition-colors">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
+        </FilterChip>
       ))}
 
-      {/* Clear all */}
       <button
         onClick={clearAll}
         className="text-[11px] text-gray-medium hover:text-foreground transition-colors ml-1"

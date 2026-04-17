@@ -1,6 +1,11 @@
 "use client";
-
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 type UserData = {
   id: number;
@@ -73,11 +78,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         }
       }
     },
-    [user]
+    [user],
   );
 
   return (
-    <UserContext.Provider value={{ user, loading, favoriteIds, refresh, toggleFavorite }}>
+    <UserContext.Provider
+      value={{ user, loading, favoriteIds, refresh, toggleFavorite }}
+    >
       {children}
     </UserContext.Provider>
   );

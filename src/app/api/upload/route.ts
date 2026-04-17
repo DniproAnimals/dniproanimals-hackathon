@@ -1,5 +1,5 @@
+import { createClient } from "@/shared/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
@@ -9,16 +9,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Файл не надано" }, { status: 400 });
   }
 
-  const allowedTypes = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "image/gif",
-  ];
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
   if (!allowedTypes.includes(file.type)) {
     return NextResponse.json(
       { error: "Дозволені лише зображення (JPEG, PNG, WebP, GIF)" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -26,7 +21,7 @@ export async function POST(request: NextRequest) {
   if (file.size > maxSize) {
     return NextResponse.json(
       { error: "Файл занадто великий (максимум 10 МБ)" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -45,7 +40,7 @@ export async function POST(request: NextRequest) {
   if (error) {
     return NextResponse.json(
       { error: "Помилка завантаження: " + error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 

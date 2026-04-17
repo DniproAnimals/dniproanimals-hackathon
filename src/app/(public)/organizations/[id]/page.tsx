@@ -1,31 +1,60 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import Link from "next/link";
-import { motion } from "motion/react";
-import ImageFallback from "@/components/ImageFallback";
 import AnimalCard from "@/components/AnimalCard";
-import type { Animal } from "@/lib/db";
+import ImageFallback from "@/components/ImageFallback";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { Animal } from "@/shared/lib/db";
 import {
-  IconMapPinFilled, IconPhoneFilled, IconMailFilled,
-  IconBrandInstagram, IconBrandTelegram, IconBrandFacebook,
-  IconWorldWww, IconChevronLeft, IconUsersGroup, IconPawFilled,
-  IconCalendarFilled, IconShieldCheckFilled, IconHeartHandshake,
+  IconBrandFacebook,
+  IconBrandInstagram,
+  IconBrandTelegram,
+  IconCalendarFilled,
+  IconChevronLeft,
+  IconHeartHandshake,
+  IconMailFilled,
+  IconMapPinFilled,
+  IconPawFilled,
+  IconPhoneFilled,
+  IconShieldCheckFilled,
+  IconUsersGroup,
+  IconWorldWww,
 } from "@tabler/icons-react";
+import { motion } from "motion/react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type Org = {
-  id: number; name: string; description: string | null; photo: string | null;
-  location: string | null; phone: string | null; email: string | null;
-  instagram: string | null; telegram: string | null; facebook: string | null;
-  website: string | null; owner_id: number; status: string; created_at: string;
+  id: number;
+  name: string;
+  description: string | null;
+  photo: string | null;
+  location: string | null;
+  phone: string | null;
+  email: string | null;
+  instagram: string | null;
+  telegram: string | null;
+  facebook: string | null;
+  website: string | null;
+  owner_id: number;
+  status: string;
+  created_at: string;
   monobank_jar_id: string | null;
 };
 
 type Volunteer = {
-  id: number; name: string; surname: string | null; photo: string | null;
-  description: string | null; phone: string | null; email: string | null;
-  instagram: string | null; telegram: string | null;
+  id: number;
+  name: string;
+  surname: string | null;
+  photo: string | null;
+  description: string | null;
+  phone: string | null;
+  email: string | null;
+  instagram: string | null;
+  telegram: string | null;
 };
 
 export default function OrganizationPage() {
@@ -37,24 +66,30 @@ export default function OrganizationPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch(`/api/organizations/${id}`).then((r) => r.ok ? r.json() : null),
-      fetch(`/api/organizations/${id}/volunteers`).then((r) => r.ok ? r.json() : []),
-      fetch(`/api/organizations/${id}/animals`).then((r) => r.ok ? r.json() : []),
-    ]).then(([orgData, volData, animalData]) => {
-      setOrg(orgData);
-      if (Array.isArray(volData)) setVolunteers(volData);
-      if (Array.isArray(animalData)) setAnimals(animalData);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+      fetch(`/api/organizations/${id}`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`/api/organizations/${id}/volunteers`).then((r) =>
+        r.ok ? r.json() : [],
+      ),
+      fetch(`/api/organizations/${id}/animals`).then((r) =>
+        r.ok ? r.json() : [],
+      ),
+    ])
+      .then(([orgData, volData, animalData]) => {
+        setOrg(orgData);
+        if (Array.isArray(volData)) setVolunteers(volData);
+        if (Array.isArray(animalData)) setAnimals(animalData);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, [id]);
 
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto px-6 py-20">
-        <div className="animate-pulse space-y-6">
-          <div className="h-48 bg-gray-light rounded-2xl" />
-          <div className="h-8 bg-gray-light rounded-lg w-1/3" />
-          <div className="h-4 bg-gray-light rounded-lg w-2/3" />
+        <div className="space-y-6">
+          <Skeleton className="h-48 rounded-2xl" />
+          <Skeleton className="h-8 rounded-lg w-1/3" />
+          <Skeleton className="h-4 rounded-lg w-2/3" />
         </div>
       </div>
     );
@@ -64,7 +99,12 @@ export default function OrganizationPage() {
     return (
       <div className="max-w-6xl mx-auto px-6 py-20 text-center">
         <p className="text-lg font-semibold mb-2">Організацію не знайдено</p>
-        <Link href="/organizations" className="text-sm text-[#5b7765] hover:underline">← Повернутися до списку</Link>
+        <Link
+          href="/organizations"
+          className="text-sm text-green-secondary hover:underline"
+        >
+          ← Повернутися до списку
+        </Link>
       </div>
     );
   }
@@ -77,26 +117,43 @@ export default function OrganizationPage() {
       className="max-w-6xl mx-auto px-6 py-6 pb-24 md:pb-6"
     >
       {/* Back */}
-      <Link href="/organizations" className="inline-flex items-center gap-1.5 text-gray-medium hover:text-foreground transition-colors text-sm mb-6">
-        <IconChevronLeft size={18} />
-        Організації
-      </Link>
+      <Button variant="ghost" size="sm" asChild className="mb-6 -ml-3">
+        <Link
+          href="/organizations"
+          className="inline-flex items-center gap-1.5 text-gray-medium hover:text-foreground text-sm"
+        >
+          <IconChevronLeft size={18} />
+          Організації
+        </Link>
+      </Button>
 
       {/* Hero — photo + meta */}
       <div className="md:flex md:gap-8 mb-10">
         {/* Photo */}
-        <div className="md:w-80 flex-shrink-0 mb-6 md:mb-0">
+        <div className="md:w-80 shrink-0 mb-6 md:mb-0">
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-light">
             {org.photo ? (
-              <ImageFallback src={org.photo} alt={org.name} fill className="object-cover" sizes="320px" />
+              <ImageFallback
+                src={org.photo}
+                alt={org.name}
+                fill
+                className="object-cover"
+                sizes="320px"
+              />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-6xl text-gray-300">🏠</div>
+              <div className="size-full flex items-center justify-center text-6xl text-gray-300">
+                🏠
+              </div>
             )}
             {org.status === "approved" && (
-              <div className="absolute top-3 right-3 bg-green-500 text-white px-2.5 py-1 rounded-full text-[10px] font-semibold flex items-center gap-1">
+              <Badge
+                variant="success"
+                size="sm"
+                className="absolute top-3 right-3 bg-green-500 text-white font-semibold"
+              >
                 <IconShieldCheckFilled size={12} />
                 Перевірено
-              </div>
+              </Badge>
             )}
           </div>
         </div>
@@ -106,36 +163,66 @@ export default function OrganizationPage() {
           <h1 className="text-2xl md:text-3xl font-bold mb-2">{org.name}</h1>
 
           {org.description && (
-            <p className="text-sm text-gray-600 leading-relaxed mb-5">{org.description}</p>
+            <p className="text-sm text-gray-600 leading-relaxed mb-5">
+              {org.description}
+            </p>
           )}
 
           {/* Info list */}
           <div className="divide-y divide-gray-border mb-5">
             {org.location && (
               <div className="flex items-center gap-2.5 py-2.5">
-                <IconMapPinFilled size={16} className="text-gray-400 flex-shrink-0" />
+                <IconMapPinFilled
+                  size={16}
+                  className="text-gray-400 shrink-0"
+                />
                 <span className="text-sm font-medium">Місцезнаходження</span>
-                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(org.location)}`} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-medium ml-auto hover:underline">{org.location}</a>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(org.location)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-gray-medium ml-auto hover:underline"
+                >
+                  {org.location}
+                </a>
               </div>
             )}
             {org.phone && (
               <div className="flex items-center gap-2.5 py-2.5">
-                <IconPhoneFilled size={16} className="text-gray-400 flex-shrink-0" />
+                <IconPhoneFilled size={16} className="text-gray-400 shrink-0" />
                 <span className="text-sm font-medium">Телефон</span>
-                <a href={`tel:${org.phone}`} className="text-sm text-gray-medium ml-auto hover:underline">{org.phone}</a>
+                <a
+                  href={`tel:${org.phone}`}
+                  className="text-sm text-gray-medium ml-auto hover:underline"
+                >
+                  {org.phone}
+                </a>
               </div>
             )}
             {org.email && (
               <div className="flex items-center gap-2.5 py-2.5">
-                <IconMailFilled size={16} className="text-gray-400 flex-shrink-0" />
+                <IconMailFilled size={16} className="text-gray-400 shrink-0" />
                 <span className="text-sm font-medium">Email</span>
-                <a href={`mailto:${org.email}`} className="text-sm text-gray-medium ml-auto hover:underline">{org.email}</a>
+                <a
+                  href={`mailto:${org.email}`}
+                  className="text-sm text-gray-medium ml-auto hover:underline"
+                >
+                  {org.email}
+                </a>
               </div>
             )}
             <div className="flex items-center gap-2.5 py-2.5">
-              <IconCalendarFilled size={16} className="text-gray-400 flex-shrink-0" />
+              <IconCalendarFilled
+                size={16}
+                className="text-gray-400 shrink-0"
+              />
               <span className="text-sm font-medium">На платформі з</span>
-              <span className="text-sm text-gray-medium ml-auto">{new Date(org.created_at).toLocaleDateString("uk-UA", { month: "long", year: "numeric" })}</span>
+              <span className="text-sm text-gray-medium ml-auto">
+                {new Date(org.created_at).toLocaleDateString("uk-UA", {
+                  month: "long",
+                  year: "numeric",
+                })}
+              </span>
             </div>
           </div>
 
@@ -143,28 +230,59 @@ export default function OrganizationPage() {
           {(org.instagram || org.telegram || org.facebook || org.website) && (
             <div className="flex gap-2 flex-wrap">
               {org.instagram && (
-                <a href={`https://instagram.com/${org.instagram}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-light text-sm hover:bg-[#ced48c]/20 transition-colors">
-                  <IconBrandInstagram size={16} className="text-gray-medium" />
-                  {org.instagram}
-                </a>
+                <Button variant="subtle" size="md" shape="square" asChild>
+                  <a
+                    href={`https://instagram.com/${org.instagram}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-sm font-normal hover:bg-primary/20"
+                  >
+                    <IconBrandInstagram
+                      size={16}
+                      className="text-gray-medium"
+                    />
+                    {org.instagram}
+                  </a>
+                </Button>
               )}
               {org.telegram && (
-                <a href={`https://t.me/${org.telegram}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-light text-sm hover:bg-[#ced48c]/20 transition-colors">
-                  <IconBrandTelegram size={16} className="text-gray-medium" />
-                  {org.telegram}
-                </a>
+                <Button variant="subtle" size="md" shape="square" asChild>
+                  <a
+                    href={`https://t.me/${org.telegram}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-sm font-normal hover:bg-primary/20"
+                  >
+                    <IconBrandTelegram size={16} className="text-gray-medium" />
+                    {org.telegram}
+                  </a>
+                </Button>
               )}
               {org.facebook && (
-                <a href={`https://facebook.com/${org.facebook}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-light text-sm hover:bg-[#ced48c]/20 transition-colors">
-                  <IconBrandFacebook size={16} className="text-gray-medium" />
-                  {org.facebook}
-                </a>
+                <Button variant="subtle" size="md" shape="square" asChild>
+                  <a
+                    href={`https://facebook.com/${org.facebook}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-sm font-normal hover:bg-primary/20"
+                  >
+                    <IconBrandFacebook size={16} className="text-gray-medium" />
+                    {org.facebook}
+                  </a>
+                </Button>
               )}
               {org.website && (
-                <a href={org.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-light text-sm hover:bg-[#ced48c]/20 transition-colors">
-                  <IconWorldWww size={16} className="text-gray-medium" />
-                  Вебсайт
-                </a>
+                <Button variant="subtle" size="md" shape="square" asChild>
+                  <a
+                    href={org.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-sm font-normal hover:bg-primary/20"
+                  >
+                    <IconWorldWww size={16} className="text-gray-medium" />
+                    Вебсайт
+                  </a>
+                </Button>
               )}
             </div>
           )}
@@ -173,53 +291,72 @@ export default function OrganizationPage() {
 
       {/* Donate */}
       {org.monobank_jar_id && (
-        <div className="mb-10 p-6 rounded-3xl bg-gradient-to-br from-[#f2f4e4] to-[#e8ebd4] border border-[#ced48c]/40 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-[#ced48c] rounded-full opacity-10 -translate-y-1/2 translate-x-1/2 blur-[60px]" />
+        <Card className="mb-10 p-6 rounded-3xl bg-gradient-to-br from-green-light to-[#e8ebd4] border-primary/40 relative overflow-hidden">
+          <div className="absolute top-0 right-0 size-40 bg-primary rounded-full opacity-10 -translate-y-1/2 translate-x-1/2 blur-[60px]" />
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#5b7765] flex items-center justify-center">
+              <div className="size-10 rounded-2xl bg-green-secondary flex items-center justify-center">
                 <IconHeartHandshake size={22} className="text-white" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-[#0c1014]">Допомогти організації</h2>
-                <p className="text-xs text-[#5b7765]">Кожна гривня рятує життя тварин</p>
+                <h2 className="text-lg font-bold text-foreground">
+                  Допомогти організації
+                </h2>
+                <p className="text-xs text-green-secondary">
+                  Кожна гривня рятує життя тварин
+                </p>
               </div>
             </div>
             <p className="text-sm text-gray-600 mb-4">
-              Ви можете підтримати <b>{org.name}</b> фінансово через Monobank банку. Кошти йдуть на корм, ліки та утримання тварин.
+              Ви можете підтримати <b>{org.name}</b> фінансово через Monobank
+              банку. Кошти йдуть на корм, ліки та утримання тварин.
             </p>
             <div className="flex flex-wrap gap-3">
               {[100, 250, 500].map((sum) => (
-                <a
+                <Button
                   key={sum}
-                  href={`https://send.monobank.ua/jar/${org.monobank_jar_id}?amount=${sum}`}
+                  variant="outline"
+                  size="lg"
+                  asChild
+                  className="border-2 border-primary text-green-secondary font-bold hover:bg-primary hover:text-primary-foreground"
+                >
+                  <a
+                    href={`https://send.monobank.ua/jar/${org.monobank_jar_id}?amount=${sum}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {sum} ₴
+                  </a>
+                </Button>
+              ))}
+              <Button
+                variant="secondary"
+                size="lg"
+                asChild
+                className="font-bold"
+              >
+                <a
+                  href={`https://send.monobank.ua/jar/${org.monobank_jar_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-5 py-2.5 rounded-xl bg-white border-2 border-[#ced48c] text-sm font-bold text-[#5b7765] hover:bg-[#ced48c] hover:text-[#0c1014] transition-all"
                 >
-                  {sum} ₴
+                  Інша сума
                 </a>
-              ))}
-              <a
-                href={`https://send.monobank.ua/jar/${org.monobank_jar_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-2.5 rounded-xl bg-[#0c1014] text-sm font-bold text-white hover:bg-[#1a232c] transition-all"
-              >
-                Інша сума
-              </a>
+              </Button>
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Volunteers */}
       {volunteers.length > 0 && (
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-4">
-            <IconUsersGroup size={20} className="text-[#ced48c]" />
+            <IconUsersGroup size={20} className="text-primary" />
             <h2 className="text-xl font-bold">Команда</h2>
-            <span className="text-sm text-gray-medium">({volunteers.length})</span>
+            <span className="text-sm text-gray-medium">
+              ({volunteers.length})
+            </span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {volunteers.map((v, i) => (
@@ -229,31 +366,82 @@ export default function OrganizationPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.06 }}
-                className="bg-white rounded-2xl border border-gray-border p-4 text-center hover:border-[#ced48c] transition-colors"
               >
-                <div className="w-16 h-16 rounded-full mx-auto mb-3 overflow-hidden relative bg-[#ced48c]/20">
-                  {v.photo ? (
-                    <ImageFallback src={v.photo} alt={v.name} fill className="object-cover" sizes="64px" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-lg font-bold text-[#5b7765]">{v.name.charAt(0)}</div>
+                <Card className="p-4 text-center hover:border-primary transition-colors">
+                  <Avatar className="size-16 mx-auto mb-3 bg-primary/20">
+                    {v.photo ? (
+                      <AvatarImage
+                        src={v.photo}
+                        alt={v.name}
+                        className="object-cover"
+                      />
+                    ) : null}
+                    <AvatarFallback className="text-lg font-bold text-green-secondary bg-primary/20">
+                      {v.name.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <p className="font-semibold text-sm truncate">
+                    {v.name}
+                    {v.surname ? ` ${v.surname}` : ""}
+                  </p>
+                  {v.description && (
+                    <p className="text-xs text-gray-medium mt-0.5 line-clamp-2">
+                      {v.description}
+                    </p>
                   )}
-                </div>
-                <p className="font-semibold text-sm truncate">{v.name}{v.surname ? ` ${v.surname}` : ""}</p>
-                {v.description && <p className="text-xs text-gray-medium mt-0.5 line-clamp-2">{v.description}</p>}
-                {(v.phone || v.email) && (
-                  <div className="mt-2 space-y-0.5">
-                    {v.phone && <p className="text-[11px] text-gray-400 flex items-center justify-center gap-1"><IconPhoneFilled size={10} />{v.phone}</p>}
-                    {v.email && <p className="text-[11px] text-gray-400 flex items-center justify-center gap-1"><IconMailFilled size={10} />{v.email}</p>}
+                  {(v.phone || v.email) && (
+                    <div className="mt-2 space-y-0.5">
+                      {v.phone && (
+                        <p className="text-[11px] text-gray-400 flex items-center justify-center gap-1">
+                          <IconPhoneFilled size={10} />
+                          {v.phone}
+                        </p>
+                      )}
+                      {v.email && (
+                        <p className="text-[11px] text-gray-400 flex items-center justify-center gap-1">
+                          <IconMailFilled size={10} />
+                          {v.email}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  <div className="flex justify-center gap-2 mt-2">
+                    {v.instagram && (
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        shape="pill"
+                        asChild
+                      >
+                        <a
+                          href={`https://instagram.com/${v.instagram}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-400 hover:text-foreground"
+                        >
+                          <IconBrandInstagram size={14} />
+                        </a>
+                      </Button>
+                    )}
+                    {v.telegram && (
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        shape="pill"
+                        asChild
+                      >
+                        <a
+                          href={`https://t.me/${v.telegram}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-400 hover:text-foreground"
+                        >
+                          <IconBrandTelegram size={14} />
+                        </a>
+                      </Button>
+                    )}
                   </div>
-                )}
-                <div className="flex justify-center gap-2 mt-2">
-                  {v.instagram && (
-                    <a href={`https://instagram.com/${v.instagram}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-foreground"><IconBrandInstagram size={14} /></a>
-                  )}
-                  {v.telegram && (
-                    <a href={`https://t.me/${v.telegram}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-foreground"><IconBrandTelegram size={14} /></a>
-                  )}
-                </div>
+                </Card>
               </motion.div>
             ))}
           </div>
@@ -263,13 +451,15 @@ export default function OrganizationPage() {
       {/* Animals */}
       <div>
         <div className="flex items-center gap-2 mb-4">
-          <IconPawFilled size={20} className="text-[#ced48c]" />
+          <IconPawFilled size={20} className="text-primary" />
           <h2 className="text-xl font-bold">Тварини</h2>
           <span className="text-sm text-gray-medium">({animals.length})</span>
         </div>
         {animals.length === 0 ? (
           <div className="bg-gray-light rounded-2xl p-10 text-center">
-            <p className="text-sm text-gray-medium">Організація ще не додала тварин</p>
+            <p className="text-sm text-gray-medium">
+              Організація ще не додала тварин
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">

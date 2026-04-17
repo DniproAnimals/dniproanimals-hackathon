@@ -1,8 +1,9 @@
+import { UserProvider } from "@/shared/lib/UserContext";
+import { cn } from "@/shared/lib/utils";
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { UserProvider } from "@/lib/UserContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,16 +30,23 @@ export default function RootLayout({
   return (
     <html
       lang="uk"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={cn(
+        geistSans.variable,
+        geistMono.variable,
+        "h-full antialiased",
+      )}
     >
       <head>
-        <Script defer data-id="3158505" src="https://usd.org/js/count.js" strategy="afterInteractive" />
+        <Script
+          defer
+          data-id="3158505"
+          src="https://usd.org/js/count.js"
+          strategy="afterInteractive"
+        />
       </head>
       <body className="min-h-full flex flex-col bg-white">
         <NuqsAdapter>
-          <UserProvider>
-            {children}
-          </UserProvider>
+          <UserProvider>{children}</UserProvider>
         </NuqsAdapter>
       </body>
     </html>

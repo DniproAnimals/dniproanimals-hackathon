@@ -1,12 +1,15 @@
+import { getSession } from "@/shared/lib/auth";
+import { createClient } from "@/shared/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/db";
-import { getSession } from "@/lib/auth";
 
 export async function GET() {
   const user = await getSession();
   const supabase = await createClient();
 
-  let query = supabase.from("organizations").select("*").order("created_at", { ascending: false });
+  let query = supabase
+    .from("organizations")
+    .select("*")
+    .order("created_at", { ascending: false });
 
   if (!user || user.role !== "superadmin") {
     query = query.eq("status", "approved");
@@ -18,10 +21,23 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const user = await getSession();
-  if (!user) return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
+  if (!user)
+    return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
 
-  const { name, description, photo, location, phone, email, instagram, telegram, facebook, website } = await request.json();
-  if (!name) return NextResponse.json({ error: "Назва обов'язкова" }, { status: 400 });
+  const {
+    name,
+    description,
+    photo,
+    location,
+    phone,
+    email,
+    instagram,
+    telegram,
+    facebook,
+    website,
+  } = await request.json();
+  if (!name)
+    return NextResponse.json({ error: "Назва обов'язкова" }, { status: 400 });
 
   const supabase = await createClient();
 
@@ -93,11 +109,26 @@ export async function PUT(request: NextRequest) {
     .single();
 
   if (!org || org.owner_id !== user.id) {
-    return NextResponse.json({ error: "Тільки власник може редагувати організацію" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Тільки власник може редагувати організацію" },
+      { status: 403 },
+    );
   }
 
-  const { name, description, photo, location, phone, email, instagram, telegram, facebook, website } = await request.json();
-  if (!name) return NextResponse.json({ error: "Назва обов'язкова" }, { status: 400 });
+  const {
+    name,
+    description,
+    photo,
+    location,
+    phone,
+    email,
+    instagram,
+    telegram,
+    facebook,
+    website,
+  } = await request.json();
+  if (!name)
+    return NextResponse.json({ error: "Назва обов'язкова" }, { status: 400 });
 
   await supabase
     .from("organizations")

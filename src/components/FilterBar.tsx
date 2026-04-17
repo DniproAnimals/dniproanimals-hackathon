@@ -1,8 +1,22 @@
 "use client";
-
+import { FilterChip } from "@/components/ui/filter-chip";
+import { InputWithIcon } from "@/components/ui/form-field";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/shared/lib/utils";
+import {
+  IconCheck,
+  IconChevronDown,
+  IconSearch,
+  IconX,
+} from "@tabler/icons-react";
 import Link from "next/link";
-import { useQueryStates, parseAsString } from "nuqs";
-import { useState, useRef, useEffect } from "react";
+import { parseAsString, useQueryStates } from "nuqs";
+import { useState } from "react";
 
 const breedOptions = [
   "Німецька вівчарка",
@@ -33,7 +47,8 @@ const colorOptions = [
   { value: "Тигровий", color: "#8B6914" },
 ];
 
-// Reusable dropdown component
+type Option = { value: string; label: string; color?: string };
+
 function FilterDropdown({
   label,
   icon,
@@ -46,24 +61,13 @@ function FilterDropdown({
   label: string;
   icon: string;
   values: string[];
-  options: { value: string; label: string; color?: string }[];
+  options: Option[];
   onToggle: (v: string) => void;
   search?: boolean;
   colorCircles?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node))
-        setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
 
   const filtered =
     search && query
@@ -81,106 +85,95 @@ function FilterDropdown({
       : "";
 
   return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl border text-sm text-left transition-colors ${
-          open
-            ? "border-[#ced48c] ring-2 ring-[#ced48c]/20 bg-white"
-            : values.length > 0
-              ? "border-[#ced48c] bg-[#ced48c]/5"
-              : "border-gray-border bg-white hover:border-gray-400"
-        }`}
-      >
-        <span className="flex items-center gap-2 min-w-0">
-          <span className="text-xs shrink-0">{icon}</span>
-          <span
-            className={`truncate text-xs ${values.length > 0 ? "text-foreground font-medium" : "text-gray-medium"}`}
-          >
-            {displayText || label}
-          </span>
-        </span>
-        <div className="flex items-center gap-1 shrink-0 ml-1">
-          {values.length > 0 && (
-            <span className="w-4 h-4 rounded-full bg-[#ced48c] text-foreground text-[9px] font-bold flex items-center justify-center">
-              {values.length}
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            "w-full flex items-center justify-between px-3 py-2 rounded-xl border text-sm text-left transition-colors",
+            open
+              ? "border-primary ring-2 ring-primary/20 bg-white"
+              : values.length > 0
+                ? "border-primary bg-primary/5"
+                : "border-gray-border bg-white hover:border-gray-medium",
+          )}
+        >
+          <span className="flex items-center gap-2 min-w-0">
+            <span className="text-xs shrink-0">{icon}</span>
+            <span
+              className={cn(
+                "truncate text-xs",
+                values.length > 0
+                  ? "text-foreground font-medium"
+                  : "text-gray-medium",
+              )}
+            >
+              {displayText || label}
             </span>
-          )}
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            className={`text-gray-400 transition-transform ${open ? "rotate-180" : ""}`}
-          >
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-        </div>
-      </button>
-      {open && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl border border-gray-border shadow-lg z-30 py-1 max-h-52 overflow-auto">
-          {search && (
-            <div className="p-2 border-b border-gray-border">
-              <input
-                type="text"
-                placeholder="Пошук..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="w-full px-2.5 py-1.5 rounded-lg bg-gray-light border-none outline-none text-xs"
-                autoFocus
-              />
-            </div>
-          )}
-          {filtered.map((opt) => {
-            const sel = values.includes(opt.value);
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => onToggle(opt.value)}
-                className="w-full flex items-center justify-between px-3 py-2 text-xs hover:bg-gray-light transition-colors"
-              >
-                <span className="flex items-center gap-2">
-                  {colorCircles && opt.color && (
-                    <span
-                      className="w-4 h-4 rounded-full border border-gray-border shrink-0"
-                      style={{ backgroundColor: opt.color }}
-                    />
-                  )}
-                  <span className={sel ? "font-medium" : ""}>{opt.label}</span>
-                </span>
-                {sel && (
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#ced48c"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
+          </span>
+          <div className="flex items-center gap-1 shrink-0 ml-1">
+            {values.length > 0 && (
+              <span className="inline-flex size-4 items-center justify-center rounded-full bg-primary text-foreground text-[9px] font-bold">
+                {values.length}
+              </span>
+            )}
+            <IconChevronDown
+              className={cn(
+                "size-3 text-gray-medium transition-transform",
+                open && "rotate-180",
+              )}
+            />
+          </div>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="start"
+        className="w-(--radix-popover-trigger-width) p-0 max-h-52 overflow-auto"
+      >
+        {search && (
+          <div className="p-2 border-b border-gray-border">
+            <Input
+              size="sm"
+              placeholder="Пошук..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="text-xs h-8"
+              autoFocus
+            />
+          </div>
+        )}
+        {filtered.map((opt) => {
+          const sel = values.includes(opt.value);
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => onToggle(opt.value)}
+              className="w-full flex items-center justify-between px-3 py-2 text-xs hover:bg-muted transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                {colorCircles && opt.color && (
+                  <span
+                    className="size-4 rounded-full border border-gray-border shrink-0"
+                    style={{ backgroundColor: opt.color }}
+                  />
                 )}
-              </button>
-            );
-          })}
-          {search && filtered.length === 0 && (
-            <p className="px-3 py-2 text-[11px] text-gray-medium">
-              Не знайдено
-            </p>
-          )}
-        </div>
-      )}
-    </div>
+                <span className={sel ? "font-medium" : ""}>{opt.label}</span>
+              </span>
+              {sel && (
+                <IconCheck className="size-3 text-primary" strokeWidth={3} />
+              )}
+            </button>
+          );
+        })}
+        {search && filtered.length === 0 && (
+          <p className="px-3 py-2 text-[11px] text-gray-medium">Не знайдено</p>
+        )}
+      </PopoverContent>
+    </Popover>
   );
 }
 
-// Toggle value in comma-separated string
 function toggleInList(current: string | null, value: string): string | null {
   const list = (current || "").split(",").filter(Boolean);
   const idx = list.indexOf(value);
@@ -188,8 +181,6 @@ function toggleInList(current: string | null, value: string): string | null {
   else list.push(value);
   return list.length > 0 ? list.join(",") : null;
 }
-
-// --- Props ---
 
 type FilterBarProps = {
   slugType: string | null;
@@ -213,16 +204,13 @@ export default function FilterBar({
   slugSex,
   slugSize,
   onPrimaryChange,
-  onReset,
 }: FilterBarProps) {
   const [secondary, setSecondary] = useQueryStates(secondaryParsers);
 
-  // Primary filters from slug (single-select)
   const typeValues = slugType ? [slugType] : [];
   const sexValues = slugSex ? [slugSex] : [];
   const sizeValues = slugSize ? [slugSize] : [];
 
-  // Secondary filters from query params (multi-select)
   const breedValues = (secondary.breed || "").split(",").filter(Boolean);
   const colorValues = (secondary.color || "").split(",").filter(Boolean);
   const extraValues = [
@@ -231,21 +219,18 @@ export default function FilterBar({
     ...(secondary.trained === "1" ? ["trained"] : []),
   ];
 
-  // Toggle primary (slug): single-select
   const togglePrimary = (key: string, value: string) => {
     const current =
       key === "type" ? slugType : key === "sex" ? slugSex : slugSize;
     onPrimaryChange(key, current === value ? null : value);
   };
 
-  // Toggle secondary (query param): multi-select
   const toggleSecondary = (key: string, value: string) => {
     setSecondary({
       [key]: toggleInList(secondary[key as keyof typeof secondary], value),
     });
   };
 
-  // Toggle extra boolean
   const toggleExtra = (value: string) => {
     const cur = secondary[value as keyof typeof secondary];
     setSecondary({ [value]: cur === "1" ? null : "1" });
@@ -261,36 +246,23 @@ export default function FilterBar({
 
   return (
     <div className="space-y-2.5">
-      {/* Search */}
-      <div className="relative">
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-        >
-          <circle cx="11" cy="11" r="7" />
-          <path d="M21 21l-4.35-4.35" />
-        </svg>
-        <input
+      <InputWithIcon icon={<IconSearch />}>
+        <Input
+          size="sm"
           type="text"
           placeholder="Пошук..."
           value={secondary.q || ""}
           onChange={(e) => setSecondary({ q: e.target.value || null })}
-          className="w-full pl-8 pr-3 py-2 rounded-xl bg-white border border-gray-border focus:ring-2 focus:ring-[#ced48c]/40 focus:border-[#ced48c] outline-none text-xs placeholder:text-gray-medium"
+          className="bg-white text-xs"
         />
-      </div>
+      </InputWithIcon>
 
-      {/* Header */}
       <div className="flex items-center gap-2">
         <span className="text-xs font-semibold text-gray-medium uppercase tracking-wider">
           Фільтри
         </span>
         {totalActive > 0 && (
-          <span className="w-4 h-4 rounded-full bg-[#ced48c] text-foreground text-[9px] font-bold flex items-center justify-center">
+          <span className="inline-flex size-4 items-center justify-center rounded-full bg-primary text-foreground text-[9px] font-bold">
             {totalActive}
           </span>
         )}
@@ -304,7 +276,6 @@ export default function FilterBar({
         )}
       </div>
 
-      {/* Type (slug) */}
       <FilterDropdown
         label="Категорія"
         icon="🐾"
@@ -317,7 +288,6 @@ export default function FilterBar({
         ]}
       />
 
-      {/* Breed (query param) */}
       <FilterDropdown
         label="Порода"
         icon="🏷️"
@@ -327,7 +297,6 @@ export default function FilterBar({
         options={breedOptions.map((b) => ({ value: b, label: b }))}
       />
 
-      {/* Sex (slug) */}
       <FilterDropdown
         label="Стать"
         icon="⚤"
@@ -339,7 +308,6 @@ export default function FilterBar({
         ]}
       />
 
-      {/* Size (slug) */}
       <FilterDropdown
         label="Розмір"
         icon="📏"
@@ -352,7 +320,6 @@ export default function FilterBar({
         ]}
       />
 
-      {/* Color (query param) */}
       <FilterDropdown
         label="Колір"
         icon="🎨"
@@ -366,7 +333,6 @@ export default function FilterBar({
         }))}
       />
 
-      {/* Extras (query param) */}
       <FilterDropdown
         label="Додатково"
         icon="⚙️"
@@ -379,7 +345,6 @@ export default function FilterBar({
         ]}
       />
 
-      {/* Active chips */}
       {totalActive > 0 && (
         <div className="flex flex-wrap gap-1 pt-1">
           {[
@@ -416,8 +381,9 @@ export default function FilterBar({
                     : "Навчено",
             })),
           ].map((chip) => (
-            <button
+            <FilterChip
               key={`${chip.key}-${chip.v}`}
+              size="sm"
               onClick={() => {
                 if (
                   chip.key === "type" ||
@@ -428,23 +394,10 @@ export default function FilterBar({
                 else if (chip.key === "extra") toggleExtra(chip.v);
                 else toggleSecondary(chip.key, chip.v);
               }}
-              className="flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#ced48c]/20 text-[10px] font-medium text-foreground hover:bg-[#ced48c]/40 transition-colors"
             >
               {chip.label}
-              <svg
-                width="8"
-                height="8"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeLinecap="round"
-                className="text-gray-400"
-              >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
+              <IconX className="size-2.5 text-gray-medium" strokeWidth={3} />
+            </FilterChip>
           ))}
         </div>
       )}

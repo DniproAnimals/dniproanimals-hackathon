@@ -1,13 +1,23 @@
 "use client";
-
-import { useEffect, useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useUser } from "@/lib/UserContext";
+import { Button, Input, InputWithIcon, Skeleton } from "@/components/ui";
+import { useUser } from "@/shared/lib/UserContext";
+import { IconLockFilled, IconMailFilled } from "@tabler/icons-react";
 import Image from "next/image";
-import { IconMailFilled, IconLockFilled } from "@tabler/icons-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
 export default function InvitePageWrapper() {
-  return <Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center"><div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" /></div>}><InvitePage /></Suspense>;
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[80vh] flex items-center justify-center">
+          <Skeleton className="size-10 rounded-full" />
+        </div>
+      }
+    >
+      <InvitePage />
+    </Suspense>
+  );
 }
 
 function InvitePage() {
@@ -16,18 +26,18 @@ function InvitePage() {
   const { refresh } = useUser();
   const token = searchParams.get("token");
 
-  const [info, setInfo] = useState<{ volunteer_name: string; volunteer_surname: string | null; org_name: string } | null>(null);
+  const [info, setInfo] = useState<{
+    volunteer_name: string;
+    volunteer_surname: string | null;
+    org_name: string;
+  } | null>(null);
   const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(() => (token ? "" : "Посилання недійсне"));
+  const [loading, setLoading] = useState(() => Boolean(token));
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!token) {
-      setError("Посилання недійсне");
-      setLoading(false);
-      return;
-    }
+    if (!token) return;
     fetch(`/api/volunteers/invite?token=${token}`)
       .then((r) => r.json())
       .then((data) => {
@@ -49,7 +59,11 @@ function InvitePage() {
     const res = await fetch("/api/volunteers/invite", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, email: form.email, password: form.password }),
+      body: JSON.stringify({
+        token,
+        email: form.email,
+        password: form.password,
+      }),
     });
 
     const data = await res.json();
@@ -74,10 +88,12 @@ function InvitePage() {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4">
         <div className="text-center">
-          <p className="text-red-500 mb-4">{error || "Запрошення недійсне"}</p>
-          <button onClick={() => router.push("/")} className="text-sm text-gray-medium hover:text-foreground">
+          <p className="text-destructive mb-4">
+            {error || "Запрошення недійсне"}
+          </p>
+          <Button variant="ghost" size="sm" onClick={() => router.push("/")}>
             На головну
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -87,29 +103,61 @@ function InvitePage() {
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-6">
-          <Image src="/logo.jpg" alt="DniproAnimals" width={48} height={48} className="rounded-full object-cover mb-3" />
+          <Image
+            src="/logo.jpg"
+            alt="DniproAnimals"
+            width={48}
+            height={48}
+            className="rounded-full object-cover mb-3"
+          />
           <h1 className="text-xl font-bold text-foreground mb-1">Запрошення</h1>
           <p className="text-sm text-gray-medium text-center">
-            Вас запрошено як волонтера <strong>{info.volunteer_name}{info.volunteer_surname ? ` ${info.volunteer_surname}` : ""}</strong> до організації <strong>{info.org_name}</strong>
+            Вас запрошено як волонтера{" "}
+            <strong>
+              {info.volunteer_name}
+              {info.volunteer_surname ? ` ${info.volunteer_surname}` : ""}
+            </strong>{" "}
+            до організації <strong>{info.org_name}</strong>
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-border space-y-3">
-          <p className="text-xs text-gray-medium mb-1">Створіть облікові дані для входу:</p>
-          <div className="relative">
-            <IconMailFilled size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input type="email" placeholder="Email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
-          </div>
-          <div className="relative">
-            <IconLockFilled size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input type="password" placeholder="Пароль" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
-          </div>
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-2xl p-6 shadow-sm border border-gray-border space-y-3"
+        >
+          <p className="text-xs text-gray-medium mb-1">
+            Створіть облікові дані для входу:
+          </p>
+          <InputWithIcon icon={<IconMailFilled />}>
+            <Input
+              type="email"
+              placeholder="Email"
+              required
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+          </InputWithIcon>
+          <InputWithIcon icon={<IconLockFilled />}>
+            <Input
+              type="password"
+              placeholder="Пароль"
+              required
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
+          </InputWithIcon>
 
-          {error && <p className="text-xs text-red-500">{error}</p>}
+          {error && <p className="text-xs text-destructive">{error}</p>}
 
-          <button type="submit" disabled={submitting} className="w-full bg-[#ced48c] text-foreground py-3 rounded-xl font-semibold hover:bg-[#b8be72] transition-colors disabled:opacity-50">
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            disabled={submitting}
+            className="w-full"
+          >
             {submitting ? "Зачекайте..." : "Приєднатися"}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

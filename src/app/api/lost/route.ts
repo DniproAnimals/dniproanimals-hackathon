@@ -1,5 +1,5 @@
+import { createClient } from "@/shared/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
   const type = request.nextUrl.searchParams.get("type");
@@ -22,14 +22,26 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const {
-    title, description, type, animal_type, breed, sex, color, size,
-    location, last_seen_location, last_seen_date, contact_name, contact_phone, photos,
+    title,
+    description,
+    type,
+    animal_type,
+    breed,
+    sex,
+    color,
+    size,
+    location,
+    last_seen_location,
+    last_seen_date,
+    contact_name,
+    contact_phone,
+    photos,
   } = body;
 
   if (!title || !description || !type || !contact_name || !contact_phone) {
     return NextResponse.json(
       { error: "Всі обов'язкові поля мають бути заповнені" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -60,8 +72,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Помилка створення" }, { status: 500 });
   }
 
-  return NextResponse.json(
-    { id: result.id, success: true },
-    { status: 201 }
-  );
+  return NextResponse.json({ id: result.id, success: true }, { status: 201 });
 }

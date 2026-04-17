@@ -1,10 +1,10 @@
 "use client";
-
-import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { useUser } from "@/lib/UserContext";
+import { Badge, Button, Card, EmptyState, FilterChip } from "@/components/ui";
+import { useUser } from "@/shared/lib/UserContext";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 type Organization = {
   id: number;
@@ -23,7 +23,9 @@ export default function SuperadminPage() {
   const router = useRouter();
   const { user, loading } = useUser();
   const [orgs, setOrgs] = useState<Organization[]>([]);
-  const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("all");
+  const [filter, setFilter] = useState<
+    "all" | "pending" | "approved" | "rejected"
+  >("all");
   const [updating, setUpdating] = useState<number | null>(null);
   const [deleting, setDeleting] = useState<number | null>(null);
 
@@ -61,7 +63,12 @@ export default function SuperadminPage() {
   };
 
   const deleteOrg = async (id: number) => {
-    if (!confirm("Видалити організацію? Акаунти власника та волонтерів буде скинуто.")) return;
+    if (
+      !confirm(
+        "Видалити організацію? Акаунти власника та волонтерів буде скинуто.",
+      )
+    )
+      return;
     setDeleting(id);
     const res = await fetch("/api/superadmin/organizations", {
       method: "DELETE",
@@ -82,7 +89,8 @@ export default function SuperadminPage() {
     );
   }
 
-  const filtered = filter === "all" ? orgs : orgs.filter((o) => o.status === filter);
+  const filtered =
+    filter === "all" ? orgs : orgs.filter((o) => o.status === filter);
 
   const statusLabel = (s: string) => {
     if (s === "pending") return "На модерації";
@@ -90,25 +98,38 @@ export default function SuperadminPage() {
     return "Відхилено";
   };
 
-  const statusColor = (s: string) => {
-    if (s === "pending") return "bg-yellow-100 text-yellow-800";
-    if (s === "approved") return "bg-green-100 text-green-800";
-    return "bg-red-100 text-red-800";
+  const statusVariant = (s: string): "warning" | "success" | "danger" => {
+    if (s === "pending") return "warning";
+    if (s === "approved") return "success";
+    return "danger";
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-gray-border">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/">
-              <Image src="/logo.jpg" alt="DniproAnimals" width={36} height={36} className="rounded-full object-cover" />
+              <Image
+                src="/logo.jpg"
+                alt="DniproAnimals"
+                width={36}
+                height={36}
+                className="rounded-full object-cover"
+              />
             </Link>
-            <h1 className="text-lg font-bold text-foreground">Глобальна адмін панель</h1>
+            <h1 className="text-lg font-bold text-foreground">
+              Глобальна адмін панель
+            </h1>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500">{user.name}</span>
-            <Link href="/" className="text-sm text-gray-500 hover:text-foreground transition-colors">На сайт</Link>
+            <span className="text-sm text-gray-medium">{user.name}</span>
+            <Link
+              href="/"
+              className="text-sm text-gray-medium hover:text-foreground transition-colors"
+            >
+              На сайт
+            </Link>
           </div>
         </div>
       </div>
@@ -118,88 +139,104 @@ export default function SuperadminPage() {
           <h2 className="text-xl font-semibold text-foreground">Організації</h2>
           <div className="flex gap-1">
             {(["all", "pending", "approved", "rejected"] as const).map((f) => (
-              <button
+              <FilterChip
                 key={f}
+                variant={filter === f ? "active" : "outline"}
+                size="md"
                 onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  filter === f ? "bg-[#ced48c] text-foreground" : "bg-white text-gray-500 hover:bg-gray-100"
-                }`}
+                count={
+                  f === "all"
+                    ? orgs.length
+                    : orgs.filter((o) => o.status === f).length
+                }
               >
                 {f === "all" ? "Усі" : statusLabel(f)}
-                <span className="ml-1 opacity-60">
-                  {f === "all" ? orgs.length : orgs.filter((o) => o.status === f).length}
-                </span>
-              </button>
+              </FilterChip>
             ))}
           </div>
         </div>
 
         {filtered.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-10 text-center text-gray-400">
-            Немає організацій
-          </div>
+          <Card className="p-10">
+            <EmptyState title="Немає організацій" />
+          </Card>
         ) : (
           <div className="space-y-3">
             {filtered.map((org) => (
-              <div key={org.id} className="bg-white rounded-xl border border-gray-200 p-5">
+              <Card key={org.id} className="p-5">
                 <div className="flex items-start justify-between gap-4">
-                  <Link href={`/organizations/${org.id}`} target="_blank" className="flex-1 min-w-0 hover:opacity-75 transition-opacity">
+                  <Link
+                    href={`/organizations/${org.id}`}
+                    target="_blank"
+                    className="flex-1 min-w-0 hover:opacity-75 transition-opacity"
+                  >
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-foreground truncate">{org.name}</h3>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${statusColor(org.status)}`}>
+                      <h3 className="font-semibold text-foreground truncate">
+                        {org.name}
+                      </h3>
+                      <Badge variant={statusVariant(org.status)} size="sm">
                         {statusLabel(org.status)}
-                      </span>
+                      </Badge>
                     </div>
                     {org.description && (
-                      <p className="text-sm text-gray-500 line-clamp-2 mb-2">{org.description}</p>
+                      <p className="text-sm text-gray-medium line-clamp-2 mb-2">
+                        {org.description}
+                      </p>
                     )}
-                    <div className="flex flex-wrap gap-3 text-xs text-gray-400">
+                    <div className="flex flex-wrap gap-3 text-xs text-gray-medium">
                       {org.location && <span>{org.location}</span>}
                       {org.email && <span>{org.email}</span>}
                       {org.phone && <span>{org.phone}</span>}
                       {org.website && <span>{org.website}</span>}
-                      <span>{new Date(org.created_at).toLocaleDateString("uk-UA")}</span>
+                      <span>
+                        {new Date(org.created_at).toLocaleDateString("uk-UA")}
+                      </span>
                     </div>
                   </Link>
 
                   <div className="flex gap-2 shrink-0">
                     {org.status === "pending" && (
-                      <button
+                      <Button
+                        variant="success"
+                        size="sm"
                         onClick={() => updateStatus(org.id, "approved")}
                         disabled={updating === org.id}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-green-500 text-white hover:bg-green-600 transition-colors disabled:opacity-50"
                       >
                         Схвалити
-                      </button>
+                      </Button>
                     )}
                     {org.status === "approved" && (
-                      <button
+                      <Button
+                        variant="primary"
+                        size="sm"
                         onClick={() => updateStatus(org.id, "rejected")}
                         disabled={updating === org.id}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-yellow-500 text-white hover:bg-yellow-600 transition-colors disabled:opacity-50"
+                        className="bg-yellow-500 text-white hover:bg-yellow-600"
                       >
                         Заблокувати
-                      </button>
+                      </Button>
                     )}
                     {org.status === "rejected" && (
-                      <button
+                      <Button
+                        variant="success"
+                        size="sm"
                         onClick={() => updateStatus(org.id, "approved")}
                         disabled={updating === org.id}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-green-500 text-white hover:bg-green-600 transition-colors disabled:opacity-50"
                       >
                         Схвалити
-                      </button>
+                      </Button>
                     )}
-                    <button
+                    <Button
+                      variant="destructive"
+                      size="sm"
                       onClick={() => deleteOrg(org.id)}
                       disabled={deleting === org.id}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-50"
                     >
                       {deleting === org.id ? "..." : "Видалити"}
-                    </button>
+                    </Button>
                   </div>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         )}

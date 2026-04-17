@@ -1,21 +1,21 @@
 "use client";
-
-import { useState, useEffect, useRef, useCallback } from "react";
 import ImageFallback from "@/components/ImageFallback";
-import Link from "next/link";
-import { useUser } from "@/lib/UserContext";
-import type { Animal } from "@/lib/db";
+import { Badge } from "@/components/ui/badge";
+import { useUser } from "@/shared/lib/UserContext";
+import type { Animal } from "@/shared/lib/db";
+import { cn } from "@/shared/lib/utils";
 import {
-  IconMapPinFilled,
-  IconRuler,
-  IconPalette,
+  IconBook,
   IconCircleCheckFilled,
-  IconForbidFilled,
-  IconBookFilled,
+  IconCircleX,
+  IconMapPinFilled,
+  IconPalette,
   IconPawFilled,
-  IconPaw,
   IconRefresh,
+  IconRuler,
 } from "@tabler/icons-react";
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 function getAgeLabel(months: number | null): string {
   if (!months) return "Невідомо";
@@ -43,7 +43,13 @@ const tintColors = [
   "bg-violet-50",
 ];
 
-export default function AnimalCard({ animal, index = 0 }: { animal: Animal; index?: number }) {
+export default function AnimalCard({
+  animal,
+  index = 0,
+}: {
+  animal: Animal;
+  index?: number;
+}) {
   const [flipped, setFlipped] = useState(false);
   const [currentPhoto, setCurrentPhoto] = useState(0);
   const [hovered, setHovered] = useState(false);
@@ -67,42 +73,46 @@ export default function AnimalCard({ animal, index = 0 }: { animal: Animal; inde
     }, 1200);
   }, [photos.length, flipped]);
 
-  const stopSlideshow = useCallback(() => {
+  const clearSlideshow = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    setCurrentPhoto(0);
   }, []);
 
   useEffect(() => {
     if (hovered && !flipped) {
       startSlideshow();
-    } else {
-      stopSlideshow();
     }
-    return stopSlideshow;
-  }, [hovered, flipped, startSlideshow, stopSlideshow]);
+    return clearSlideshow;
+  }, [hovered, flipped, startSlideshow, clearSlideshow]);
 
   return (
     <div
       className="group"
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseLeave={() => {
+        setHovered(false);
+        setCurrentPhoto(0);
+      }}
     >
-      {/* Card container with perspective */}
-      <div className="relative aspect-square [perspective:800px] mb-2.5">
+      <div className="relative aspect-square perspective-midrange mb-2.5">
         <div
-          className={`relative w-full h-full transition-transform duration-500 [transform-style:preserve-3d] ${
-            flipped ? "[transform:rotateY(180deg)]" : ""
-          }`}
+          className={cn(
+            "relative w-full h-full transition-transform duration-500 transform-3d",
+            flipped && "transform-[rotateY(180deg)]",
+          )}
         >
-          {/* Front — photo with zoom + slideshow */}
           <Link
             href={`/animals/${animal.id}`}
-            className="absolute inset-0 [backface-visibility:hidden]"
+            className="absolute inset-0 backface-hidden"
           >
-            <div className={`relative w-full h-full rounded-2xl overflow-hidden ${tint}`}>
+            <div
+              className={cn(
+                "relative w-full h-full rounded-2xl overflow-hidden",
+                tint,
+              )}
+            >
               {/* All photos stacked, only currentPhoto visible */}
               {photos.length > 0 ? (
                 photos.map((photo, i) => (
@@ -111,16 +121,22 @@ export default function AnimalCard({ animal, index = 0 }: { animal: Animal; inde
                     src={photo}
                     alt={animal.name}
                     fill
-                    className={`object-cover transition-all duration-700 ${
-                      i === currentPhoto ? "opacity-100" : "opacity-0"
-                    } ${hovered && !flipped ? "scale-110" : "scale-100"}`}
+                    className={cn(
+                      "object-cover transition-all duration-700",
+                      i === currentPhoto ? "opacity-100" : "opacity-0",
+                      hovered && !flipped ? "scale-110" : "scale-100",
+                    )}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     priority={i === 0}
                   />
                 ))
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-4xl bg-gray-light">
-                  {animal.type === "dog" ? "🐕" : animal.type === "cat" ? "🐈" : "🐾"}
+                  {animal.type === "dog"
+                    ? "🐕"
+                    : animal.type === "cat"
+                      ? "🐈"
+                      : "🐾"}
                 </div>
               )}
 
@@ -130,68 +146,125 @@ export default function AnimalCard({ animal, index = 0 }: { animal: Animal; inde
                   {photos.map((_, i) => (
                     <span
                       key={i}
-                      className={`rounded-full transition-all ${
+                      className={cn(
+                        "rounded-full transition-all",
                         i === currentPhoto
                           ? "w-4 h-1.5 bg-white"
-                          : "w-1.5 h-1.5 bg-white/50"
-                      }`}
+                          : "w-1.5 h-1.5 bg-white/50",
+                      )}
                     />
                   ))}
                 </div>
               )}
 
               {animal.status === "reserved" && (
-                <span className="absolute top-2.5 left-2.5 bg-yellow-500/90 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium">
+                <Badge
+                  variant="reserved"
+                  size="sm"
+                  className="absolute top-2.5 left-2.5"
+                >
                   Зарезервовано
-                </span>
+                </Badge>
               )}
               {animal.status === "adopted" && (
-                <span className="absolute top-2.5 left-2.5 bg-green-accent/90 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium">
+                <Badge
+                  variant="adopted"
+                  size="sm"
+                  className="absolute top-2.5 left-2.5"
+                >
                   Знайшов дім!
-                </span>
+                </Badge>
               )}
             </div>
           </Link>
 
-          {/* Back — Fast Facts */}
-          <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-            <div className="w-full h-full rounded-2xl bg-[#ced48c] p-3.5 flex flex-col">
+          <div className="absolute inset-0 backface-hidden transform-[rotateY(180deg)]">
+            <div className="w-full h-full rounded-2xl bg-primary p-3.5 flex flex-col">
               <p className="text-sm font-bold text-foreground mb-2">
                 {animal.name}
               </p>
 
               <div className="flex-1 flex flex-col justify-center divide-y divide-foreground/10">
                 <div className="flex items-center gap-2 py-1.5">
-                  <IconMapPinFilled width={14} height={14} className="text-foreground/60 flex-shrink-0" />
-                  <span className="text-[11px] font-semibold text-foreground">Місце</span>
-                  <span className="text-[11px] text-foreground/70 ml-auto truncate max-w-[45%] text-right">{animal.contact_location || "Дніпро"}</span>
+                  <IconMapPinFilled
+                    width={14}
+                    height={14}
+                    className="text-foreground/60 shrink-0"
+                  />
+                  <span className="text-[11px] font-semibold text-foreground">
+                    Місце
+                  </span>
+                  <span className="text-[11px] text-foreground/70 ml-auto truncate max-w-[45%] text-right">
+                    {animal.contact_location || "Дніпро"}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 py-1.5">
-                  <IconRuler width={14} height={14} className="text-foreground/60 flex-shrink-0" />
-                  <span className="text-[11px] font-semibold text-foreground">Розмір</span>
-                  <span className="text-[11px] text-foreground/70 ml-auto">{getSizeLabel(animal.size)}{animal.weight_kg ? ` · ${animal.weight_kg} кг` : ""}</span>
+                  <IconRuler
+                    width={14}
+                    height={14}
+                    className="text-foreground/60 shrink-0"
+                  />
+                  <span className="text-[11px] font-semibold text-foreground">
+                    Розмір
+                  </span>
+                  <span className="text-[11px] text-foreground/70 ml-auto">
+                    {getSizeLabel(animal.size)}
+                    {animal.weight_kg ? ` · ${animal.weight_kg} кг` : ""}
+                  </span>
                 </div>
                 {animal.color && (
                   <div className="flex items-center gap-2 py-1.5">
-                    <IconPalette width={14} height={14} className="text-foreground/60 flex-shrink-0" />
-                    <span className="text-[11px] font-semibold text-foreground">Колір</span>
-                    <span className="text-[11px] text-foreground/70 ml-auto">{animal.color}</span>
+                    <IconPalette
+                      width={14}
+                      height={14}
+                      className="text-foreground/60 shrink-0"
+                    />
+                    <span className="text-[11px] font-semibold text-foreground">
+                      Колір
+                    </span>
+                    <span className="text-[11px] text-foreground/70 ml-auto">
+                      {animal.color}
+                    </span>
                   </div>
                 )}
                 <div className="flex items-center gap-2 py-1.5">
-                  <IconCircleCheckFilled width={14} height={14} className="text-foreground/60 flex-shrink-0" />
-                  <span className="text-[11px] font-semibold text-foreground">Вакцинація</span>
-                  <span className="text-[11px] text-foreground/70 ml-auto">{animal.vaccinated ? "Так" : "Ні"}</span>
+                  <IconCircleCheckFilled
+                    width={14}
+                    height={14}
+                    className="text-foreground/60 shrink-0"
+                  />
+                  <span className="text-[11px] font-semibold text-foreground">
+                    Вакцинація
+                  </span>
+                  <span className="text-[11px] text-foreground/70 ml-auto">
+                    {animal.vaccinated ? "Так" : "Ні"}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 py-1.5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/60 flex-shrink-0"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
-                  <span className="text-[11px] font-semibold text-foreground">Стерилізація</span>
-                  <span className="text-[11px] text-foreground/70 ml-auto">{animal.sterilized ? "Так" : "Ні"}</span>
+                  <IconCircleX
+                    width={14}
+                    height={14}
+                    className="text-foreground/60 shrink-0"
+                  />
+                  <span className="text-[11px] font-semibold text-foreground">
+                    Стерилізація
+                  </span>
+                  <span className="text-[11px] text-foreground/70 ml-auto">
+                    {animal.sterilized ? "Так" : "Ні"}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 py-1.5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/60 flex-shrink-0"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-                  <span className="text-[11px] font-semibold text-foreground">Навчено</span>
-                  <span className="text-[11px] text-foreground/70 ml-auto">{animal.trained ? "Так" : "Ні"}</span>
+                  <IconBook
+                    width={14}
+                    height={14}
+                    className="text-foreground/60 shrink-0"
+                  />
+                  <span className="text-[11px] font-semibold text-foreground">
+                    Навчено
+                  </span>
+                  <span className="text-[11px] text-foreground/70 ml-auto">
+                    {animal.trained ? "Так" : "Ні"}
+                  </span>
                 </div>
               </div>
 
@@ -205,43 +278,62 @@ export default function AnimalCard({ animal, index = 0 }: { animal: Animal; inde
           </div>
         </div>
 
-        {/* Favorite paw button — top right */}
         {user && (
           <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(animal.id); }}
-            className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full backdrop-blur-sm shadow-md flex items-center justify-center transition-all hover:bg-white ${
-              isFav ? "bg-white opacity-100" : "bg-white/90 opacity-0 group-hover:opacity-100"
-            }`}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleFavorite(animal.id);
+            }}
+            className={cn(
+              "absolute top-2.5 right-2.5 z-10 size-8 rounded-full backdrop-blur-sm shadow-md flex items-center justify-center transition-all hover:bg-white",
+              isFav
+                ? "bg-white opacity-100 text-primary"
+                : "bg-white/90 opacity-0 group-hover:opacity-100 text-foreground",
+            )}
             aria-label={isFav ? "Прибрати з обраного" : "Додати до обраного"}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill={isFav ? "#ced48c" : "none"} stroke={isFav ? "#ced48c" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 21c-1.5 0-5-2.5-7.5-6C2 11 2 7.5 4 5.5S9 3 12 6c3-3 6-2.5 8-0.5s2 5.5-.5 9.5C17 19 13.5 21 12 21z"/>
-              <circle cx="7.5" cy="7" r="1.5"/><circle cx="16.5" cy="7" r="1.5"/><circle cx="10" cy="4.5" r="1.5"/><circle cx="14" cy="4.5" r="1.5"/>
-            </svg>
+            <IconPawFilled
+              className={cn(
+                "size-4",
+                isFav ? "text-primary" : "text-foreground",
+              )}
+            />
           </button>
         )}
 
-        {/* Flip button — bottom right */}
         <button
           onClick={handleFlip}
-          className={`absolute bottom-2.5 right-2.5 z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center transition-all hover:bg-white ${
-            flipped ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-          }`}
+          className={cn(
+            "absolute bottom-2.5 right-2.5 z-10 size-8 rounded-full bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center transition-all hover:bg-white",
+            flipped ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+          )}
           aria-label={flipped ? "Показати фото" : "Показати факти"}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-300 ${flipped ? "rotate-180" : ""}`}>
-            <path d="M17 1l4 4-4 4" /><path d="M3 11V9a4 4 0 014-4h14" /><path d="M7 23l-4-4 4-4" /><path d="M21 13v2a4 4 0 01-4 4H3" />
-          </svg>
+          <IconRefresh
+            className={cn(
+              "size-4 transition-transform duration-300",
+              flipped && "rotate-180",
+            )}
+          />
         </button>
       </div>
 
       {/* Name + info below card */}
       <div className="px-1">
         <div className="flex items-center gap-1.5">
-          <Link href={`/animals/${animal.id}`} className="font-semibold text-[15px] text-foreground hover:underline">
+          <Link
+            href={`/animals/${animal.id}`}
+            className="font-semibold text-[15px] text-foreground hover:underline"
+          >
             {animal.name}
           </Link>
-          <span className={`text-sm ${animal.sex === "male" ? "text-blue-400" : "text-pink-400"}`}>
+          <span
+            className={cn(
+              "text-sm",
+              animal.sex === "male" ? "text-blue-400" : "text-pink-400",
+            )}
+          >
             {animal.sex === "male" ? "♂" : "♀"}
           </span>
         </div>

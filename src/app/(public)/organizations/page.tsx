@@ -1,19 +1,29 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { motion } from "motion/react";
 import ImageFallback from "@/components/ImageFallback";
-import { useUser } from "@/lib/UserContext";
+import { Badge, Button, EmptyState, Skeleton } from "@/components/ui";
+import { useUser } from "@/shared/lib/UserContext";
 import {
-  IconMapPinFilled, IconBrandInstagram, IconBrandTelegram,
-  IconBrandFacebook, IconShieldCheckFilled,
+  IconBrandFacebook,
+  IconBrandInstagram,
+  IconBrandTelegram,
+  IconMapPinFilled,
+  IconShieldCheckFilled,
 } from "@tabler/icons-react";
+import { motion } from "motion/react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 type Org = {
-  id: number; name: string; description: string | null; photo: string | null;
-  location: string | null; instagram: string | null; telegram: string | null;
-  facebook: string | null; status: string; created_at: string;
+  id: number;
+  name: string;
+  description: string | null;
+  photo: string | null;
+  location: string | null;
+  instagram: string | null;
+  telegram: string | null;
+  facebook: string | null;
+  status: string;
+  created_at: string;
 };
 
 export default function OrganizationsPage() {
@@ -26,7 +36,8 @@ export default function OrganizationsPage() {
     fetch("/api/organizations")
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data)) setOrgs(data.filter((o: Org) => o.status === "approved"));
+        if (Array.isArray(data))
+          setOrgs(data.filter((o: Org) => o.status === "approved"));
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -41,12 +52,19 @@ export default function OrganizationsPage() {
         transition={{ duration: 0.4 }}
         className="text-center mb-10"
       >
-        <p className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f2f4e4] text-[#5b7765] text-sm font-bold mb-4 border border-[#ced48c]/40">
+        <Badge
+          variant="soft"
+          size="lg"
+          className="mb-4 border border-primary/40 font-bold"
+        >
           <span className="text-lg">🤝</span> Партнерство
-        </p>
-        <h1 className="text-3xl md:text-5xl font-bold mb-4">Організації та Притулки</h1>
+        </Badge>
+        <h1 className="text-3xl md:text-5xl font-bold mb-4">
+          Організації та Притулки
+        </h1>
         <p className="text-base text-gray-medium max-w-2xl mx-auto mb-6">
-          Ми об&apos;єднуємо зусилля з перевіреними притулками та фондами. Підтримайте їх або знайдіть нового друга.
+          Ми об&apos;єднуємо зусилля з перевіреними притулками та фондами.
+          Підтримайте їх або знайдіть нового друга.
         </p>
         {!hasOrg && (
           <motion.div
@@ -54,9 +72,11 @@ export default function OrganizationsPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.4 }}
           >
-            <Link href="/organizations/create" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-foreground text-white font-semibold text-sm hover:bg-foreground/90 transition-colors">
-              Зареєструвати свою організацію
-            </Link>
+            <Button asChild variant="secondary" size="lg">
+              <Link href="/organizations/create">
+                Зареєструвати свою організацію
+              </Link>
+            </Button>
           </motion.div>
         )}
       </motion.div>
@@ -65,14 +85,14 @@ export default function OrganizationsPage() {
       {loading ? (
         <div className="grid md:grid-cols-2 gap-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-gray-light rounded-2xl animate-pulse h-64" />
+            <Skeleton key={i} className="rounded-2xl h-64" />
           ))}
         </div>
       ) : orgs.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-lg font-semibold mb-2">Організацій поки немає</p>
-          <p className="text-sm text-gray-medium">Будьте першим — зареєструйте свою організацію</p>
-        </div>
+        <EmptyState
+          title="Організацій поки немає"
+          description="Будьте першим — зареєструйте свою організацію"
+        />
       ) : (
         <div className="grid md:grid-cols-2 gap-6">
           {orgs.map((org, i) => (
@@ -84,26 +104,40 @@ export default function OrganizationsPage() {
             >
               <Link
                 href={`/organizations/${org.id}`}
-                className="block bg-white rounded-2xl border border-gray-border overflow-hidden hover:border-[#ced48c] hover:shadow-md transition-all group"
+                className="block bg-white rounded-2xl border border-gray-border overflow-hidden hover:border-primary hover:shadow-md transition-all group"
               >
                 {/* Photo */}
                 <div className="relative h-40 bg-gray-light">
                   {org.photo ? (
-                    <ImageFallback src={org.photo} alt={org.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="50vw" />
+                    <ImageFallback
+                      src={org.photo}
+                      alt={org.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      sizes="50vw"
+                    />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-5xl text-gray-300">🏠</div>
+                    <div className="w-full h-full flex items-center justify-center text-5xl text-gray-300">
+                      🏠
+                    </div>
                   )}
                   {org.status === "approved" && (
-                    <div className="absolute top-2.5 left-2.5 bg-green-500 text-white px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1">
+                    <Badge
+                      variant="success"
+                      size="sm"
+                      className="absolute top-2.5 left-2.5 bg-green-500 text-white font-semibold"
+                    >
                       <IconShieldCheckFilled size={10} />
                       Перевірено
-                    </div>
+                    </Badge>
                   )}
                 </div>
 
                 {/* Info */}
                 <div className="p-5">
-                  <h3 className="font-bold text-lg mb-1 group-hover:text-[#5b7765] transition-colors">{org.name}</h3>
+                  <h3 className="font-bold text-lg mb-1 group-hover:text-green-secondary transition-colors">
+                    {org.name}
+                  </h3>
                   {org.location && (
                     <p className="text-xs text-gray-medium flex items-center gap-1 mb-2">
                       <IconMapPinFilled size={12} />
@@ -111,27 +145,40 @@ export default function OrganizationsPage() {
                     </p>
                   )}
                   {org.description && (
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-3">{org.description}</p>
+                    <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                      {org.description}
+                    </p>
                   )}
                   <div className="flex items-center justify-between">
                     <div className="flex gap-2">
                       {org.instagram && (
-                        <span className="w-8 h-8 rounded-lg bg-gray-light flex items-center justify-center">
-                          <IconBrandInstagram size={14} className="text-gray-medium" />
+                        <span className="size-8 rounded-lg bg-gray-light flex items-center justify-center">
+                          <IconBrandInstagram
+                            size={14}
+                            className="text-gray-medium"
+                          />
                         </span>
                       )}
                       {org.telegram && (
-                        <span className="w-8 h-8 rounded-lg bg-gray-light flex items-center justify-center">
-                          <IconBrandTelegram size={14} className="text-gray-medium" />
+                        <span className="size-8 rounded-lg bg-gray-light flex items-center justify-center">
+                          <IconBrandTelegram
+                            size={14}
+                            className="text-gray-medium"
+                          />
                         </span>
                       )}
                       {org.facebook && (
-                        <span className="w-8 h-8 rounded-lg bg-gray-light flex items-center justify-center">
-                          <IconBrandFacebook size={14} className="text-gray-medium" />
+                        <span className="size-8 rounded-lg bg-gray-light flex items-center justify-center">
+                          <IconBrandFacebook
+                            size={14}
+                            className="text-gray-medium"
+                          />
                         </span>
                       )}
                     </div>
-                    <span className="text-xs text-[#5b7765] font-medium group-hover:underline">Детальніше →</span>
+                    <span className="text-xs text-green-secondary font-medium group-hover:underline">
+                      Детальніше →
+                    </span>
                   </div>
                 </div>
               </Link>

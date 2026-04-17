@@ -1,39 +1,56 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { motion } from "motion/react";
 import ImageFallback from "@/components/ImageFallback";
-import { useUser } from "@/lib/UserContext";
-import type { Animal } from "@/lib/db";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { InputWithIcon } from "@/components/ui/form-field";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
+import { useUser } from "@/shared/lib/UserContext";
+import type { Animal } from "@/shared/lib/db";
+import { cn } from "@/shared/lib/utils";
+import {
+  IconBook,
+  IconBrandFacebook,
+  IconBrandInstagram,
+  IconBrandTelegram,
+  IconBuildingCommunity,
+  IconCalendar,
   IconChevronLeft,
   IconChevronRight,
+  IconCircleCheck,
+  IconCircleOff,
+  IconCirclePlus,
   IconHeart,
   IconHeartFilled,
-  IconPencil,
-  IconTrash,
-  IconPaw,
-  IconTag,
-  IconUser,
-  IconCalendar,
+  IconMail,
   IconMapPin,
   IconPackage,
   IconPalette,
-  IconCircleCheck,
-  IconCircleOff,
-  IconBook,
+  IconPaw,
+  IconPencil,
   IconPhone,
-  IconMail,
-  IconBrandInstagram,
-  IconBrandTelegram,
-  IconBrandFacebook,
-  IconX,
-  IconCirclePlus,
+  IconTag,
+  IconTrash,
+  IconUser,
   IconWeight,
-  IconBuildingCommunity,
+  IconX,
 } from "@tabler/icons-react";
+import { motion } from "motion/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 function getAgeLabel(months: number | null): string {
   if (!months) return "Невідомо";
@@ -108,7 +125,13 @@ export default function AnimalDetailPage({ id }: { id: string }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [visibleContacts, setVisibleContacts] = useState<string[]>(["email"]);
-  const [org, setOrg] = useState<{ id: number; name: string; photo: string | null; location: string | null } | null>(null);
+  const [addContactOpen, setAddContactOpen] = useState(false);
+  const [org, setOrg] = useState<{
+    id: number;
+    name: string;
+    photo: string | null;
+    location: string | null;
+  } | null>(null);
   const { user, favoriteIds, toggleFavorite } = useUser();
   const isFav = animal ? favoriteIds.includes(animal.id) : false;
 
@@ -157,16 +180,18 @@ export default function AnimalDetailPage({ id }: { id: string }) {
   if (!animal) {
     return (
       <div className="max-w-6xl mx-auto px-6 py-20 text-center">
-        <div className="w-20 h-20 rounded-full bg-gray-light mx-auto flex items-center justify-center mb-4">
+        <div className="size-20 rounded-full bg-gray-light mx-auto flex items-center justify-center mb-4">
           <span className="text-4xl">😿</span>
         </div>
         <p className="text-lg font-semibold mb-1">Тварину не знайдено</p>
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => router.push("/")}
-          className="mt-3 text-green-accent text-sm font-medium"
+          className="mt-3 text-green-accent font-medium"
         >
           ← Повернутися до каталогу
-        </button>
+        </Button>
       </div>
     );
   }
@@ -178,13 +203,15 @@ export default function AnimalDetailPage({ id }: { id: string }) {
   return (
     <div className="max-w-6xl mx-auto px-6 py-6 pb-24 md:pb-10">
       {/* Back */}
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={() => router.back()}
-        className="flex items-center gap-2 text-gray-medium hover:text-foreground mb-5 transition-colors text-sm"
+        className="flex items-center gap-2 text-gray-medium hover:text-foreground mb-5 -ml-3"
       >
         <IconChevronLeft size={18} />
         Назад
-      </button>
+      </Button>
 
       <div className="md:grid md:grid-cols-2 md:gap-10">
         {/* Photos */}
@@ -206,28 +233,36 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                 />
                 {photos.length > 1 && (
                   <>
-                    <button
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      shape="pill"
                       onClick={() =>
                         setActivePhoto(
                           (prev) => (prev - 1 + photos.length) % photos.length,
                         )
                       }
-                      className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-white"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm shadow opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-white"
                     >
                       <IconChevronLeft size={18} color="#1a1a1a" stroke={2.5} />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      shape="pill"
                       onClick={() =>
                         setActivePhoto((prev) => (prev + 1) % photos.length)
                       }
-                      className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-white"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm shadow opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-white"
                     >
                       <IconChevronRight
                         size={18}
                         color="#1a1a1a"
                         stroke={2.5}
                       />
-                    </button>
+                    </Button>
                     <div className="absolute bottom-2 right-2 bg-black/50 backdrop-blur-sm text-white text-[11px] px-2 py-0.5 rounded-full">
                       {activePhoto + 1}/{photos.length}
                     </div>
@@ -240,11 +275,12 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                     <button
                       key={i}
                       onClick={() => setActivePhoto(i)}
-                      className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${
+                      className={cn(
+                        "relative size-16 rounded-xl overflow-hidden border-2 transition-all",
                         i === activePhoto
                           ? "border-green-primary"
-                          : "border-transparent opacity-60 hover:opacity-100"
-                      }`}
+                          : "border-transparent opacity-60 hover:opacity-100",
+                      )}
                     >
                       <ImageFallback
                         src={photo}
@@ -293,14 +329,19 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                 {animal.name}
               </h1>
               <span
-                className={`text-xl ${animal.sex === "male" ? "text-blue-400" : "text-pink-400"}`}
+                className={cn(
+                  "text-xl",
+                  animal.sex === "male" ? "text-blue-400" : "text-pink-400",
+                )}
               >
                 {animal.sex === "male" ? "♂" : "♀"}
               </span>
               {user && (
-                <button
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
                   onClick={() => toggleFavorite(animal.id)}
-                  className="p-1 transition-colors"
                   aria-label={
                     isFav ? "Прибрати з обраного" : "Додати до обраного"
                   }
@@ -310,20 +351,26 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                   ) : (
                     <IconHeart size={22} color="#ccc" />
                   )}
-                </button>
+                </Button>
               )}
             </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               {user?.role === "admin" && (
                 <>
-                  <Link
-                    href={`/dashboard/animals/edit?edit=${animal.id}`}
-                    className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center justify-center"
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    asChild
+                    className="bg-blue-50 text-blue-600 hover:bg-blue-100"
                     title="Редагувати"
                   >
-                    <IconPencil size={14} />
-                  </Link>
-                  <button
+                    <Link href={`/dashboard/animals/edit?edit=${animal.id}`}>
+                      <IconPencil size={14} />
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
                     onClick={async () => {
                       if (!confirm("Видалити цю тварину?")) return;
                       const res = await fetch(`/api/animals/${animal.id}`, {
@@ -331,35 +378,35 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                       });
                       if (res.ok) router.push("/");
                     }}
-                    className="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors flex items-center justify-center"
+                    className="bg-red-50 text-red-600 hover:bg-red-100"
                     title="Видалити"
                   >
                     <IconTrash size={14} />
-                  </button>
+                  </Button>
                 </>
               )}
               {animal.status === "available" &&
                 !showAdoptForm &&
                 !submitted && (
-                  <button
+                  <Button
+                    type="button"
+                    variant="primary"
+                    size="md"
                     onClick={() => setShowAdoptForm(true)}
-                    className="bg-[#ced48c] text-foreground px-5 py-2 rounded-xl font-semibold text-sm hover:bg-[#b8be72] transition-colors"
                   >
                     Забрати додому
-                  </button>
+                  </Button>
                 )}
               {animal.status !== "available" && (
-                <span
-                  className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                    animal.status === "adopted"
-                      ? "bg-green-light text-green-accent"
-                      : "bg-yellow-100 text-yellow-700"
-                  }`}
+                <Badge
+                  variant={animal.status === "adopted" ? "soft" : "warning"}
+                  size="md"
+                  className="font-semibold"
                 >
                   {animal.status === "adopted"
                     ? "Прилаштовано"
                     : "Зарезервовано"}
-                </span>
+                </Badge>
               )}
             </div>
           </div>
@@ -371,7 +418,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
           {/* Metadata — list */}
           <div className="divide-y divide-gray-border mb-6">
             <div className="flex items-center gap-2.5 py-3">
-              <IconPaw size={16} className="text-gray-400 flex-shrink-0" />
+              <IconPaw size={16} className="text-gray-400 shrink-0" />
               <span className="text-sm font-medium text-foreground">Вид</span>
               <span className="text-sm text-gray-medium ml-auto">
                 {getTypeLabel(animal.type)}
@@ -379,7 +426,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
             </div>
             {animal.breed && (
               <div className="flex items-center gap-2.5 py-3">
-                <IconTag size={16} className="text-gray-400 flex-shrink-0" />
+                <IconTag size={16} className="text-gray-400 shrink-0" />
                 <span className="text-sm font-medium text-foreground">
                   Порода
                 </span>
@@ -389,21 +436,21 @@ export default function AnimalDetailPage({ id }: { id: string }) {
               </div>
             )}
             <div className="flex items-center gap-2.5 py-3">
-              <IconUser size={16} className="text-gray-400 flex-shrink-0" />
+              <IconUser size={16} className="text-gray-400 shrink-0" />
               <span className="text-sm font-medium text-foreground">Стать</span>
               <span className="text-sm text-gray-medium ml-auto">
                 {animal.sex === "male" ? "Хлопчик" : "Дівчинка"}
               </span>
             </div>
             <div className="flex items-center gap-2.5 py-3">
-              <IconCalendar size={16} className="text-gray-400 flex-shrink-0" />
+              <IconCalendar size={16} className="text-gray-400 shrink-0" />
               <span className="text-sm font-medium text-foreground">Вік</span>
               <span className="text-sm text-gray-medium ml-auto">
                 {getAgeLabel(animal.age_months)}
               </span>
             </div>
             <div className="flex items-center gap-2.5 py-3">
-              <IconPackage size={16} className="text-gray-400 flex-shrink-0" />
+              <IconPackage size={16} className="text-gray-400 shrink-0" />
               <span className="text-sm font-medium text-foreground">
                 Розмір
               </span>
@@ -413,7 +460,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
             </div>
             {animal.weight_kg && (
               <div className="flex items-center gap-2.5 py-3">
-                <IconWeight size={16} className="text-gray-400 flex-shrink-0" />
+                <IconWeight size={16} className="text-gray-400 shrink-0" />
                 <span className="text-sm font-medium text-foreground">
                   Вага
                 </span>
@@ -424,17 +471,14 @@ export default function AnimalDetailPage({ id }: { id: string }) {
             )}
             {animal.color && (
               <div className="flex items-center gap-2.5 py-3">
-                <IconPalette
-                  size={16}
-                  className="text-gray-400 flex-shrink-0"
-                />
+                <IconPalette size={16} className="text-gray-400 shrink-0" />
                 <span className="text-sm font-medium text-foreground">
                   Колір
                 </span>
                 <span className="flex items-center gap-2 text-sm text-gray-medium ml-auto">
                   {animal.color}
                   <span
-                    className="inline-block w-4 h-4 rounded-full border border-gray-border flex-shrink-0"
+                    className="inline-block size-4 rounded-full border border-gray-border shrink-0"
                     style={
                       isGradient
                         ? { background: colorStyle! }
@@ -445,10 +489,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
               </div>
             )}
             <div className="flex items-center gap-2.5 py-3">
-              <IconCircleCheck
-                size={16}
-                className="text-gray-400 flex-shrink-0"
-              />
+              <IconCircleCheck size={16} className="text-gray-400 shrink-0" />
               <span className="text-sm font-medium text-foreground">
                 Вакцинація
               </span>
@@ -457,10 +498,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
               </span>
             </div>
             <div className="flex items-center gap-2.5 py-3">
-              <IconCircleOff
-                size={16}
-                className="text-gray-400 flex-shrink-0"
-              />
+              <IconCircleOff size={16} className="text-gray-400 shrink-0" />
               <span className="text-sm font-medium text-foreground">
                 Стерилізація
               </span>
@@ -469,7 +507,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
               </span>
             </div>
             <div className="flex items-center gap-2.5 py-3">
-              <IconBook size={16} className="text-gray-400 flex-shrink-0" />
+              <IconBook size={16} className="text-gray-400 shrink-0" />
               <span className="text-sm font-medium text-foreground">
                 Навчено
               </span>
@@ -485,7 +523,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
               <h2 className="text-sm font-semibold mb-3">Організація</h2>
               <Link
                 href={`/organizations/${org.id}`}
-                className="flex items-center gap-3 p-3 rounded-xl border border-gray-border hover:border-[#ced48c] hover:bg-[#ced48c]/5 transition-colors"
+                className="flex items-center gap-3 p-3 rounded-xl border border-gray-border hover:border-primary hover:bg-primary/5 transition-colors"
               >
                 {org.photo ? (
                   <ImageFallback
@@ -493,20 +531,30 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                     alt={org.name}
                     width={40}
                     height={40}
-                    className="w-10 h-10 rounded-lg object-cover shrink-0"
+                    className="size-10 rounded-lg object-cover shrink-0"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-[#ced48c]/20 flex items-center justify-center shrink-0">
-                    <IconBuildingCommunity size={18} className="text-[#5b7765]" />
+                  <div className="size-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
+                    <IconBuildingCommunity
+                      size={18}
+                      className="text-green-secondary"
+                    />
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-foreground truncate">{org.name}</p>
+                  <p className="text-sm font-semibold text-foreground truncate">
+                    {org.name}
+                  </p>
                   {org.location && (
-                    <p className="text-xs text-gray-medium truncate">{org.location}</p>
+                    <p className="text-xs text-gray-medium truncate">
+                      {org.location}
+                    </p>
                   )}
                 </div>
-                <IconChevronRight size={16} className="text-gray-400 ml-auto shrink-0" />
+                <IconChevronRight
+                  size={16}
+                  className="text-gray-400 ml-auto shrink-0"
+                />
               </Link>
             </div>
           )}
@@ -524,10 +572,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
               <div className="space-y-2.5">
                 {animal.contact_name && (
                   <div className="flex items-center gap-2.5 text-sm">
-                    <IconUser
-                      size={16}
-                      className="text-gray-400 flex-shrink-0"
-                    />
+                    <IconUser size={16} className="text-gray-400 shrink-0" />
                     <span className="text-foreground font-medium">
                       {animal.contact_name}
                     </span>
@@ -535,10 +580,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                 )}
                 {animal.contact_phone && (
                   <div className="flex items-center gap-2.5 text-sm">
-                    <IconPhone
-                      size={16}
-                      className="text-gray-400 flex-shrink-0"
-                    />
+                    <IconPhone size={16} className="text-gray-400 shrink-0" />
                     <a
                       href={`tel:${animal.contact_phone}`}
                       className="text-foreground hover:underline"
@@ -549,10 +591,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                 )}
                 {animal.contact_email && (
                   <div className="flex items-center gap-2.5 text-sm">
-                    <IconMail
-                      size={16}
-                      className="text-gray-400 flex-shrink-0"
-                    />
+                    <IconMail size={16} className="text-gray-400 shrink-0" />
                     <a
                       href={`mailto:${animal.contact_email}`}
                       className="text-foreground hover:underline"
@@ -565,7 +604,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                   <div className="flex items-center gap-2.5 text-sm">
                     <IconBrandInstagram
                       size={16}
-                      className="text-gray-400 flex-shrink-0"
+                      className="text-gray-400 shrink-0"
                     />
                     <a
                       href={`https://instagram.com/${animal.contact_instagram}`}
@@ -581,7 +620,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                   <div className="flex items-center gap-2.5 text-sm">
                     <IconBrandTelegram
                       size={16}
-                      className="text-gray-400 flex-shrink-0"
+                      className="text-gray-400 shrink-0"
                     />
                     <a
                       href={`https://t.me/${animal.contact_telegram}`}
@@ -597,7 +636,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                   <div className="flex items-center gap-2.5 text-sm">
                     <IconBrandFacebook
                       size={16}
-                      className="text-gray-400 flex-shrink-0"
+                      className="text-gray-400 shrink-0"
                     />
                     <a
                       href={`https://facebook.com/${animal.contact_facebook}`}
@@ -614,7 +653,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                     <div className="flex items-center gap-2.5 text-sm mb-2">
                       <IconMapPin
                         size={16}
-                        className="text-gray-400 flex-shrink-0"
+                        className="text-gray-400 shrink-0"
                       />
                       <a
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(animal.contact_location)}`}
@@ -629,7 +668,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(animal.contact_location)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block rounded-xl overflow-hidden border border-gray-border hover:border-[#ced48c] transition-colors"
+                      className="block rounded-xl overflow-hidden border border-gray-border hover:border-primary transition-colors"
                     >
                       <iframe
                         title="Карта"
@@ -654,37 +693,23 @@ export default function AnimalDetailPage({ id }: { id: string }) {
       </div>
 
       {/* Adopt form — modal */}
-      {showAdoptForm && !submitted && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 animate-modal-overlay"
-          onClick={() => setShowAdoptForm(false)}
-        >
-          <form
-            onSubmit={handleSubmit}
-            onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl p-6 w-full max-w-md space-y-3 shadow-xl animate-modal-in"
-          >
-            <div className="flex items-center justify-between mb-1">
-              <h3 className="font-semibold text-lg">Заявка на усиновлення</h3>
-              <button
-                type="button"
-                onClick={() => setShowAdoptForm(false)}
-                className="text-gray-400 hover:text-foreground transition-colors"
-              >
-                <IconX size={20} />
-              </button>
-            </div>
-            <p className="text-sm text-gray-medium mb-2">
+      <Dialog
+        open={showAdoptForm && !submitted}
+        onOpenChange={(open) => {
+          if (!open) setShowAdoptForm(false);
+        }}
+      >
+        <DialogContent className="max-w-md space-y-3">
+          <DialogHeader>
+            <DialogTitle>Заявка на усиновлення</DialogTitle>
+            <DialogDescription>
               Вкажіть як з вами зв&apos;язатися
-            </p>
-
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-3">
             {/* Name */}
-            <div className="relative">
-              <IconUser
-                size={16}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-              />
-              <input
+            <InputWithIcon icon={<IconUser size={16} />}>
+              <Input
                 type="text"
                 placeholder="Ваше ім'я *"
                 required
@@ -692,17 +717,12 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm"
               />
-            </div>
+            </InputWithIcon>
 
             {/* Phone */}
-            <div className="relative">
-              <IconPhone
-                size={16}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-              />
-              <input
+            <InputWithIcon icon={<IconPhone size={16} />}>
+              <Input
                 type="tel"
                 placeholder="Телефон *"
                 required
@@ -710,28 +730,22 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm"
               />
-            </div>
+            </InputWithIcon>
 
             {/* Місто */}
-            <div className="relative">
-              <IconMapPin
-                size={16}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-              />
-              <input
+            <InputWithIcon icon={<IconMapPin size={16} />}>
+              <Input
                 type="text"
                 placeholder="Місто / район"
                 value={formData.location}
                 onChange={(e) =>
                   setFormData({ ...formData, location: e.target.value })
                 }
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm"
               />
-            </div>
+            </InputWithIcon>
 
-            <textarea
+            <Textarea
               placeholder="Розкажіть про себе та умови утримання... *"
               rows={3}
               required
@@ -739,120 +753,102 @@ export default function AnimalDetailPage({ id }: { id: string }) {
               onChange={(e) =>
                 setFormData({ ...formData, message: e.target.value })
               }
-              className="w-full px-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm resize-none"
             />
 
             {/* Dynamic extra contact fields */}
             {visibleContacts.map((type) => (
               <div key={type} className="relative animate-modal-in">
                 {type === "email" && (
-                  <>
-                    <IconMail
-                      size={16}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
-                    <input
+                  <InputWithIcon icon={<IconMail size={16} />}>
+                    <Input
                       type="email"
                       placeholder="Email"
                       value={formData.email}
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
                       }
-                      className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm"
+                      className="pr-9"
                     />
-                  </>
+                  </InputWithIcon>
                 )}
                 {type === "instagram" && (
-                  <>
-                    <IconBrandInstagram
-                      size={16}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
-                    <input
+                  <InputWithIcon icon={<IconBrandInstagram size={16} />}>
+                    <Input
                       type="text"
                       placeholder="Instagram"
                       value={formData.instagram}
                       onChange={(e) =>
                         setFormData({ ...formData, instagram: e.target.value })
                       }
-                      className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm"
+                      className="pr-9"
                     />
-                  </>
+                  </InputWithIcon>
                 )}
                 {type === "telegram" && (
-                  <>
-                    <IconBrandTelegram
-                      size={16}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
-                    <input
+                  <InputWithIcon icon={<IconBrandTelegram size={16} />}>
+                    <Input
                       type="text"
                       placeholder="Telegram"
                       value={formData.telegram}
                       onChange={(e) =>
                         setFormData({ ...formData, telegram: e.target.value })
                       }
-                      className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm"
+                      className="pr-9"
                     />
-                  </>
+                  </InputWithIcon>
                 )}
                 {type === "facebook" && (
-                  <>
-                    <IconBrandFacebook
-                      size={16}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
-                    <input
+                  <InputWithIcon icon={<IconBrandFacebook size={16} />}>
+                    <Input
                       type="text"
                       placeholder="Facebook"
                       value={formData.facebook}
                       onChange={(e) =>
                         setFormData({ ...formData, facebook: e.target.value })
                       }
-                      className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm"
+                      className="pr-9"
                     />
-                  </>
+                  </InputWithIcon>
                 )}
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon-sm"
                   onClick={() =>
                     setVisibleContacts(
                       visibleContacts.filter((c) => c !== type),
                     )
                   }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-foreground"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-400 hover:text-foreground"
                 >
                   <IconX size={14} />
-                </button>
+                </Button>
               </div>
             ))}
 
             {/* Add contact button */}
             {visibleContacts.length < 4 && (
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    const btn = e.currentTarget;
-                    const menu = btn.nextElementSibling as HTMLElement;
-                    menu.classList.toggle("hidden");
-                  }}
-                  className="flex items-center gap-1.5 text-[13px] text-gray-medium hover:text-foreground transition-colors py-1"
-                >
-                  <IconCirclePlus size={14} />
-                  Додати спосіб зв&apos;язку
-                </button>
-                <div className="hidden absolute left-0 bottom-full mb-1 bg-white rounded-xl border border-gray-border shadow-lg z-10 py-1 w-48 animate-modal-in">
+              <Popover open={addContactOpen} onOpenChange={setAddContactOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center gap-1.5 text-[13px] text-gray-medium hover:text-foreground font-normal -ml-3"
+                  >
+                    <IconCirclePlus size={14} />
+                    Додати спосіб зв&apos;язку
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-48 p-1">
                   {!visibleContacts.includes("email") && (
                     <button
                       type="button"
-                      onClick={(e) => {
+                      onClick={() => {
                         setVisibleContacts([...visibleContacts, "email"]);
-                        (
-                          e.currentTarget.parentElement as HTMLElement
-                        ).classList.add("hidden");
+                        setAddContactOpen(false);
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light transition-colors"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light rounded-lg transition-colors"
                     >
                       <IconMail size={14} className="text-gray-400" />
                       Email
@@ -861,13 +857,11 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                   {!visibleContacts.includes("instagram") && (
                     <button
                       type="button"
-                      onClick={(e) => {
+                      onClick={() => {
                         setVisibleContacts([...visibleContacts, "instagram"]);
-                        (
-                          e.currentTarget.parentElement as HTMLElement
-                        ).classList.add("hidden");
+                        setAddContactOpen(false);
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light transition-colors"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light rounded-lg transition-colors"
                     >
                       <IconBrandInstagram size={14} className="text-gray-400" />
                       Instagram
@@ -876,13 +870,11 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                   {!visibleContacts.includes("telegram") && (
                     <button
                       type="button"
-                      onClick={(e) => {
+                      onClick={() => {
                         setVisibleContacts([...visibleContacts, "telegram"]);
-                        (
-                          e.currentTarget.parentElement as HTMLElement
-                        ).classList.add("hidden");
+                        setAddContactOpen(false);
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light transition-colors"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light rounded-lg transition-colors"
                     >
                       <IconBrandTelegram size={14} className="text-gray-400" />
                       Telegram
@@ -891,42 +883,40 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                   {!visibleContacts.includes("facebook") && (
                     <button
                       type="button"
-                      onClick={(e) => {
+                      onClick={() => {
                         setVisibleContacts([...visibleContacts, "facebook"]);
-                        (
-                          e.currentTarget.parentElement as HTMLElement
-                        ).classList.add("hidden");
+                        setAddContactOpen(false);
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light transition-colors"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light rounded-lg transition-colors"
                     >
                       <IconBrandFacebook size={14} className="text-gray-400" />
                       Facebook
                     </button>
                   )}
-                </div>
-              </div>
+                </PopoverContent>
+              </Popover>
             )}
-            <button
+            <Button
               type="submit"
+              variant="primary"
               disabled={submitting}
-              className="w-full bg-[#ced48c] text-foreground py-3 rounded-xl font-semibold hover:bg-[#b8be72] transition-colors disabled:opacity-50"
+              className="w-full py-3 h-auto"
             >
               {submitting ? "Надсилання..." : "Надіслати заявку"}
-            </button>
+            </Button>
           </form>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* Success — modal */}
-      {submitted && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 animate-modal-overlay"
-          onClick={() => setSubmitted(false)}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl p-6 w-full max-w-sm text-center shadow-xl animate-modal-success"
-          >
+      <Dialog
+        open={submitted}
+        onOpenChange={(open) => {
+          if (!open) setSubmitted(false);
+        }}
+      >
+        <DialogContent className="max-w-sm text-center">
+          <div className="animate-modal-success">
             <p className="text-2xl mb-2">💚</p>
             <p className="text-lg font-semibold text-foreground mb-1">
               Дякуємо!
@@ -934,15 +924,17 @@ export default function AnimalDetailPage({ id }: { id: string }) {
             <p className="text-sm text-gray-medium mb-4">
               Вашу заявку отримано. Ми зв&apos;яжемося з вами найближчим часом.
             </p>
-            <button
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
               onClick={() => setSubmitted(false)}
-              className="bg-[#ced48c] text-foreground px-6 py-2.5 rounded-xl font-medium hover:bg-[#b8be72] transition-colors text-sm"
             >
               Закрити
-            </button>
+            </Button>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

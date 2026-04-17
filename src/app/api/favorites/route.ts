@@ -1,6 +1,6 @@
+import { getSession } from "@/shared/lib/auth";
+import { createClient } from "@/shared/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/db";
-import { getSession } from "@/lib/auth";
 
 export async function GET() {
   const user = await getSession();
@@ -14,13 +14,16 @@ export async function GET() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-  const result = (favs || []).map((f: Record<string, unknown>) => f.animals).filter(Boolean);
+  const result = (favs || [])
+    .map((f: Record<string, unknown>) => f.animals)
+    .filter(Boolean);
   return NextResponse.json(result);
 }
 
 export async function POST(request: NextRequest) {
   const user = await getSession();
-  if (!user) return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
+  if (!user)
+    return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
 
   const { animal_id } = await request.json();
   const supabase = await createClient();
@@ -40,9 +43,7 @@ export async function POST(request: NextRequest) {
       .eq("animal_id", animal_id);
     return NextResponse.json({ favorited: false });
   } else {
-    await supabase
-      .from("favorites")
-      .insert({ user_id: user.id, animal_id });
+    await supabase.from("favorites").insert({ user_id: user.id, animal_id });
     return NextResponse.json({ favorited: true });
   }
 }

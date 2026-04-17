@@ -1,6 +1,6 @@
+import { getSession } from "@/shared/lib/auth";
+import { createClient } from "@/shared/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/db";
-import { getSession } from "@/lib/auth";
 
 export async function PUT(request: NextRequest) {
   const user = await getSession();
@@ -17,7 +17,10 @@ export async function PUT(request: NextRequest) {
     .single();
 
   if (!org || org.owner_id !== user.id) {
-    return NextResponse.json({ error: "Тільки власник може змінювати банку" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Тільки власник може змінювати банку" },
+      { status: 403 },
+    );
   }
 
   const { monobank_jar_id } = await request.json();

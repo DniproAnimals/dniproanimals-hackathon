@@ -1,10 +1,14 @@
 "use client";
-
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useUser } from "@/lib/UserContext";
+import { Button, Input, InputWithIcon } from "@/components/ui";
+import { useUser } from "@/shared/lib/UserContext";
+import {
+  IconLockFilled,
+  IconMailFilled,
+  IconUserFilled,
+} from "@tabler/icons-react";
 import Image from "next/image";
-import { IconUserFilled, IconMailFilled, IconLockFilled } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -30,7 +34,8 @@ export default function AuthPage() {
     setError("");
 
     const url = mode === "login" ? "/api/auth/login" : "/api/auth/register";
-    const body = mode === "login" ? { email: form.email, password: form.password } : form;
+    const body =
+      mode === "login" ? { email: form.email, password: form.password } : form;
 
     const res = await fetch(url, {
       method: "POST",
@@ -60,37 +65,78 @@ export default function AuthPage() {
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-6">
-          <Image src="/logo.jpg" alt="DniproAnimals" width={48} height={48} className="rounded-full object-cover mb-3" />
+          <Image
+            src="/logo.jpg"
+            alt="DniproAnimals"
+            width={48}
+            height={48}
+            className="rounded-full object-cover mb-3"
+          />
           <h1 className="text-xl font-bold text-foreground">
             {mode === "login" ? "Увійти в акаунт" : "Створити акаунт"}
           </h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-border space-y-3">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-2xl p-6 shadow-sm border border-gray-border space-y-3"
+        >
           {mode === "register" && (
-            <div className="relative">
-              <IconUserFilled size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type="text" placeholder="Ім'я" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
-            </div>
+            <InputWithIcon icon={<IconUserFilled />}>
+              <Input
+                type="text"
+                placeholder="Ім'я"
+                required
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+            </InputWithIcon>
           )}
-          <div className="relative">
-            <IconMailFilled size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input type="email" placeholder="Email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
-          </div>
-          <div className="relative">
-            <IconLockFilled size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input type="password" placeholder="Пароль" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-light border border-gray-border focus:ring-2 focus:ring-[#ced48c]/30 outline-none text-sm" />
-          </div>
+          <InputWithIcon icon={<IconMailFilled />}>
+            <Input
+              type="email"
+              placeholder="Email"
+              required
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+          </InputWithIcon>
+          <InputWithIcon icon={<IconLockFilled />}>
+            <Input
+              type="password"
+              placeholder="Пароль"
+              required
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
+          </InputWithIcon>
 
-          {error && <p className="text-xs text-red-500">{error}</p>}
+          {error && <p className="text-xs text-destructive">{error}</p>}
 
-          <button type="submit" disabled={loading} className="w-full bg-[#ced48c] text-foreground py-3 rounded-xl font-semibold hover:bg-[#b8be72] transition-colors disabled:opacity-50">
-            {loading ? "Зачекайте..." : mode === "login" ? "Увійти" : "Зареєструватися"}
-          </button>
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            disabled={loading}
+            className="w-full"
+          >
+            {loading
+              ? "Зачекайте..."
+              : mode === "login"
+                ? "Увійти"
+                : "Зареєструватися"}
+          </Button>
 
           <p className="text-xs text-center text-gray-medium">
             {mode === "login" ? "Немає акаунту? " : "Вже є акаунт? "}
-            <button type="button" onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(""); }} className="font-medium text-foreground hover:underline">
+            <button
+              type="button"
+              onClick={() => {
+                setMode(mode === "login" ? "register" : "login");
+                setError("");
+              }}
+              className="font-medium text-foreground hover:underline"
+            >
               {mode === "login" ? "Зареєструватися" : "Увійти"}
             </button>
           </p>

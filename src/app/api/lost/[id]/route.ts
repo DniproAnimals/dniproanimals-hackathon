@@ -1,9 +1,9 @@
+import { createClient } from "@/shared/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/db";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const body = await request.json();
@@ -16,12 +16,27 @@ export async function PUT(
     .single();
 
   if (!existing) {
-    return NextResponse.json({ error: "Оголошення не знайдено" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Оголошення не знайдено" },
+      { status: 404 },
+    );
   }
 
   const {
-    title, description, type, animal_type, breed, sex, color, size,
-    location, last_seen_location, last_seen_date, contact_name, contact_phone, photos,
+    title,
+    description,
+    type,
+    animal_type,
+    breed,
+    sex,
+    color,
+    size,
+    location,
+    last_seen_location,
+    last_seen_date,
+    contact_name,
+    contact_phone,
+    photos,
   } = body;
 
   const { data: updated } = await supabase

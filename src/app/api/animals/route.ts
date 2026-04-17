@@ -1,6 +1,6 @@
+import { getSession } from "@/shared/lib/auth";
+import { createClient } from "@/shared/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/db";
-import { getSession } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
@@ -18,9 +18,13 @@ export async function GET(request: NextRequest) {
       .from("organizations")
       .select("id")
       .eq("status", "approved");
-    const approvedOrgIds = (approvedOrgs || []).map((o: { id: number }) => o.id);
+    const approvedOrgIds = (approvedOrgs || []).map(
+      (o: { id: number }) => o.id,
+    );
     if (approvedOrgIds.length > 0) {
-      query = query.or(`org_id.is.null,org_id.in.(${approvedOrgIds.join(",")})`);
+      query = query.or(
+        `org_id.is.null,org_id.in.(${approvedOrgIds.join(",")})`,
+      );
     } else {
       query = query.is("org_id", null);
     }
@@ -73,18 +77,35 @@ export async function GET(request: NextRequest) {
   const q = params.get("q");
   if (q) {
     const pattern = `%${q}%`;
-    query = query.or(`name.ilike.${pattern},breed.ilike.${pattern},description.ilike.${pattern}`);
+    query = query.or(
+      `name.ilike.${pattern},breed.ilike.${pattern},description.ilike.${pattern}`,
+    );
   }
 
   switch (params.get("sort")) {
-    case "name_asc": query = query.order("name", { ascending: true }); break;
-    case "name_desc": query = query.order("name", { ascending: false }); break;
-    case "age_asc": query = query.order("age_months", { ascending: true }); break;
-    case "age_desc": query = query.order("age_months", { ascending: false }); break;
-    case "oldest": query = query.order("created_at", { ascending: true }); break;
-    case "weight_asc": query = query.order("weight_kg", { ascending: true }); break;
-    case "weight_desc": query = query.order("weight_kg", { ascending: false }); break;
-    default: query = query.order("created_at", { ascending: false });
+    case "name_asc":
+      query = query.order("name", { ascending: true });
+      break;
+    case "name_desc":
+      query = query.order("name", { ascending: false });
+      break;
+    case "age_asc":
+      query = query.order("age_months", { ascending: true });
+      break;
+    case "age_desc":
+      query = query.order("age_months", { ascending: false });
+      break;
+    case "oldest":
+      query = query.order("created_at", { ascending: true });
+      break;
+    case "weight_asc":
+      query = query.order("weight_kg", { ascending: true });
+      break;
+    case "weight_desc":
+      query = query.order("weight_kg", { ascending: false });
+      break;
+    default:
+      query = query.order("created_at", { ascending: false });
   }
 
   const { data: result } = await query;
@@ -96,16 +117,33 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient();
 
   const {
-    name, description, type, breed, sex, age_months, weight_kg,
-    size, color, vaccinated, sterilized, trained, photos, status,
-    contact_name, contact_phone, contact_email, contact_instagram,
-    contact_telegram, contact_facebook, contact_location,
+    name,
+    description,
+    type,
+    breed,
+    sex,
+    age_months,
+    weight_kg,
+    size,
+    color,
+    vaccinated,
+    sterilized,
+    trained,
+    photos,
+    status,
+    contact_name,
+    contact_phone,
+    contact_email,
+    contact_instagram,
+    contact_telegram,
+    contact_facebook,
+    contact_location,
   } = body;
 
   if (!name || !type) {
     return NextResponse.json(
       { error: "Ім'я та вид тварини обов'язкові" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
