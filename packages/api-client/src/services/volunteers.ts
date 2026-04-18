@@ -14,8 +14,6 @@ import type {
 import { endpoints } from "@dniproanimals/endpoints";
 import type { HttpFn } from "../createHttp";
 
-const JSON_HEADERS = { "Content-Type": "application/json" };
-
 export function createVolunteersApiService(http: HttpFn) {
   return {
     list: () =>
@@ -27,21 +25,21 @@ export function createVolunteersApiService(http: HttpFn) {
         endpoint: endpoints.volunteers.create(),
         method: "POST",
         body: JSON.stringify(body),
-        headers: JSON_HEADERS,
+        headers: { "Content-Type": "application/json" },
       }),
     update: (body: UpdateVolunteerBody) =>
       http<UpdateVolunteerResponse>({
         endpoint: endpoints.volunteers.update(),
         method: "PUT",
         body: JSON.stringify(body),
-        headers: JSON_HEADERS,
+        headers: { "Content-Type": "application/json" },
       }),
     delete: (body: DeleteVolunteerBody) =>
       http<DeleteVolunteerResponse>({
         endpoint: endpoints.volunteers.delete(),
         method: "DELETE",
         body: JSON.stringify(body),
-        headers: JSON_HEADERS,
+        headers: { "Content-Type": "application/json" },
       }),
     inviteInfo: (query: InviteInfoQuery) =>
       http<InviteInfoResponse>({
@@ -53,7 +51,7 @@ export function createVolunteersApiService(http: HttpFn) {
         endpoint: endpoints.volunteers.invite(),
         method: "POST",
         body: JSON.stringify(body),
-        headers: JSON_HEADERS,
+        headers: { "Content-Type": "application/json" },
       }),
   };
 }

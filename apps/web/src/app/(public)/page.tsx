@@ -1,5 +1,4 @@
 "use client";
-import { cn } from "@/shared/lib/utils";
 import {
   IconBrandFacebook,
   IconBrandInstagram,
@@ -8,26 +7,12 @@ import {
   IconMailFilled,
   IconMapPinFilled,
   IconPhoneFilled,
+  PawIcon,
 } from "@dniproanimals/icons";
-import { Badge, Button, Card } from "@dniproanimals/ui";
+import { Badge, Button, Card, cn } from "@dniproanimals/ui";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-
-// Subtle Paw icon for the background pattern
-const PawIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path d="M11 20c-3 0-5.5-2.5-6-5s3-6 7-6 7 3.5 7 6-3 5-8 5z" />
-    <circle cx="7" cy="8" r="2.5" />
-    <circle cx="12" cy="5" r="2.5" />
-    <circle cx="17" cy="8" r="2.5" />
-  </svg>
-);
 
 export default function AboutPage() {
   return (

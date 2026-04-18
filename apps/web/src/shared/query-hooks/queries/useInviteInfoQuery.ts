@@ -1,12 +1,20 @@
 "use client";
-import { apiClient, queryKeys } from "@/shared/query-client";
+import { apiClient } from "@/shared/api-client";
+import type { OmitQueryOptions } from "@/shared/types/react-query";
+import { endpoints } from "@dniproanimals/endpoints";
 import { useQuery } from "@tanstack/react-query";
 
-export function useInviteInfoQuery(token: string | null | undefined) {
+export const useInviteInfoQuery = (
+  token: string,
+  options: OmitQueryOptions<
+    typeof apiClient.volunteers.inviteInfo,
+    "queryKey" | "queryFn"
+  > = {},
+) => {
   return useQuery({
-    queryKey: token ? queryKeys.volunteers.invite(token) : ["invite", "none"],
-    queryFn: () => apiClient.volunteers.inviteInfo({ token: token as string }),
-    enabled: !!token,
+    queryKey: [endpoints.volunteers.invite(), token],
+    queryFn: () => apiClient.volunteers.inviteInfo({ token }),
     retry: false,
+    ...options,
   });
-}
+};

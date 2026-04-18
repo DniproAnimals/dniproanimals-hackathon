@@ -1,19 +1,25 @@
 "use client";
-import { useUser } from "@/shared/lib/UserContext";
-import { useLoginMutation, useRegisterMutation } from "@/shared/query-hooks";
+import {
+  useLoginMutation,
+  useMeQuery,
+  useRegisterMutation,
+} from "@/shared/query-hooks";
+import { endpoints } from "@dniproanimals/endpoints";
 import {
   IconLockFilled,
   IconMailFilled,
   IconUserFilled,
 } from "@dniproanimals/icons";
 import { Button, Input, InputWithIcon } from "@dniproanimals/ui";
+import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function AuthPage() {
   const router = useRouter();
-  const { user } = useUser();
+  const queryClient = useQueryClient();
+  const { data: user } = useMeQuery();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
@@ -28,6 +34,7 @@ export default function AuthPage() {
 
   const loginMutation = useLoginMutation({
     onSuccess: (data) => {
+      queryClient.setQueryData([endpoints.auth.me()], data);
       if (data.role === "superadmin") router.push("/admin");
       else if (data.orgId) router.push("/dashboard");
       else router.push("/onboarding");
@@ -36,7 +43,10 @@ export default function AuthPage() {
   });
 
   const registerMutation = useRegisterMutation({
-    onSuccess: () => router.push("/onboarding"),
+    onSuccess: (data) => {
+      queryClient.setQueryData([endpoints.auth.me()], data);
+      router.push("/onboarding");
+    },
     onError: (err) => setError(err.message || "Помилка"),
   });
 

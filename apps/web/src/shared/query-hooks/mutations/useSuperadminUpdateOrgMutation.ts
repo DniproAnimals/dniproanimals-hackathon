@@ -1,12 +1,16 @@
 "use client";
-import { apiClient, queryKeys } from "@/shared/query-client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/shared/api-client";
+import type { OmitMutationOptions } from "@/shared/types/react-query";
+import { useMutation } from "@tanstack/react-query";
 
-export function useSuperadminUpdateOrgMutation() {
-  const qc = useQueryClient();
+export const useSuperadminUpdateOrgMutation = (
+  options: OmitMutationOptions<
+    typeof apiClient.superadmin.updateOrg,
+    "mutationFn"
+  > = {},
+) => {
   return useMutation({
     mutationFn: apiClient.superadmin.updateOrg,
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: queryKeys.organizations.all }),
+    ...options,
   });
-}
+};

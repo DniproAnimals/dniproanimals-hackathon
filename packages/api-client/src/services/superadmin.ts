@@ -7,8 +7,6 @@ import type {
 import { endpoints } from "@dniproanimals/endpoints";
 import type { HttpFn } from "../createHttp";
 
-const JSON_HEADERS = { "Content-Type": "application/json" };
-
 export function createSuperadminApiService(http: HttpFn) {
   return {
     updateOrg: (body: SuperadminUpdateOrgBody) =>
@@ -16,14 +14,14 @@ export function createSuperadminApiService(http: HttpFn) {
         endpoint: endpoints.superadmin.updateOrg(),
         method: "PUT",
         body: JSON.stringify(body),
-        headers: JSON_HEADERS,
+        headers: { "Content-Type": "application/json" },
       }),
     deleteOrg: (body: SuperadminDeleteOrgBody) =>
       http<SuperadminDeleteOrgResponse>({
         endpoint: endpoints.superadmin.deleteOrg(),
         method: "DELETE",
         body: JSON.stringify(body),
-        headers: JSON_HEADERS,
+        headers: { "Content-Type": "application/json" },
       }),
   };
 }

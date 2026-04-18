@@ -1,8 +1,10 @@
 "use client";
-import AnimalCard from "@/components/AnimalCard";
-import { useUser } from "@/shared/lib/UserContext";
-import type { Animal } from "@/shared/lib/db";
-import { useLogoutMutation } from "@/shared/query-hooks";
+import AnimalCard from "@/shared/components/AnimalCard";
+import {
+  useFavoritesQuery,
+  useLogoutMutation,
+  useMeQuery,
+} from "@/shared/query-hooks";
 import { IconHeartFilled } from "@dniproanimals/icons";
 import {
   Avatar,
@@ -14,16 +16,17 @@ import {
 } from "@dniproanimals/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function ProfilePage() {
-  const { user, loading } = useUser();
+  const { data: user, isLoading: loading } = useMeQuery();
   const router = useRouter();
   const logoutMutation = useLogoutMutation({
     onSuccess: () => router.push("/"),
   });
-  const [favorites, setFavorites] = useState<Animal[]>([]);
-  const [loadingFavs, setLoadingFavs] = useState(true);
+  const { data: favorites, isLoading: loadingFavs } = useFavoritesQuery({
+    enabled: !!user,
+  });
 
   useEffect(() => {
     if (!loading && !user) {
@@ -31,18 +34,7 @@ export default function ProfilePage() {
     }
   }, [user, loading, router]);
 
-  useEffect(() => {
-    if (user) {
-      fetch("/api/favorites")
-        .then((r) => r.json())
-        .then((data) => {
-          if (Array.isArray(data)) setFavorites(data);
-          setLoadingFavs(false);
-        });
-    }
-  }, [user]);
-
-  const handleLogout = () => logoutMutation.mutate();
+  const handleLogout = () => logoutMutation.mutate(undefined);
 
   if (loading || !user) {
     return (
@@ -52,9 +44,10 @@ export default function ProfilePage() {
     );
   }
 
+  const favs = favorites ?? [];
+
   return (
     <div className="max-w-6xl mx-auto px-6 py-6 pb-24 md:pb-6">
-      {/* Profile header */}
       <div className="flex items-center gap-4 mb-8">
         <Avatar className="size-16 shrink-0">
           <AvatarFallback className="text-2xl font-bold">
@@ -81,12 +74,11 @@ export default function ProfilePage() {
         </Button>
       </div>
 
-      {/* Favorites */}
       <h2 className="text-xl font-bold mb-4">
         Обрані тварини
-        {favorites.length > 0 && (
+        {favs.length > 0 && (
           <span className="ml-2 text-sm font-normal text-gray-medium">
-            {favorites.length}
+            {favs.length}
           </span>
         )}
       </h2>
@@ -100,7 +92,7 @@ export default function ProfilePage() {
             </div>
           ))}
         </div>
-      ) : favorites.length === 0 ? (
+      ) : favs.length === 0 ? (
         <EmptyState
           icon={<IconHeartFilled />}
           description="Ви ще не додали тварин до обраного"
@@ -115,7 +107,7 @@ export default function ProfilePage() {
         />
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
-          {favorites.map((animal, i) => (
+          {favs.map((animal, i) => (
             <AnimalCard key={animal.id} animal={animal} index={i} />
           ))}
         </div>

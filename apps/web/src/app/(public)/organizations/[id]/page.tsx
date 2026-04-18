@@ -1,7 +1,11 @@
 "use client";
-import AnimalCard from "@/components/AnimalCard";
-import ImageFallback from "@/components/ImageFallback";
-import type { Animal } from "@/shared/lib/db";
+import AnimalCard from "@/shared/components/AnimalCard";
+import ImageFallback from "@/shared/components/ImageFallback";
+import {
+  useOrganizationAnimalsQuery,
+  useOrganizationQuery,
+  useOrganizationVolunteersQuery,
+} from "@/shared/query-hooks";
 import {
   IconBrandFacebook,
   IconBrandInstagram,
@@ -29,65 +33,21 @@ import {
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-
-type Org = {
-  id: number;
-  name: string;
-  description: string | null;
-  photo: string | null;
-  location: string | null;
-  phone: string | null;
-  email: string | null;
-  instagram: string | null;
-  telegram: string | null;
-  facebook: string | null;
-  website: string | null;
-  owner_id: number;
-  status: string;
-  created_at: string;
-  monobank_jar_id: string | null;
-};
-
-type Volunteer = {
-  id: number;
-  name: string;
-  surname: string | null;
-  photo: string | null;
-  description: string | null;
-  phone: string | null;
-  email: string | null;
-  instagram: string | null;
-  telegram: string | null;
-};
 
 export default function OrganizationPage() {
-  const { id } = useParams();
-  const [org, setOrg] = useState<Org | null>(null);
-  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
-  const [animals, setAnimals] = useState<Animal[]>([]);
-  const [loading, setLoading] = useState(true);
+  const params = useParams();
+  const id = Number(params.id);
+  const { data: org, isLoading: orgLoading } = useOrganizationQuery(id, {
+    enabled: !!id,
+  });
+  const { data: volunteers = [] } = useOrganizationVolunteersQuery(id, {
+    enabled: !!id,
+  });
+  const { data: animals = [] } = useOrganizationAnimalsQuery(id, {
+    enabled: !!id,
+  });
 
-  useEffect(() => {
-    Promise.all([
-      fetch(`/api/organizations/${id}`).then((r) => (r.ok ? r.json() : null)),
-      fetch(`/api/organizations/${id}/volunteers`).then((r) =>
-        r.ok ? r.json() : [],
-      ),
-      fetch(`/api/organizations/${id}/animals`).then((r) =>
-        r.ok ? r.json() : [],
-      ),
-    ])
-      .then(([orgData, volData, animalData]) => {
-        setOrg(orgData);
-        if (Array.isArray(volData)) setVolunteers(volData);
-        if (Array.isArray(animalData)) setAnimals(animalData);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [id]);
-
-  if (loading) {
+  if (orgLoading) {
     return (
       <div className="max-w-6xl mx-auto px-6 py-20">
         <div className="space-y-6">
@@ -120,7 +80,6 @@ export default function OrganizationPage() {
       transition={{ duration: 0.4 }}
       className="max-w-6xl mx-auto px-6 py-6 pb-24 md:pb-6"
     >
-      {/* Back */}
       <Button variant="ghost" size="sm" asChild className="mb-6 -ml-3">
         <Link
           href="/organizations"
@@ -131,9 +90,7 @@ export default function OrganizationPage() {
         </Link>
       </Button>
 
-      {/* Hero — photo + meta */}
       <div className="md:flex md:gap-8 mb-10">
-        {/* Photo */}
         <div className="md:w-80 shrink-0 mb-6 md:mb-0">
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-light">
             {org.photo ? (
@@ -162,7 +119,6 @@ export default function OrganizationPage() {
           </div>
         </div>
 
-        {/* Meta */}
         <div className="flex-1">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">{org.name}</h1>
 
@@ -172,7 +128,6 @@ export default function OrganizationPage() {
             </p>
           )}
 
-          {/* Info list */}
           <div className="divide-y divide-gray-border mb-5">
             {org.location && (
               <div className="flex items-center gap-2.5 py-2.5">
@@ -222,7 +177,7 @@ export default function OrganizationPage() {
               />
               <span className="text-sm font-medium">На платформі з</span>
               <span className="text-sm text-gray-medium ml-auto">
-                {new Date(org.created_at).toLocaleDateString("uk-UA", {
+                {new Date(org.createdAt).toLocaleDateString("uk-UA", {
                   month: "long",
                   year: "numeric",
                 })}
@@ -230,7 +185,6 @@ export default function OrganizationPage() {
             </div>
           </div>
 
-          {/* Social links */}
           {(org.instagram || org.telegram || org.facebook || org.website) && (
             <div className="flex gap-2 flex-wrap">
               {org.instagram && (
@@ -293,8 +247,7 @@ export default function OrganizationPage() {
         </div>
       </div>
 
-      {/* Donate */}
-      {org.monobank_jar_id && (
+      {org.monobankJarId && (
         <Card className="mb-10 p-6 rounded-3xl bg-gradient-to-br from-green-light to-[#e8ebd4] border-primary/40 relative overflow-hidden">
           <div className="absolute top-0 right-0 size-40 bg-primary rounded-full opacity-10 -translate-y-1/2 translate-x-1/2 blur-[60px]" />
           <div className="relative z-10">
@@ -325,7 +278,7 @@ export default function OrganizationPage() {
                   className="border-2 border-primary text-green-secondary font-bold hover:bg-primary hover:text-primary-foreground"
                 >
                   <a
-                    href={`https://send.monobank.ua/jar/${org.monobank_jar_id}?amount=${sum}`}
+                    href={`https://send.monobank.ua/jar/${org.monobankJarId}?amount=${sum}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -340,7 +293,7 @@ export default function OrganizationPage() {
                 className="font-bold"
               >
                 <a
-                  href={`https://send.monobank.ua/jar/${org.monobank_jar_id}`}
+                  href={`https://send.monobank.ua/jar/${org.monobankJarId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -352,7 +305,6 @@ export default function OrganizationPage() {
         </Card>
       )}
 
-      {/* Volunteers */}
       {volunteers.length > 0 && (
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-4">
@@ -452,7 +404,6 @@ export default function OrganizationPage() {
         </div>
       )}
 
-      {/* Animals */}
       <div>
         <div className="flex items-center gap-2 mb-4">
           <IconPawFilled size={20} className="text-primary" />

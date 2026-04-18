@@ -1,9 +1,19 @@
 "use client";
-import { apiClient } from "@/shared/query-client";
-import { useMutation } from "@tanstack/react-query";
+import { apiClient } from "@/shared/api-client";
+import type { UploadImageResponse } from "@dniproanimals/contracts";
+import {
+  useMutation,
+  type UseMutationOptions,
+} from "@tanstack/react-query";
 
-export function useUploadImageMutation() {
+export const useUploadImageMutation = (
+  options: Omit<
+    UseMutationOptions<UploadImageResponse, Error, File>,
+    "mutationFn"
+  > = {},
+) => {
   return useMutation({
     mutationFn: (file: File) => apiClient.upload.image(file),
+    ...options,
   });
-}
+};

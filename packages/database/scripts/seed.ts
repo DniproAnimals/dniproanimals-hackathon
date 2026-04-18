@@ -1,6 +1,7 @@
 import "@dniproanimals/env/load";
 import bcrypt from "bcryptjs";
 import { eq, sql } from "drizzle-orm";
+import { AnyPgTable } from "drizzle-orm/pg-core";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -188,13 +189,18 @@ const sampleLost = [
     photos: JSON.stringify([]),
   },
 ];
+export async function getCount(table: AnyPgTable) {
+  const result = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(table);
+
+  return result[0]?.count ?? 0;
+}
 
 async function seed() {
   console.log("Seed started...\n");
 
-  const [{ count: userCount }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(usersTable);
+  const userCount = await getCount(usersTable);
 
   let adminUserId: number | null = null;
   let regularUserId: number | null = null;
@@ -237,9 +243,7 @@ async function seed() {
     console.log(`Users: already exist (${userCount})`);
   }
 
-  const [{ count: orgCount }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(organizationsTable);
+  const orgCount = await getCount(organizationsTable);
   let orgId: number | null = null;
 
   if (orgCount === 0 && adminUserId) {
@@ -277,9 +281,7 @@ async function seed() {
   }
 
   if (orgId) {
-    const [{ count: volCount }] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(volunteersTable);
+    const volCount = await getCount(volunteersTable);
 
     if (volCount === 0) {
       const data = [
@@ -319,9 +321,7 @@ async function seed() {
   }
 
   if (orgId) {
-    const [{ count: animalCount }] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(animalsTable);
+    const animalCount = await getCount(animalsTable);
 
     if (animalCount === 0) {
       const animals = loadAnimals(orgId);
@@ -332,9 +332,7 @@ async function seed() {
     }
   }
 
-  const [{ count: lostCount }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(lostAnimalsTable);
+  const lostCount = await getCount(lostAnimalsTable);
 
   if (lostCount === 0) {
     await db.insert(lostAnimalsTable).values(sampleLost);
@@ -343,9 +341,7 @@ async function seed() {
     console.log(`Lost animals: already exist (${lostCount})`);
   }
 
-  const [{ count: adoptionCount }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(adoptionRequestsTable);
+  const adoptionCount = await getCount(adoptionRequestsTable);
 
   if (adoptionCount === 0) {
     const firstAnimals = await db
@@ -382,9 +378,7 @@ async function seed() {
   }
 
   if (regularUserId) {
-    const [{ count: favCount }] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(favoritesTable);
+    const favCount = await getCount(favoritesTable);
 
     if (favCount === 0) {
       const some = await db
@@ -406,9 +400,7 @@ async function seed() {
   }
 
   if (orgId) {
-    const [{ count: notifCount }] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(notificationsTable);
+    const notifCount = await getCount(notificationsTable);
 
     if (notifCount === 0) {
       await db.insert(notificationsTable).values([

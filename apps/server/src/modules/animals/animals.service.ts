@@ -50,7 +50,7 @@ const splitCsv = (v: string | undefined) =>
 
 export const animalsService = {
   async list(query: ListAnimalsQuery) {
-    const filters: SQL[] = [];
+    const filters = [];
 
     if (query.orgId) {
       filters.push(eq(animalsTable.orgId, query.orgId));

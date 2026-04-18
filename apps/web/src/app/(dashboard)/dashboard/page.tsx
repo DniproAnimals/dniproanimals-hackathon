@@ -1,6 +1,12 @@
 "use client";
-import { useUser } from "@/shared/lib/UserContext";
-import { cn } from "@/shared/lib/utils";
+import {
+  useAdoptionQuery,
+  useAnimalsQuery,
+  useCreateVolunteerMutation,
+  useMeQuery,
+  useVolunteersQuery,
+} from "@/shared/query-hooks";
+import { endpoints } from "@dniproanimals/endpoints";
 import {
   IconAlertTriangleFilled,
   IconArrowRight,
@@ -16,6 +22,7 @@ import {
   Badge,
   Button,
   Card,
+  cn,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -24,78 +31,31 @@ import {
   Skeleton,
   Textarea,
 } from "@dniproanimals/ui";
+import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDashboard } from "./layout";
 
-type Animal = {
-  id: number;
-  name: string;
-  type: string;
-  status: string;
-  photos: string;
-  created_at: string;
-};
-
-type Request = {
-  id: number;
-  name: string;
-  animal_name: string;
-  status: string;
-  created_at: string;
-};
-
-type Volunteer = {
-  id: number;
-  name: string;
-  surname: string | null;
-  user_id: number | null;
-};
-
 export default function DashboardOverview() {
+  const qc = useQueryClient();
   const { org, isOwner } = useDashboard();
-  const { user } = useUser();
-  const [animals, setAnimals] = useState<Animal[]>([]);
-  const [requests, setRequests] = useState<Request[]>([]);
-  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showVolunteerModal, setShowVolunteerModal] = useState(false);
-  const [volForm, setVolForm] = useState({
-    name: "",
-    surname: "",
-    description: "",
-    phone: "",
-    email: "",
-    instagram: "",
-    telegram: "",
+  const { data: user } = useMeQuery();
+  const orgId = org?.id;
+  const { data: animals = [], isLoading: animalsLoading } = useAnimalsQuery(
+    { orgId },
+    { enabled: !!orgId },
+  );
+  const { data: requests = [], isLoading: requestsLoading } = useAdoptionQuery(
+    { orgId },
+    { enabled: !!orgId },
+  );
+  const { data: volunteers = [], isLoading: volLoading } = useVolunteersQuery({
+    enabled: !!orgId,
   });
-  const [volSubmitting, setVolSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!org) return;
-    Promise.all([
-      fetch(`/api/animals?org_id=${org.id}`).then((r) => r.json()),
-      fetch(`/api/adoption?org_id=${org.id}`).then((r) => r.json()),
-      fetch("/api/volunteers").then((r) => r.json()),
-    ]).then(([a, r, v]) => {
-      if (Array.isArray(a)) setAnimals(a);
-      if (Array.isArray(r)) setRequests(r);
-      if (Array.isArray(v)) setVolunteers(v);
-      setLoading(false);
-    });
-  }, [org]);
-
-  const handleAddVolunteer = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setVolSubmitting(true);
-    const res = await fetch("/api/volunteers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(volForm),
-    });
-    if (res.ok) {
-      const vols = await fetch("/api/volunteers").then((r) => r.json());
-      if (Array.isArray(vols)) setVolunteers(vols);
+  const addVolunteerMutation = useCreateVolunteerMutation({
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: [endpoints.volunteers.list()] });
       setVolForm({
         name: "",
         surname: "",
@@ -106,13 +66,30 @@ export default function DashboardOverview() {
         telegram: "",
       });
       setShowVolunteerModal(false);
-    }
-    setVolSubmitting(false);
+    },
+  });
+
+  const [showVolunteerModal, setShowVolunteerModal] = useState(false);
+  const [volForm, setVolForm] = useState({
+    name: "",
+    surname: "",
+    description: "",
+    phone: "",
+    email: "",
+    instagram: "",
+    telegram: "",
+  });
+
+  const loading = animalsLoading || requestsLoading || volLoading;
+
+  const handleAddVolunteer = (e: React.FormEvent) => {
+    e.preventDefault();
+    addVolunteerMutation.mutate(volForm);
   };
 
   const pendingRequests = requests.filter((r) => r.status === "pending");
   const availableAnimals = animals.filter((a) => a.status === "available");
-  const activeVolunteers = volunteers.filter((v) => v.user_id);
+  const activeVolunteers = volunteers.filter((v) => v.userId);
   const recentAnimals = animals.slice(0, 5);
   const recentRequests = requests.slice(0, 5);
 
@@ -141,17 +118,12 @@ export default function DashboardOverview() {
             <Skeleton key={i} className="h-28 rounded-xl" />
           ))}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Skeleton className="h-64 rounded-xl" />
-          <Skeleton className="h-64 rounded-xl" />
-        </div>
       </div>
     );
   }
 
   return (
     <div className="max-w-5xl space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground">
           Вітаємо, {user?.name}!
@@ -161,17 +133,12 @@ export default function DashboardOverview() {
         </p>
       </div>
 
-      {/* Org status alert */}
       {org && org.status === "pending" && (
         <div className="flex items-center gap-3 bg-yellow-50 border border-yellow-200 rounded-xl p-4">
           <IconClockFilled size={20} className="text-yellow-500 shrink-0" />
           <div>
             <p className="text-sm font-medium text-yellow-800">
               Організація на модерації
-            </p>
-            <p className="text-xs text-yellow-600 mt-0.5">
-              Ваша організація очікує перевірки адміністратором. Деякі функції
-              можуть бути обмежені.
             </p>
           </div>
         </div>
@@ -186,14 +153,10 @@ export default function DashboardOverview() {
             <p className="text-sm font-medium text-red-800">
               Організацію відхилено
             </p>
-            <p className="text-xs text-red-600 mt-0.5">
-              Зверніться до адміністрації для уточнення причин.
-            </p>
           </div>
         </div>
       )}
 
-      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Link href="/dashboard/animals" className="block">
           <Card className="p-4 hover:shadow-sm transition-all group">
@@ -203,7 +166,7 @@ export default function DashboardOverview() {
               </div>
               <IconArrowRight
                 size={16}
-                className="text-gray-medium group-hover:text-foreground transition-colors"
+                className="text-gray-medium group-hover:text-foreground"
               />
             </div>
             <p className="text-2xl font-bold text-foreground">
@@ -224,7 +187,7 @@ export default function DashboardOverview() {
               </div>
               <IconArrowRight
                 size={16}
-                className="text-gray-medium group-hover:text-foreground transition-colors"
+                className="text-gray-medium group-hover:text-foreground"
               />
             </div>
             <p className="text-2xl font-bold text-foreground">
@@ -247,7 +210,7 @@ export default function DashboardOverview() {
               </div>
               <IconArrowRight
                 size={16}
-                className="text-gray-medium group-hover:text-foreground transition-colors"
+                className="text-gray-medium group-hover:text-foreground"
               />
             </div>
             <p className="text-2xl font-bold text-foreground">
@@ -273,9 +236,7 @@ export default function DashboardOverview() {
         </Card>
       </div>
 
-      {/* Two columns: recent animals + recent requests */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Recent animals */}
         <Card>
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-border/60">
             <h2 className="text-sm font-semibold text-foreground">
@@ -297,7 +258,7 @@ export default function DashboardOverview() {
               )}
               <Link
                 href="/dashboard/animals"
-                className="text-xs text-gray-medium hover:text-foreground transition-colors"
+                className="text-xs text-gray-medium hover:text-foreground"
               >
                 Всі →
               </Link>
@@ -320,7 +281,7 @@ export default function DashboardOverview() {
                     </p>
                     <div className="flex items-center gap-1.5 text-[10px] text-gray-medium">
                       <IconClock size={10} />
-                      {timeAgo(a.created_at)}
+                      {timeAgo(a.createdAt)}
                     </div>
                   </div>
                   <Badge variant={animalStatusVariant(a.status)} size="sm">
@@ -336,7 +297,6 @@ export default function DashboardOverview() {
           )}
         </Card>
 
-        {/* Recent requests */}
         <Card>
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-border/60">
             <h2 className="text-sm font-semibold text-foreground">
@@ -344,7 +304,7 @@ export default function DashboardOverview() {
             </h2>
             <Link
               href="/dashboard/requests"
-              className="text-xs text-gray-medium hover:text-foreground transition-colors"
+              className="text-xs text-gray-medium hover:text-foreground"
             >
               Всі →
             </Link>
@@ -366,7 +326,7 @@ export default function DashboardOverview() {
                     </p>
                     <p className="text-[10px] text-gray-medium truncate">
                       хоче усиновити{" "}
-                      <span className="text-foreground">{r.animal_name}</span>
+                      <span className="text-foreground">{r.animalName}</span>
                     </p>
                   </div>
                   <Badge variant={requestStatusVariant(r.status)} size="sm">
@@ -383,7 +343,6 @@ export default function DashboardOverview() {
         </Card>
       </div>
 
-      {/* Volunteers overview */}
       {volunteers.length > 0 && (
         <Card>
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-border/60">
@@ -402,7 +361,7 @@ export default function DashboardOverview() {
               )}
               <Link
                 href="/dashboard/volunteers"
-                className="text-xs text-gray-medium hover:text-foreground transition-colors"
+                className="text-xs text-gray-medium hover:text-foreground"
               >
                 Всі →
               </Link>
@@ -417,7 +376,7 @@ export default function DashboardOverview() {
                 <div
                   className={cn(
                     "size-6 rounded-full flex items-center justify-center text-[10px] font-bold",
-                    v.user_id
+                    v.userId
                       ? "bg-green-100 text-green-700"
                       : "bg-gray-200 text-gray-medium",
                   )}
@@ -430,16 +389,10 @@ export default function DashboardOverview() {
                 </span>
               </div>
             ))}
-            {volunteers.length > 8 && (
-              <span className="flex items-center px-3 py-1.5 text-xs text-gray-medium">
-                +{volunteers.length - 8} ще
-              </span>
-            )}
           </div>
         </Card>
       )}
 
-      {/* Add volunteer modal */}
       <Dialog open={showVolunteerModal} onOpenChange={setShowVolunteerModal}>
         <DialogContent>
           <DialogHeader>
@@ -456,7 +409,6 @@ export default function DashboardOverview() {
                   onChange={(e) =>
                     setVolForm({ ...volForm, name: e.target.value })
                   }
-                  placeholder="Ім'я"
                 />
               </div>
               <div>
@@ -467,7 +419,6 @@ export default function DashboardOverview() {
                   onChange={(e) =>
                     setVolForm({ ...volForm, surname: e.target.value })
                   }
-                  placeholder="Прізвище"
                 />
               </div>
             </div>
@@ -479,64 +430,35 @@ export default function DashboardOverview() {
                   setVolForm({ ...volForm, description: e.target.value })
                 }
                 rows={2}
-                placeholder="Чим займається"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <p className="text-xs text-gray-medium mb-1">Телефон</p>
-                <Input
-                  type="tel"
-                  value={volForm.phone}
-                  onChange={(e) =>
-                    setVolForm({ ...volForm, phone: e.target.value })
-                  }
-                  placeholder="+380..."
-                />
-              </div>
-              <div>
-                <p className="text-xs text-gray-medium mb-1">Email</p>
-                <Input
-                  type="email"
-                  value={volForm.email}
-                  onChange={(e) =>
-                    setVolForm({ ...volForm, email: e.target.value })
-                  }
-                  placeholder="email@example.com"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <p className="text-xs text-gray-medium mb-1">Instagram</p>
-                <Input
-                  type="text"
-                  value={volForm.instagram}
-                  onChange={(e) =>
-                    setVolForm({ ...volForm, instagram: e.target.value })
-                  }
-                  placeholder="@username"
-                />
-              </div>
-              <div>
-                <p className="text-xs text-gray-medium mb-1">Telegram</p>
-                <Input
-                  type="text"
-                  value={volForm.telegram}
-                  onChange={(e) =>
-                    setVolForm({ ...volForm, telegram: e.target.value })
-                  }
-                  placeholder="@username"
-                />
-              </div>
+              <Input
+                type="tel"
+                placeholder="Телефон"
+                value={volForm.phone}
+                onChange={(e) =>
+                  setVolForm({ ...volForm, phone: e.target.value })
+                }
+              />
+              <Input
+                type="email"
+                placeholder="Email"
+                value={volForm.email}
+                onChange={(e) =>
+                  setVolForm({ ...volForm, email: e.target.value })
+                }
+              />
             </div>
             <Button
               type="submit"
               variant="primary"
-              disabled={volSubmitting}
+              disabled={addVolunteerMutation.isPending}
               className="w-full"
             >
-              {volSubmitting ? "Зачекайте..." : "Додати волонтера"}
+              {addVolunteerMutation.isPending
+                ? "Зачекайте..."
+                : "Додати волонтера"}
             </Button>
           </form>
         </DialogContent>

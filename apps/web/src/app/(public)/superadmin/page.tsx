@@ -1,58 +1,39 @@
 "use client";
-import { useUser } from "@/shared/lib/UserContext";
+import {
+  useMeQuery,
+  useOrganizationsQuery,
+  useSuperadminDeleteOrgMutation,
+  useSuperadminUpdateOrgMutation,
+} from "@/shared/query-hooks";
 import { Badge, Button, Card, EmptyState } from "@dniproanimals/ui";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-
-type Org = {
-  id: number;
-  name: string;
-  description: string | null;
-  location: string | null;
-  status: string;
-  owner_id: number;
-  created_at: string;
-};
+import { useEffect } from "react";
 
 export default function SuperAdminPage() {
-  const { user, loading } = useUser();
+  const { data: user, isLoading: loading } = useMeQuery();
   const router = useRouter();
-  const [orgs, setOrgs] = useState<Org[]>([]);
+  const { data: orgs = [] } = useOrganizationsQuery({
+    enabled: user?.role === "superadmin",
+  });
+  const updateMutation = useSuperadminUpdateOrgMutation();
+  const deleteMutation = useSuperadminDeleteOrgMutation();
 
   useEffect(() => {
     if (!loading && user?.role !== "superadmin") router.push("/");
   }, [user, loading, router]);
 
-  useEffect(() => {
-    fetch("/api/organizations")
-      .then((r) => r.json())
-      .then((d) => {
-        if (Array.isArray(d)) setOrgs(d);
-      });
-  }, []);
-
-  const updateStatus = async (id: number, status: string) => {
-    await fetch(`/api/superadmin/organizations`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status }),
-    });
-    setOrgs(orgs.map((o) => (o.id === id ? { ...o, status } : o)));
+  const updateStatus = (id: number, status: "approved" | "rejected") => {
+    updateMutation.mutate({ id, status });
   };
 
-  const deleteOrg = async (id: number) => {
+  const deleteOrg = (id: number) => {
     if (
       !confirm(
         "Видалити організацію? Це видалить всіх волонтерів та скине роль власника.",
       )
     )
       return;
-    await fetch(`/api/superadmin/organizations`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    setOrgs(orgs.filter((o) => o.id !== id));
+    deleteMutation.mutate({ id });
   };
 
   if (loading || user?.role !== "superadmin") return null;
@@ -100,7 +81,7 @@ export default function SuperAdminPage() {
                     </p>
                   )}
                   <p className="text-[10px] text-gray-400 mt-1">
-                    {new Date(org.created_at).toLocaleDateString("uk-UA")}
+                    {new Date(org.createdAt).toLocaleDateString("uk-UA")}
                   </p>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">

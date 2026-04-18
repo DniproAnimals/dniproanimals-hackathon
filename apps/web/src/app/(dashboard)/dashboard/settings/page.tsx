@@ -1,6 +1,9 @@
 "use client";
-import ImageFallback from "@/components/ImageFallback";
-import { cn } from "@/shared/lib/utils";
+import ImageFallback from "@/shared/components/ImageFallback";
+import {
+  useUpdateOwnOrganizationMutation,
+  useUploadImageMutation,
+} from "@/shared/query-hooks";
 import {
   IconBrandFacebook,
   IconBrandInstagram,
@@ -17,6 +20,7 @@ import {
 } from "@dniproanimals/icons";
 import {
   Button,
+  cn,
   Input,
   InputWithIcon,
   Popover,
@@ -37,9 +41,9 @@ const contactTypes = [
 export default function SettingsPage() {
   const { org, isOwner, refreshOrg } = useDashboard();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [showContactPicker, setShowContactPicker] = useState(false);
+
   const buildVisibleContacts = (o: typeof org): string[] => {
     const contacts: string[] = [];
     if (!o) return contacts;
@@ -66,7 +70,6 @@ export default function SettingsPage() {
   const [visibleContacts, setVisibleContacts] = useState<string[]>(() =>
     buildVisibleContacts(org),
   );
-  const [showContactPicker, setShowContactPicker] = useState(false);
   const [form, setForm] = useState(() => buildForm(org));
   const [syncedOrgId, setSyncedOrgId] = useState(org?.id);
 
@@ -76,36 +79,28 @@ export default function SettingsPage() {
     setForm(buildForm(org));
   }
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
-    if (res.ok) {
-      const { url } = await res.json();
-      setForm((prev) => ({ ...prev, photo: url }));
-    }
-    setUploading(false);
-    if (fileRef.current) fileRef.current.value = "";
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setSaved(false);
-    const res = await fetch("/api/organizations", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    if (res.ok) {
+  const uploadMutation = useUploadImageMutation({
+    onSuccess: ({ url }) => setForm((prev) => ({ ...prev, photo: url })),
+  });
+  const updateMutation = useUpdateOwnOrganizationMutation({
+    onSuccess: () => {
       setSaved(true);
       refreshOrg();
       setTimeout(() => setSaved(false), 3000);
-    }
-    setSubmitting(false);
+    },
+  });
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadMutation.mutateAsync(file);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaved(false);
+    updateMutation.mutate(form);
   };
 
   if (!isOwner) {
@@ -128,7 +123,6 @@ export default function SettingsPage() {
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Photo */}
         <div>
           <p className="text-xs text-gray-medium mb-2">Фото організації</p>
           {form.photo ? (
@@ -143,7 +137,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => setForm({ ...form, photo: "" })}
-                className="absolute top-2 right-2 size-7 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-2 right-2 size-7 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100"
               >
                 <IconX size={14} />
               </button>
@@ -155,10 +149,9 @@ export default function SettingsPage() {
             >
               <IconPhoto size={32} className="text-gray-medium mb-2" />
               <p className="text-sm text-gray-medium font-medium">
-                {uploading ? "Завантаження..." : "Натисніть, щоб додати фото"}
-              </p>
-              <p className="text-xs text-gray-medium mt-0.5">
-                JPG, PNG до 5 МБ
+                {uploadMutation.isPending
+                  ? "Завантаження..."
+                  : "Натисніть, щоб додати фото"}
               </p>
             </div>
           )}
@@ -171,43 +164,36 @@ export default function SettingsPage() {
           />
         </div>
 
-        {/* Name */}
         <div>
           <p className="text-xs text-gray-medium mb-1.5">Назва організації *</p>
           <Input
             type="text"
-            placeholder="Назва"
             required
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
         </div>
 
-        {/* Description */}
         <div>
           <p className="text-xs text-gray-medium mb-1.5">Опис</p>
           <Textarea
-            placeholder="Розкажіть про діяльність, місію та особливості..."
             rows={4}
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
         </div>
 
-        {/* Location */}
         <div>
           <p className="text-xs text-gray-medium mb-1.5">Місцезнаходження</p>
           <InputWithIcon icon={<IconMapPinFilled />}>
             <Input
               type="text"
-              placeholder="Місто / адреса"
               value={form.location}
               onChange={(e) => setForm({ ...form, location: e.target.value })}
             />
           </InputWithIcon>
         </div>
 
-        {/* Contacts */}
         <div>
           <p className="text-sm font-semibold text-gray-medium uppercase tracking-wider mb-3">
             Контакти
@@ -230,7 +216,6 @@ export default function SettingsPage() {
               />
             </InputWithIcon>
 
-            {/* Dynamic contacts */}
             {visibleContacts.map((type) => {
               const ct = contactTypes.find((c) => c.key === type);
               if (!ct) return null;
@@ -255,7 +240,7 @@ export default function SettingsPage() {
                         );
                         setForm({ ...form, [type]: "" });
                       }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-medium hover:text-foreground"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-medium"
                     >
                       <IconX size={14} />
                     </button>
@@ -264,7 +249,6 @@ export default function SettingsPage() {
               );
             })}
 
-            {/* Add contact picker */}
             {visibleContacts.length < contactTypes.length && (
               <Popover
                 open={showContactPicker}
@@ -273,7 +257,7 @@ export default function SettingsPage() {
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="flex items-center gap-1.5 text-[13px] text-gray-medium hover:text-foreground transition-colors py-1"
+                    className="flex items-center gap-1.5 text-[13px] text-gray-medium hover:text-foreground py-1"
                   >
                     <IconPlus size={14} />
                     Додати спосіб зв&apos;язку
@@ -299,7 +283,7 @@ export default function SettingsPage() {
                             setVisibleContacts([...visibleContacts, ct.key]);
                             setShowContactPicker(false);
                           }}
-                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-left hover:bg-gray-light rounded-lg transition-colors"
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-left hover:bg-gray-light rounded-lg"
                         >
                           <Icon size={16} className="text-gray-medium" />
                           {ct.label}
@@ -317,9 +301,9 @@ export default function SettingsPage() {
             type="submit"
             variant="primary"
             size="lg"
-            disabled={submitting}
+            disabled={updateMutation.isPending}
           >
-            {submitting ? "Зачекайте..." : "Зберегти зміни"}
+            {updateMutation.isPending ? "Зачекайте..." : "Зберегти зміни"}
           </Button>
           {saved && (
             <span className="flex items-center gap-1 text-sm text-green-600">

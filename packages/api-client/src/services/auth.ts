@@ -1,5 +1,5 @@
 import type {
-  AuthUserResponse,
+  User,
   LoginBody,
   LogoutResponse,
   RegisterBody,
@@ -10,7 +10,7 @@ import type { HttpFn } from "../createHttp";
 export function createAuthApiService(http: HttpFn) {
   return {
     register: (body: RegisterBody) =>
-      http<AuthUserResponse>({
+      http<User>({
         endpoint: endpoints.auth.register(),
         method: "POST",
         body: JSON.stringify(body),
@@ -18,7 +18,7 @@ export function createAuthApiService(http: HttpFn) {
       }),
 
     login: (body: LoginBody) =>
-      http<AuthUserResponse>({
+      http<User>({
         endpoint: endpoints.auth.login(),
         method: "POST",
         body: JSON.stringify(body),
@@ -32,7 +32,7 @@ export function createAuthApiService(http: HttpFn) {
       }),
 
     me: () =>
-      http<AuthUserResponse>({
+      http<User>({
         endpoint: endpoints.auth.me(),
       }),
   };

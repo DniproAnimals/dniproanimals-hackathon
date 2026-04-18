@@ -9,7 +9,6 @@ import type {
 import { endpoints } from "@dniproanimals/endpoints";
 import type { HttpFn } from "../createHttp";
 
-const JSON_HEADERS = { "Content-Type": "application/json" };
 
 export function createLostApiService(http: HttpFn) {
   return {
@@ -23,14 +22,14 @@ export function createLostApiService(http: HttpFn) {
         endpoint: endpoints.lost.create(),
         method: "POST",
         body: JSON.stringify(body),
-        headers: JSON_HEADERS,
+        headers: { "Content-Type": "application/json" },
       }),
     update: (id: number, body: UpdateLostBody) =>
       http<UpdateLostResponse>({
         endpoint: endpoints.lost.update({ id }),
         method: "PUT",
         body: JSON.stringify(body),
-        headers: JSON_HEADERS,
+        headers: { "Content-Type": "application/json" },
       }),
   };
 }

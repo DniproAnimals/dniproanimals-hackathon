@@ -1,13 +1,25 @@
 "use client";
-import { apiClient, queryKeys } from "@/shared/query-client";
-import type { UpdateLostBody } from "@dniproanimals/contracts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/shared/api-client";
+import type {
+  UpdateLostBody,
+  UpdateLostResponse,
+} from "@dniproanimals/contracts";
+import {
+  useMutation,
+  type UseMutationOptions,
+} from "@tanstack/react-query";
 
-export function useUpdateLostMutation() {
-  const qc = useQueryClient();
+type UpdateLostArgs = { id: number; body: UpdateLostBody };
+
+export const useUpdateLostMutation = (
+  options: Omit<
+    UseMutationOptions<UpdateLostResponse, Error, UpdateLostArgs>,
+    "mutationFn"
+  > = {},
+) => {
   return useMutation({
-    mutationFn: ({ id, body }: { id: number; body: UpdateLostBody }) =>
+    mutationFn: ({ id, body }: UpdateLostArgs) =>
       apiClient.lost.update(id, body),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.lost.all }),
+    ...options,
   });
-}
+};

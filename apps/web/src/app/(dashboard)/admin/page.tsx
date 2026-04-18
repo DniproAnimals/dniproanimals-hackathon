@@ -1,41 +1,27 @@
 "use client";
-import { useUser } from "@/shared/lib/UserContext";
+import {
+  useMeQuery,
+  useOrganizationsQuery,
+  useSuperadminDeleteOrgMutation,
+  useSuperadminUpdateOrgMutation,
+} from "@/shared/query-hooks";
 import { Badge, Button, Card, EmptyState, FilterChip } from "@dniproanimals/ui";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-
-type Organization = {
-  id: number;
-  name: string;
-  description: string | null;
-  location: string | null;
-  phone: string | null;
-  email: string | null;
-  website: string | null;
-  owner_id: number;
-  status: "pending" | "approved" | "rejected";
-  created_at: string;
-};
+import { useEffect, useState } from "react";
 
 export default function SuperadminPage() {
   const router = useRouter();
-  const { user, loading } = useUser();
-  const [orgs, setOrgs] = useState<Organization[]>([]);
+  const { data: user, isLoading: loading } = useMeQuery();
+  const { data: orgs = [] } = useOrganizationsQuery({
+    enabled: user?.role === "superadmin",
+  });
+  const updateMutation = useSuperadminUpdateOrgMutation();
+  const deleteMutation = useSuperadminDeleteOrgMutation();
   const [filter, setFilter] = useState<
     "all" | "pending" | "approved" | "rejected"
   >("all");
-  const [updating, setUpdating] = useState<number | null>(null);
-  const [deleting, setDeleting] = useState<number | null>(null);
-
-  const fetchOrgs = useCallback(() => {
-    fetch("/api/organizations")
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) setOrgs(data);
-      });
-  }, []);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -44,41 +30,21 @@ export default function SuperadminPage() {
     }
     if (!loading && user && user.role !== "superadmin") {
       router.replace("/");
-      return;
     }
-    if (user) fetchOrgs();
-  }, [user, loading, router, fetchOrgs]);
+  }, [user, loading, router]);
 
-  const updateStatus = async (id: number, status: "approved" | "rejected") => {
-    setUpdating(id);
-    const res = await fetch("/api/superadmin/organizations", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status }),
-    });
-    if (res.ok) {
-      setOrgs((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
-    }
-    setUpdating(null);
+  const updateStatus = (id: number, status: "approved" | "rejected") => {
+    updateMutation.mutate({ id, status });
   };
 
-  const deleteOrg = async (id: number) => {
+  const deleteOrg = (id: number) => {
     if (
       !confirm(
         "Видалити організацію? Акаунти власника та волонтерів буде скинуто.",
       )
     )
       return;
-    setDeleting(id);
-    const res = await fetch("/api/superadmin/organizations", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    if (res.ok) {
-      setOrgs((prev) => prev.filter((o) => o.id !== id));
-    }
-    setDeleting(null);
+    deleteMutation.mutate({ id });
   };
 
   if (loading || !user) {
@@ -189,7 +155,7 @@ export default function SuperadminPage() {
                       {org.phone && <span>{org.phone}</span>}
                       {org.website && <span>{org.website}</span>}
                       <span>
-                        {new Date(org.created_at).toLocaleDateString("uk-UA")}
+                        {new Date(org.createdAt).toLocaleDateString("uk-UA")}
                       </span>
                     </div>
                   </Link>
@@ -200,7 +166,7 @@ export default function SuperadminPage() {
                         variant="success"
                         size="sm"
                         onClick={() => updateStatus(org.id, "approved")}
-                        disabled={updating === org.id}
+                        disabled={updateMutation.isPending}
                       >
                         Схвалити
                       </Button>
@@ -210,7 +176,7 @@ export default function SuperadminPage() {
                         variant="primary"
                         size="sm"
                         onClick={() => updateStatus(org.id, "rejected")}
-                        disabled={updating === org.id}
+                        disabled={updateMutation.isPending}
                         className="bg-yellow-500 text-white hover:bg-yellow-600"
                       >
                         Заблокувати
@@ -221,7 +187,7 @@ export default function SuperadminPage() {
                         variant="success"
                         size="sm"
                         onClick={() => updateStatus(org.id, "approved")}
-                        disabled={updating === org.id}
+                        disabled={updateMutation.isPending}
                       >
                         Схвалити
                       </Button>
@@ -230,9 +196,9 @@ export default function SuperadminPage() {
                       variant="destructive"
                       size="sm"
                       onClick={() => deleteOrg(org.id)}
-                      disabled={deleting === org.id}
+                      disabled={deleteMutation.isPending}
                     >
-                      {deleting === org.id ? "..." : "Видалити"}
+                      {deleteMutation.isPending ? "..." : "Видалити"}
                     </Button>
                   </div>
                 </div>

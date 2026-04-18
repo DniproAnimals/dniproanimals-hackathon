@@ -1,7 +1,11 @@
 "use client";
-import ImageFallback from "@/components/ImageFallback";
-import { useUser } from "@/shared/lib/UserContext";
-import { cn } from "@/shared/lib/utils";
+import ImageFallback from "@/shared/components/ImageFallback";
+import {
+  useCreateOrganizationMutation,
+  useMeQuery,
+  useUploadImageMutation,
+} from "@/shared/query-hooks";
+import { endpoints } from "@dniproanimals/endpoints";
 import {
   IconBrandFacebook,
   IconBrandInstagram,
@@ -20,6 +24,7 @@ import {
 } from "@dniproanimals/icons";
 import {
   Button,
+  cn,
   Input,
   InputWithIcon,
   Popover,
@@ -28,6 +33,7 @@ import {
   Skeleton,
   Textarea,
 } from "@dniproanimals/ui";
+import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -41,11 +47,10 @@ const contactTypes = [
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { user, loading, refresh } = useUser();
+  const queryClient = useQueryClient();
+  const { data: user, isLoading: loading } = useMeQuery();
   const fileRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<"choose" | "org">("choose");
-  const [submitting, setSubmitting] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [visibleContacts, setVisibleContacts] = useState<string[]>([]);
   const [showContactPicker, setShowContactPicker] = useState(false);
   const [form, setForm] = useState({
@@ -61,34 +66,27 @@ export default function OnboardingPage() {
     website: "",
   });
 
+  const uploadMutation = useUploadImageMutation({
+    onSuccess: ({ url }) => setForm((prev) => ({ ...prev, photo: url })),
+  });
+  const createOrgMutation = useCreateOrganizationMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [endpoints.auth.me()] });
+      queryClient.invalidateQueries({ queryKey: [endpoints.organizations.list()] });
+      router.push("/dashboard");
+    },
+  });
+
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
-    if (res.ok) {
-      const { url } = await res.json();
-      setForm((prev) => ({ ...prev, photo: url }));
-    }
-    setUploading(false);
+    await uploadMutation.mutateAsync(file);
     if (fileRef.current) fileRef.current.value = "";
   };
 
-  const handleCreateOrg = async (e: React.FormEvent) => {
+  const handleCreateOrg = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    const res = await fetch("/api/organizations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    if (res.ok) {
-      refresh();
-      router.push("/dashboard");
-    }
-    setSubmitting(false);
+    createOrgMutation.mutate(form);
   };
 
   if (loading) {
@@ -104,7 +102,6 @@ export default function OnboardingPage() {
     return null;
   }
 
-  // Step 1: Choose path
   if (step === "choose") {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4">
@@ -169,10 +166,8 @@ export default function OnboardingPage() {
     );
   }
 
-  // Step 2: Create org form (same style as /organizations/create)
   return (
     <div className="max-w-2xl mx-auto px-6 py-6 pb-24 md:pb-6">
-      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <Button
           variant="ghost"
@@ -201,7 +196,6 @@ export default function OnboardingPage() {
       </div>
 
       <form onSubmit={handleCreateOrg} className="space-y-5">
-        {/* Photo */}
         <div>
           <p className="text-xs text-gray-medium mb-2">Фото організації</p>
           {form.photo ? (
@@ -228,7 +222,9 @@ export default function OnboardingPage() {
             >
               <IconPhoto size={32} className="text-gray-medium mb-2" />
               <p className="text-sm text-gray-medium font-medium">
-                {uploading ? "Завантаження..." : "Натисніть, щоб додати фото"}
+                {uploadMutation.isPending
+                  ? "Завантаження..."
+                  : "Натисніть, щоб додати фото"}
               </p>
               <p className="text-xs text-gray-medium mt-0.5">
                 JPG, PNG до 5 МБ
@@ -244,7 +240,6 @@ export default function OnboardingPage() {
           />
         </div>
 
-        {/* Name */}
         <div>
           <p className="text-xs text-gray-medium mb-1.5">Назва організації *</p>
           <Input
@@ -256,7 +251,6 @@ export default function OnboardingPage() {
           />
         </div>
 
-        {/* Description */}
         <div>
           <p className="text-xs text-gray-medium mb-1.5">Опис</p>
           <Textarea
@@ -267,7 +261,6 @@ export default function OnboardingPage() {
           />
         </div>
 
-        {/* Location */}
         <div>
           <p className="text-xs text-gray-medium mb-1.5">Місцезнаходження *</p>
           <InputWithIcon icon={<IconMapPinFilled />}>
@@ -281,7 +274,6 @@ export default function OnboardingPage() {
           </InputWithIcon>
         </div>
 
-        {/* Contacts */}
         <div>
           <p className="text-sm font-semibold text-gray-medium uppercase tracking-wider mb-3">
             Контакти
@@ -305,7 +297,6 @@ export default function OnboardingPage() {
               />
             </InputWithIcon>
 
-            {/* Dynamic contacts */}
             {visibleContacts.map((type) => {
               const ct = contactTypes.find((c) => c.key === type);
               if (!ct) return null;
@@ -340,7 +331,6 @@ export default function OnboardingPage() {
               );
             })}
 
-            {/* Add contact picker */}
             {visibleContacts.length < contactTypes.length && (
               <Popover
                 open={showContactPicker}
@@ -392,10 +382,10 @@ export default function OnboardingPage() {
           type="submit"
           variant="primary"
           size="lg"
-          disabled={submitting}
+          disabled={createOrgMutation.isPending}
           className="w-full"
         >
-          {submitting ? "Створення..." : "Створити організацію"}
+          {createOrgMutation.isPending ? "Створення..." : "Створити організацію"}
         </Button>
 
         <p className="text-xs text-gray-medium text-center">

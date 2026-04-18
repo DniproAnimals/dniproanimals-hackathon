@@ -15,7 +15,6 @@ import type {
 import { endpoints } from "@dniproanimals/endpoints";
 import type { HttpFn } from "../createHttp";
 
-const JSON_HEADERS = { "Content-Type": "application/json" };
 
 export function createOrganizationsApiService(http: HttpFn) {
   return {
@@ -40,28 +39,28 @@ export function createOrganizationsApiService(http: HttpFn) {
         endpoint: endpoints.organizations.create(),
         method: "POST",
         body: JSON.stringify(body),
-        headers: JSON_HEADERS,
+        headers: { "Content-Type": "application/json" },
       }),
     updateStatus: (body: UpdateOrgStatusBody) =>
       http<UpdateOrgStatusResponse>({
         endpoint: endpoints.organizations.updateStatus(),
         method: "PATCH",
         body: JSON.stringify(body),
-        headers: JSON_HEADERS,
+        headers: { "Content-Type": "application/json" },
       }),
     updateOwn: (body: UpdateOwnOrganizationBody) =>
       http<UpdateOwnOrganizationResponse>({
         endpoint: endpoints.organizations.updateOwn(),
         method: "PUT",
         body: JSON.stringify(body),
-        headers: JSON_HEADERS,
+        headers: { "Content-Type": "application/json" },
       }),
     updateJar: (body: UpdateJarBody) =>
       http<UpdateJarResponse>({
         endpoint: endpoints.organizations.jar(),
         method: "PUT",
         body: JSON.stringify(body),
-        headers: JSON_HEADERS,
+        headers: { "Content-Type": "application/json" },
       }),
   };
 }

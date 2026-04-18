@@ -1,6 +1,8 @@
 "use client";
-import { useUser } from "@/shared/lib/UserContext";
-import { cn } from "@/shared/lib/utils";
+import {
+  useMeQuery,
+  useOrganizationQuery,
+} from "@/shared/query-hooks";
 import {
   IconCoin,
   IconExternalLink,
@@ -11,34 +13,12 @@ import {
   IconSettingsFilled,
   IconUsersGroup,
 } from "@dniproanimals/icons";
-import { Badge, Button, SidebarNavItem } from "@dniproanimals/ui";
+import { Badge, Button, cn, SidebarNavItem } from "@dniproanimals/ui";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-
-type Organization = {
-  id: number;
-  name: string;
-  description: string | null;
-  photo: string | null;
-  location: string | null;
-  phone: string | null;
-  email: string | null;
-  instagram: string | null;
-  telegram: string | null;
-  facebook: string | null;
-  website: string | null;
-  owner_id: number;
-  status: "pending" | "approved" | "rejected";
-  monobank_jar_id: string | null;
-};
+import { createContext, useContext, useEffect, useState } from "react";
+import type { Organization } from "@dniproanimals/contracts";
 
 type DashboardContextType = {
   org: Organization | null;
@@ -98,21 +78,13 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, loading } = useUser();
-  const [org, setOrg] = useState<Organization | null>(null);
-  const [isOwner, setIsOwner] = useState(false);
+  const { data: user, isLoading: loading } = useMeQuery();
+  const { data: org, refetch: refreshOrg } = useOrganizationQuery(
+    user?.orgId ?? 0,
+    { enabled: !!user?.orgId },
+  );
+  const isOwner = !!(org && user && org.ownerId === user.id);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const refreshOrg = useCallback(async () => {
-    if (!user?.orgId) return;
-    const res = await fetch(`/api/organizations/${user.orgId}`);
-    if (!res.ok) return;
-    const myOrg = await res.json();
-    if (myOrg) {
-      setOrg(myOrg);
-      setIsOwner(myOrg.owner_id === user.id);
-    }
-  }, [user]);
 
   useEffect(() => {
     if (loading) return;
@@ -124,21 +96,6 @@ export default function DashboardLayout({
       router.replace("/");
     }
   }, [user, loading, router]);
-
-  useEffect(() => {
-    if (!user?.orgId) return;
-    let cancelled = false;
-    fetch(`/api/organizations/${user.orgId}`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((myOrg) => {
-        if (cancelled || !myOrg) return;
-        setOrg(myOrg);
-        setIsOwner(myOrg.owner_id === user.id);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
 
   if (loading || !user) {
     return (
@@ -160,7 +117,9 @@ export default function DashboardLayout({
   };
 
   return (
-    <DashboardContext.Provider value={{ org, isOwner, refreshOrg }}>
+    <DashboardContext.Provider
+      value={{ org: org ?? null, isOwner, refreshOrg: () => void refreshOrg() }}
+    >
       <div className="min-h-screen bg-gray-50 flex">
         {/* Sidebar overlay for mobile */}
         {sidebarOpen && (

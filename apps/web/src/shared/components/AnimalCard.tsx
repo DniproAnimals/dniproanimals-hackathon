@@ -1,8 +1,11 @@
 "use client";
-import ImageFallback from "@/components/ImageFallback";
-import { useUser } from "@/shared/lib/UserContext";
-import type { Animal } from "@/shared/lib/db";
-import { cn } from "@/shared/lib/utils";
+import ImageFallback from "@/shared/components/ImageFallback";
+import {
+  useFavoritesQuery,
+  useMeQuery,
+  useToggleFavoriteMutation,
+} from "@/shared/query-hooks";
+import type { Animal } from "@dniproanimals/contracts";
 import {
   IconBook,
   IconCircleCheckFilled,
@@ -13,7 +16,7 @@ import {
   IconRefresh,
   IconRuler,
 } from "@dniproanimals/icons";
-import { Badge } from "@dniproanimals/ui";
+import { Badge, cn } from "@dniproanimals/ui";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -54,9 +57,11 @@ export default function AnimalCard({
   const [currentPhoto, setCurrentPhoto] = useState(0);
   const [hovered, setHovered] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const { user, favoriteIds, toggleFavorite } = useUser();
-  const isFav = favoriteIds.includes(animal.id);
-  const photos: string[] = JSON.parse(animal.photos || "[]");
+  const { data: user } = useMeQuery();
+  const { data: favorites } = useFavoritesQuery({ enabled: !!user });
+  const toggleFavMut = useToggleFavoriteMutation();
+  const isFav = (favorites ?? []).some((f) => f.id === animal.id);
+  const photos: string[] = animal.photos ?? [];
   const tint = tintColors[index % tintColors.length];
 
   const handleFlip = (e: React.MouseEvent) => {
@@ -195,7 +200,7 @@ export default function AnimalCard({
                     Місце
                   </span>
                   <span className="text-[11px] text-foreground/70 ml-auto truncate max-w-[45%] text-right">
-                    {animal.contact_location || "Дніпро"}
+                    {animal.contactLocation || "Дніпро"}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 py-1.5">
@@ -209,7 +214,7 @@ export default function AnimalCard({
                   </span>
                   <span className="text-[11px] text-foreground/70 ml-auto">
                     {getSizeLabel(animal.size)}
-                    {animal.weight_kg ? ` · ${animal.weight_kg} кг` : ""}
+                    {animal.weightKg ? ` · ${animal.weightKg} кг` : ""}
                   </span>
                 </div>
                 {animal.color && (
@@ -283,7 +288,7 @@ export default function AnimalCard({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              toggleFavorite(animal.id);
+              toggleFavMut.mutate({ animalId: animal.id });
             }}
             className={cn(
               "absolute top-2.5 right-2.5 z-10 size-8 rounded-full backdrop-blur-sm shadow-md flex items-center justify-center transition-all hover:bg-white",
@@ -338,7 +343,7 @@ export default function AnimalCard({
           </span>
         </div>
         <p className="text-xs text-gray-medium mt-0.5">
-          {getAgeLabel(animal.age_months)} | {animal.breed || "Мікс"}
+          {getAgeLabel(animal.ageMonths)} | {animal.breed || "Мікс"}
         </p>
       </div>
     </div>

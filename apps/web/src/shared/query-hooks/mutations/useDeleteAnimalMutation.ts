@@ -1,11 +1,16 @@
 "use client";
-import { apiClient, queryKeys } from "@/shared/query-client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/shared/api-client";
+import type { OmitMutationOptions } from "@/shared/types/react-query";
+import { useMutation } from "@tanstack/react-query";
 
-export function useDeleteAnimalMutation() {
-  const qc = useQueryClient();
+export const useDeleteAnimalMutation = (
+  options: OmitMutationOptions<
+    typeof apiClient.animals.delete,
+    "mutationFn"
+  > = {},
+) => {
   return useMutation({
-    mutationFn: (id: number) => apiClient.animals.delete(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.animals.all }),
+    mutationFn: apiClient.animals.delete,
+    ...options,
   });
-}
+};

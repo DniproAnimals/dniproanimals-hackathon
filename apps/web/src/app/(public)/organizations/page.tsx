@@ -1,6 +1,6 @@
 "use client";
-import ImageFallback from "@/components/ImageFallback";
-import { useUser } from "@/shared/lib/UserContext";
+import ImageFallback from "@/shared/components/ImageFallback";
+import { useMeQuery, useOrganizationsQuery } from "@/shared/query-hooks";
 import {
   IconBrandFacebook,
   IconBrandInstagram,
@@ -11,41 +11,15 @@ import {
 import { Badge, Button, EmptyState, Skeleton } from "@dniproanimals/ui";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-
-type Org = {
-  id: number;
-  name: string;
-  description: string | null;
-  photo: string | null;
-  location: string | null;
-  instagram: string | null;
-  telegram: string | null;
-  facebook: string | null;
-  status: string;
-  created_at: string;
-};
 
 export default function OrganizationsPage() {
-  const { user } = useUser();
+  const { data: user } = useMeQuery();
   const hasOrg = !!user?.orgId;
-  const [orgs, setOrgs] = useState<Org[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/organizations")
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data))
-          setOrgs(data.filter((o: Org) => o.status === "approved"));
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+  const { data: allOrgs, isLoading } = useOrganizationsQuery();
+  const orgs = (allOrgs ?? []).filter((o) => o.status === "approved");
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-6 pb-24 md:pb-6">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -81,8 +55,7 @@ export default function OrganizationsPage() {
         )}
       </motion.div>
 
-      {/* List */}
-      {loading ? (
+      {isLoading ? (
         <div className="grid md:grid-cols-2 gap-6">
           {[...Array(4)].map((_, i) => (
             <Skeleton key={i} className="rounded-2xl h-64" />
@@ -106,7 +79,6 @@ export default function OrganizationsPage() {
                 href={`/organizations/${org.id}`}
                 className="block bg-white rounded-2xl border border-gray-border overflow-hidden hover:border-primary hover:shadow-md transition-all group"
               >
-                {/* Photo */}
                 <div className="relative h-40 bg-gray-light">
                   {org.photo ? (
                     <ImageFallback
@@ -133,7 +105,6 @@ export default function OrganizationsPage() {
                   )}
                 </div>
 
-                {/* Info */}
                 <div className="p-5">
                   <h3 className="font-bold text-lg mb-1 group-hover:text-green-secondary transition-colors">
                     {org.name}

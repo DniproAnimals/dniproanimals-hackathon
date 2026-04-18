@@ -1,14 +1,17 @@
-import type { Animal } from "@/shared/lib/db";
-import { createPublicClient } from "@/shared/lib/db";
+import { apiClient } from "@/shared/api-client";
+import type {
+  Animal,
+  AnimalSex,
+  AnimalSize,
+  AnimalType,
+} from "@dniproanimals/contracts";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import AnimalDetail from "./AnimalDetail";
 import CatalogContent from "./CatalogContent";
 
-// --- Slug mappings ---
-
-const typeSlugToValue: Record<string, string> = {
+const typeSlugToValue: Record<string, AnimalType> = {
   dogs: "dog",
   cats: "cat",
   other: "other",
@@ -18,10 +21,8 @@ const typeValueToSlug: Record<string, string> = {
   cat: "cats",
   other: "other",
 };
-const sexSlugs = new Set(["male", "female"]);
-const sizeSlugs = new Set(["small", "medium", "large"]);
-
-// --- Ukrainian labels ---
+const sexSlugs = new Set<string>(["male", "female"]);
+const sizeSlugs = new Set<string>(["small", "medium", "large"]);
 
 const typeLabels: Record<string, string> = {
   dog: "Собаки",
@@ -53,57 +54,55 @@ const sizeLabelsCap: Record<string, string> = {
   large: "Великі",
 };
 
-// --- Filter parsing ---
-
-type Filters = { type: string; sex?: string; size?: string };
+type Filters = { type: AnimalType; sex?: AnimalSex; size?: AnimalSize };
 
 function parseSlug(slug: string[]): Filters | null {
   if (slug.length === 0 || slug.length > 3) return null;
-  const type = typeSlugToValue[slug[0]];
+  const type = typeSlugToValue[slug[0]!];
   if (!type) return null;
   const filters: Filters = { type };
   for (let i = 1; i < slug.length; i++) {
-    if (sexSlugs.has(slug[i]) && !filters.sex) filters.sex = slug[i];
-    else if (sizeSlugs.has(slug[i]) && !filters.size) filters.size = slug[i];
+    const part = slug[i]!;
+    if (sexSlugs.has(part) && !filters.sex) filters.sex = part as AnimalSex;
+    else if (sizeSlugs.has(part) && !filters.size)
+      filters.size = part as AnimalSize;
     else return null;
   }
   return filters;
 }
 
-// --- SEO text builders ---
-
 function buildTitle(filters: Filters): string {
   const parts: string[] = [];
-  if (filters.size) parts.push(sizeLabelsCap[filters.size]);
-  if (filters.sex) parts.push(sexAdjective[filters.type][filters.sex]);
-  else parts.push(typeLabels[filters.type].toLowerCase());
+  if (filters.size) parts.push(sizeLabelsCap[filters.size]!);
+  if (filters.sex) parts.push(sexAdjective[filters.type]![filters.sex]!);
+  else parts.push(typeLabels[filters.type]!.toLowerCase());
   const t = parts.join(" ");
   return `${t.charAt(0).toUpperCase() + t.slice(1)} для усиновлення у Дніпрі | DniproAnimals`;
 }
 
 function buildDescription(filters: Filters): string {
   const extras: string[] = [];
-  if (filters.size) extras.push(sizeLabels[filters.size]);
-  if (filters.sex) extras.push(sexLabels[filters.sex]);
+  if (filters.size) extras.push(sizeLabels[filters.size]!);
+  if (filters.sex) extras.push(sexLabels[filters.sex]!);
   const suffix = extras.length ? ` (${extras.join(", ")})` : "";
   return `Каталог ${typeGenitive[filters.type]}${suffix} для усиновлення у Дніпрі. Знайдіть свого нового хвостатого друга у притулку DniproAnimals.`;
 }
 
 function buildH1(filters: Filters): string {
   const parts: string[] = [];
-  if (filters.size) parts.push(sizeLabelsCap[filters.size]);
-  if (filters.sex) parts.push(sexAdjective[filters.type][filters.sex]);
-  else parts.push(typeLabels[filters.type].toLowerCase());
+  if (filters.size) parts.push(sizeLabelsCap[filters.size]!);
+  if (filters.sex) parts.push(sexAdjective[filters.type]![filters.sex]!);
+  else parts.push(typeLabels[filters.type]!.toLowerCase());
   const h1 = parts.join(" ");
   return `${h1.charAt(0).toUpperCase() + h1.slice(1)} для усиновлення`;
 }
 
 function getRelatedLinks(filters: Filters): { href: string; label: string }[] {
   const links: { href: string; label: string }[] = [];
-  const ts = typeValueToSlug[filters.type];
+  const ts = typeValueToSlug[filters.type]!;
   for (const [v, s] of Object.entries(typeValueToSlug)) {
     if (v !== filters.type)
-      links.push({ href: `/animals/${s}`, label: typeLabels[v] });
+      links.push({ href: `/animals/${s}`, label: typeLabels[v]! });
   }
   if (!filters.sex) {
     links.push({
@@ -114,16 +113,6 @@ function getRelatedLinks(filters: Filters): { href: string; label: string }[] {
       href: `/animals/${ts}/female`,
       label: `${typeLabels[filters.type]}-дівчинки`,
     });
-  } else {
-    const opp = filters.sex === "male" ? "female" : "male";
-    const base = filters.size
-      ? `/animals/${ts}/${opp}/${filters.size}`
-      : `/animals/${ts}/${opp}`;
-    const label = sexAdjective[filters.type][opp];
-    links.push({
-      href: base,
-      label: label.charAt(0).toUpperCase() + label.slice(1),
-    });
   }
   if (!filters.size) {
     for (const sz of ["small", "medium", "large"] as const) {
@@ -132,38 +121,24 @@ function getRelatedLinks(filters: Filters): { href: string; label: string }[] {
         : `/animals/${ts}/${sz}`;
       links.push({
         href: p,
-        label: `${sizeLabelsCap[sz]} ${typeLabels[filters.type].toLowerCase()}`,
+        label: `${sizeLabelsCap[sz]} ${typeLabels[filters.type]!.toLowerCase()}`,
       });
-    }
-  } else {
-    for (const sz of ["small", "medium", "large"] as const) {
-      if (sz !== filters.size) {
-        const p = filters.sex
-          ? `/animals/${ts}/${filters.sex}/${sz}`
-          : `/animals/${ts}/${sz}`;
-        links.push({
-          href: p,
-          label: `${sizeLabelsCap[sz]} ${typeLabels[filters.type].toLowerCase()}`,
-        });
-      }
     }
   }
   if (filters.sex || filters.size)
     links.push({
       href: `/animals/${ts}`,
-      label: `Усі ${typeLabels[filters.type].toLowerCase()}`,
+      label: `Усі ${typeLabels[filters.type]!.toLowerCase()}`,
     });
   links.push({ href: "/animals", label: "Усі тварини" });
   return links;
 }
 
-// --- Static params (36 SEO pages) ---
-
 export function generateStaticParams() {
   const types = ["dogs", "cats", "other"];
   const sexes = ["male", "female"];
   const sizes = ["small", "medium", "large"];
-  const params: { slug?: string[] }[] = [{ slug: undefined }]; // /animals (no slug)
+  const params: { slug?: string[] }[] = [{ slug: undefined }];
   for (const t of types) {
     params.push({ slug: [t] });
     for (const s of sexes) {
@@ -177,8 +152,6 @@ export function generateStaticParams() {
 
 export const dynamicParams = true;
 export const revalidate = 3600;
-
-// --- Metadata ---
 
 export async function generateMetadata({
   params,
@@ -195,20 +168,22 @@ export async function generateMetadata({
     };
   }
 
-  if (slug.length === 1 && /^\d+$/.test(slug[0])) {
-    const supabase = createPublicClient();
-    const { data } = await supabase
-      .from("animals")
-      .select("name, type, breed")
-      .eq("id", Number(slug[0]))
-      .single();
-    if (!data) return { title: "Тварину не знайдено | DniproAnimals" };
-    const tw =
-      data.type === "dog" ? "собака" : data.type === "cat" ? "кіт" : "тварина";
-    return {
-      title: `${data.name} — ${tw} для усиновлення | DniproAnimals`,
-      description: `${data.name} — ${data.breed || "мікс порід"} шукає дім у Дніпрі. Деталі та контакти у DniproAnimals.`,
-    };
+  if (slug.length === 1 && /^\d+$/.test(slug[0]!)) {
+    try {
+      const animal = await apiClient.animals.get(Number(slug[0]));
+      const tw =
+        animal.type === "dog"
+          ? "собака"
+          : animal.type === "cat"
+            ? "кіт"
+            : "тварина";
+      return {
+        title: `${animal.name} — ${tw} для усиновлення | DniproAnimals`,
+        description: `${animal.name} — ${animal.breed || "мікс порід"} шукає дім у Дніпрі.`,
+      };
+    } catch {
+      return { title: "Тварину не знайдено | DniproAnimals" };
+    }
   }
 
   const filters = parseSlug(slug);
@@ -220,34 +195,17 @@ export async function generateMetadata({
   };
 }
 
-// --- Fetch animals ---
-
 async function fetchAnimals(filters: Filters | null): Promise<Animal[]> {
-  const supabase = createPublicClient();
-
-  // Only show animals from approved organizations (or without org)
-  const { data: approvedOrgs } = await supabase
-    .from("organizations")
-    .select("id")
-    .eq("status", "approved");
-  const approvedIds = (approvedOrgs || []).map((o: { id: number }) => o.id);
-
-  let query = supabase.from("animals").select("*");
-  if (approvedIds.length > 0) {
-    query = query.in("org_id", approvedIds);
-  } else {
-    query = query.eq("org_id", -1);
+  try {
+    return await apiClient.animals.list({
+      type: filters?.type,
+      sex: filters?.sex,
+      size: filters?.size,
+    });
+  } catch {
+    return [];
   }
-
-  if (filters?.type) query = query.eq("type", filters.type);
-  if (filters?.sex) query = query.eq("sex", filters.sex);
-  if (filters?.size) query = query.eq("size", filters.size);
-  query = query.order("created_at", { ascending: false });
-  const { data } = await query;
-  return (data as Animal[]) || [];
 }
-
-// --- Page ---
 
 export default async function AnimalSlugPage({
   params,
@@ -256,7 +214,6 @@ export default async function AnimalSlugPage({
 }) {
   const { slug } = await params;
 
-  // No slug → full catalog
   if (!slug || slug.length === 0) {
     const animals = await fetchAnimals(null);
     return (
@@ -269,12 +226,10 @@ export default async function AnimalSlugPage({
     );
   }
 
-  // Numeric ID → detail
-  if (slug.length === 1 && /^\d+$/.test(slug[0])) {
-    return <AnimalDetail id={slug[0]} />;
+  if (slug.length === 1 && /^\d+$/.test(slug[0]!)) {
+    return <AnimalDetail id={slug[0]!} />;
   }
 
-  // Filter slug → SEO catalog
   const filters = parseSlug(slug);
   if (!filters) return notFound();
 
@@ -297,7 +252,6 @@ export default async function AnimalSlugPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* SEO breadcrumbs */}
       <div className="max-w-6xl mx-auto px-6 pt-6">
         <nav
           aria-label="Breadcrumb"
@@ -307,58 +261,16 @@ export default async function AnimalSlugPage({
             Головна
           </Link>
           <span>/</span>
-          <Link
-            href="/animals"
-            className="hover:text-foreground transition-colors"
-          >
+          <Link href="/animals" className="hover:text-foreground transition-colors">
             Тварини
           </Link>
           <span>/</span>
-          {filters.sex || filters.size ? (
-            <>
-              <Link
-                href={`/animals/${typeValueToSlug[filters.type]}`}
-                className="hover:text-foreground transition-colors"
-              >
-                {typeLabels[filters.type]}
-              </Link>
-              {filters.sex && (
-                <>
-                  <span>/</span>
-                  {filters.size ? (
-                    <Link
-                      href={`/animals/${typeValueToSlug[filters.type]}/${filters.sex}`}
-                      className="hover:text-foreground transition-colors"
-                    >
-                      {sexLabels[filters.sex].charAt(0).toUpperCase() +
-                        sexLabels[filters.sex].slice(1)}
-                    </Link>
-                  ) : (
-                    <span className="text-foreground font-medium">
-                      {sexLabels[filters.sex].charAt(0).toUpperCase() +
-                        sexLabels[filters.sex].slice(1)}
-                    </span>
-                  )}
-                </>
-              )}
-              {filters.size && (
-                <>
-                  <span>/</span>
-                  <span className="text-foreground font-medium">
-                    {sizeLabelsCap[filters.size]}
-                  </span>
-                </>
-              )}
-            </>
-          ) : (
-            <span className="text-foreground font-medium">
-              {typeLabels[filters.type]}
-            </span>
-          )}
+          <span className="text-foreground font-medium">
+            {typeLabels[filters.type]}
+          </span>
         </nav>
       </div>
 
-      {/* Catalog with interactive filters */}
       <CatalogContent
         initialAnimals={animals}
         slugType={filters.type}
@@ -368,7 +280,6 @@ export default async function AnimalSlugPage({
         seoDescription={buildDescription(filters)}
       />
 
-      {/* SEO related links */}
       <div className="max-w-6xl mx-auto px-6 pb-6">
         <div className="border-t border-gray-border pt-6">
           <h2 className="text-sm font-semibold text-foreground mb-3">

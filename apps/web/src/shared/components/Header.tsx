@@ -1,7 +1,10 @@
 "use client";
-import { useUser } from "@/shared/lib/UserContext";
-import { cn } from "@/shared/lib/utils";
-import { useLogoutMutation } from "@/shared/query-hooks";
+import {
+  useLogoutMutation,
+  useLostQuery,
+  useMeQuery,
+} from "@/shared/query-hooks";
+import { endpoints } from "@dniproanimals/endpoints";
 import {
   IconChevronDown,
   IconHomeFilled,
@@ -14,16 +17,17 @@ import {
   AvatarFallback,
   Badge,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@dniproanimals/ui";
+import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 const navItems = [
   { href: "/", label: "Про нас" },
@@ -36,24 +40,19 @@ const navItems = [
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user } = useUser();
-  const [lostCount, setLostCount] = useState(0);
-
-  useEffect(() => {
-    fetch("/api/lost?type=lost")
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) setLostCount(data.length);
-      })
-      .catch(() => {});
-  }, [pathname]);
+  const queryClient = useQueryClient();
+  const { data: user } = useMeQuery();
+  const { data: lostItems } = useLostQuery({ type: "lost" });
+  const lostCount = lostItems?.length ?? 0;
 
   const logoutMutation = useLogoutMutation({
     onSuccess: () => {
+      queryClient.setQueryData([endpoints.auth.me()], null);
+      queryClient.invalidateQueries({ queryKey: [endpoints.auth.me()] });
       router.push("/");
     },
   });
-  const handleLogout = () => logoutMutation.mutate();
+  const handleLogout = () => logoutMutation.mutate(undefined);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);

@@ -1,14 +1,14 @@
 "use client";
-import { useUser } from "@/shared/lib/UserContext";
-import { cn } from "@/shared/lib/utils";
 import {
-  IconBellFilled,
-  IconHeartFilled,
-  IconSearch,
-} from "@dniproanimals/icons";
+  useAdoptionQuery,
+  useLostQuery,
+  useMeQuery,
+} from "@/shared/query-hooks";
+import { IconBellFilled, IconHeartFilled, IconSearch } from "@dniproanimals/icons";
 import {
   Badge,
   Card,
+  cn,
   EmptyState,
   Skeleton,
   Tabs,
@@ -19,44 +19,16 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function NotificationsPage() {
-  const { user, loading } = useUser();
+  const { data: user, isLoading: loading } = useMeQuery();
   const router = useRouter();
-  const [requests, setRequests] = useState<
-    {
-      id: number;
-      name: string;
-      phone: string;
-      email: string;
-      animal_name: string;
-      message: string | null;
-      status: string;
-      created_at: string;
-    }[]
-  >([]);
-  const [lostItems, setLostItems] = useState<
-    {
-      id: number;
-      title: string;
-      type: string;
-      contact_name: string;
-      created_at: string;
-    }[]
-  >([]);
+  const enabled = !!user && user.role !== "user";
+  const { data: requests = [] } = useAdoptionQuery(undefined, { enabled });
+  const { data: lostItems = [] } = useLostQuery(undefined, { enabled });
   const [tab, setTab] = useState<"all" | "requests" | "lost">("all");
 
   useEffect(() => {
     if (!loading && (!user || user.role === "user")) router.push("/");
   }, [user, loading, router]);
-
-  useEffect(() => {
-    if (!user || user.role === "user") return;
-    fetch("/api/adoption")
-      .then((r) => r.json())
-      .then(setRequests);
-    fetch("/api/lost")
-      .then((r) => r.json())
-      .then(setLostItems);
-  }, [user]);
 
   if (loading || !user)
     return (
@@ -70,8 +42,8 @@ export default function NotificationsPage() {
       id: `req-${r.id}`,
       type: "adoption" as const,
       title: `Заявка від ${r.name}`,
-      sub: `на ${r.animal_name}`,
-      date: r.created_at,
+      sub: `на ${r.animalName}`,
+      date: r.createdAt,
       status: r.status,
       data: r,
     })),
@@ -79,8 +51,8 @@ export default function NotificationsPage() {
       id: `lost-${l.id}`,
       type: "lost" as const,
       title: l.title,
-      sub: l.contact_name,
-      date: l.created_at,
+      sub: l.contactName,
+      date: l.createdAt,
       status: l.type,
       data: l,
     })),
@@ -111,7 +83,6 @@ export default function NotificationsPage() {
         {allItems.length} повідомлень
       </p>
 
-      {/* Tabs */}
       <Tabs
         value={tab}
         onValueChange={(v) => setTab(v as "all" | "requests" | "lost")}
@@ -192,12 +163,12 @@ export default function NotificationsPage() {
                   {item.type === "adoption" && (
                     <div className="mt-2 text-xs text-gray-600 space-y-0.5">
                       <p>
-                        📧 {(item.data as (typeof requests)[0]).email} · 📞{" "}
-                        {(item.data as (typeof requests)[0]).phone}
+                        📧 {(item.data as (typeof requests)[number]).email} · 📞{" "}
+                        {(item.data as (typeof requests)[number]).phone}
                       </p>
-                      {(item.data as (typeof requests)[0]).message && (
+                      {(item.data as (typeof requests)[number]).message && (
                         <p className="bg-gray-light rounded-lg p-2 mt-1">
-                          {(item.data as (typeof requests)[0]).message}
+                          {(item.data as (typeof requests)[number]).message}
                         </p>
                       )}
                     </div>

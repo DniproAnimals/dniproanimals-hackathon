@@ -1,21 +1,16 @@
 "use client";
-import { apiClient, queryKeys } from "@/shared/query-client";
-import type { User } from "@dniproanimals/contracts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/shared/api-client";
+import type { OmitMutationOptions } from "@/shared/types/react-query";
+import { useMutation } from "@tanstack/react-query";
 
-interface Options {
-  onSuccess?: (user: User) => void;
-  onError?: (error: Error) => void;
-}
-
-export function useAcceptInviteMutation(options?: Options) {
-  const qc = useQueryClient();
+export const useAcceptInviteMutation = (
+  options: OmitMutationOptions<
+    typeof apiClient.volunteers.acceptInvite,
+    "mutationFn"
+  > = {},
+) => {
   return useMutation({
     mutationFn: apiClient.volunteers.acceptInvite,
-    onSuccess: async (user) => {
-      qc.setQueryData(queryKeys.auth.me, user);
-      await options?.onSuccess?.(user);
-    },
-    onError: options?.onError,
+    ...options,
   });
-}
+};

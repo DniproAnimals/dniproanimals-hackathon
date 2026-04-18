@@ -1,6 +1,14 @@
 "use client";
-import ImageFallback from "@/components/ImageFallback";
-import { cn } from "@/shared/lib/utils";
+import ImageFallback from "@/shared/components/ImageFallback";
+import {
+  useCreateVolunteerMutation,
+  useDeleteVolunteerMutation,
+  useUpdateVolunteerMutation,
+  useUploadImageMutation,
+  useVolunteersQuery,
+} from "@/shared/query-hooks";
+import type { Volunteer } from "@dniproanimals/contracts";
+import { endpoints } from "@dniproanimals/endpoints";
 import {
   IconBrandInstagram,
   IconBrandTelegram,
@@ -20,6 +28,7 @@ import {
   Badge,
   Button,
   Card,
+  cn,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -32,22 +41,9 @@ import {
   TabsTrigger,
   Textarea,
 } from "@dniproanimals/ui";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRef, useState } from "react";
 import { useDashboard } from "../layout";
-
-type Volunteer = {
-  id: number;
-  name: string;
-  surname: string | null;
-  photo: string | null;
-  description: string | null;
-  phone: string | null;
-  email: string | null;
-  instagram: string | null;
-  telegram: string | null;
-  user_id: number | null;
-  invite_token: string;
-};
 
 const emptyForm = {
   name: "",
@@ -61,65 +57,60 @@ const emptyForm = {
 };
 
 export default function VolunteersPage() {
+  const qc = useQueryClient();
   const { isOwner } = useDashboard();
-  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
+  const { data: volunteers = [] } = useVolunteersQuery();
+  const uploadMutation = useUploadImageMutation({
+    onSuccess: ({ url }) => setForm((prev) => ({ ...prev, photo: url })),
+  });
+  const createMutation = useCreateVolunteerMutation({
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: [endpoints.volunteers.list()] });
+      setForm(emptyForm);
+      setShowForm(false);
+      setEditingVol(null);
+    },
+  });
+  const updateMutation = useUpdateVolunteerMutation({
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: [endpoints.volunteers.list()] });
+      setForm(emptyForm);
+      setShowForm(false);
+      setEditingVol(null);
+    },
+  });
+  const deleteMutation = useDeleteVolunteerMutation({
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: [endpoints.volunteers.list()] });
+      setSelectedVol(null);
+    },
+  });
+
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "active" | "pending"
-  >("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "pending">(
+    "all",
+  );
   const [showForm, setShowForm] = useState(false);
   const [editingVol, setEditingVol] = useState<Volunteer | null>(null);
   const [selectedVol, setSelectedVol] = useState<Volunteer | null>(null);
   const [form, setForm] = useState(emptyForm);
-  const [submitting, setSubmitting] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-
-  const fetchVolunteers = useCallback(() => {
-    fetch("/api/volunteers")
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) setVolunteers(data);
-      });
-  }, []);
-
-  useEffect(() => {
-    fetchVolunteers();
-  }, [fetchVolunteers]);
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
-    if (res.ok) {
-      const { url } = await res.json();
-      setForm((prev) => ({ ...prev, photo: url }));
-    }
-    setUploading(false);
+    await uploadMutation.mutateAsync(file);
     if (fileRef.current) fileRef.current.value = "";
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    const isEdit = !!editingVol;
-    const body = isEdit ? { ...form, id: editingVol.id } : form;
-    const res = await fetch("/api/volunteers", {
-      method: isEdit ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    if (res.ok) {
-      setForm(emptyForm);
-      setShowForm(false);
-      setEditingVol(null);
-      fetchVolunteers();
+    if (editingVol) {
+      updateMutation.mutate({ id: editingVol.id, ...form });
+    } else {
+      createMutation.mutate(form);
     }
-    setSubmitting(false);
   };
 
   const openEdit = (vol: Volunteer) => {
@@ -143,20 +134,15 @@ export default function VolunteersPage() {
     setShowForm(true);
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = (id: number) => {
     if (!confirm("Видалити волонтера?")) return;
-    await fetch("/api/volunteers", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    setVolunteers((prev) => prev.filter((v) => v.id !== id));
-    setSelectedVol(null);
+    deleteMutation.mutate({ id });
   };
 
   const copyInviteLink = (vol: Volunteer) => {
+    if (!vol.inviteToken) return;
     navigator.clipboard.writeText(
-      `${window.location.origin}/invite?token=${vol.invite_token}`,
+      `${window.location.origin}/invite?token=${vol.inviteToken}`,
     );
     setCopiedId(vol.id);
     setTimeout(() => setCopiedId(null), 2000);
@@ -170,16 +156,16 @@ export default function VolunteersPage() {
         .includes(search.toLowerCase());
     const matchStatus =
       statusFilter === "all" ||
-      (statusFilter === "active" ? v.user_id : !v.user_id);
+      (statusFilter === "active" ? !!v.userId : !v.userId);
     return matchSearch && matchStatus;
   });
 
-  const activeCount = volunteers.filter((v) => v.user_id).length;
+  const activeCount = volunteers.filter((v) => v.userId).length;
   const pendingCount = volunteers.length - activeCount;
+  const submitting = createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className="max-w-5xl space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Волонтери</h1>
@@ -194,7 +180,6 @@ export default function VolunteersPage() {
         )}
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         {[
           {
@@ -233,7 +218,6 @@ export default function VolunteersPage() {
         ))}
       </div>
 
-      {/* Search */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex-1 min-w-50">
           <InputWithIcon icon={<IconSearch />}>
@@ -260,7 +244,6 @@ export default function VolunteersPage() {
         </Tabs>
       </div>
 
-      {/* Cards */}
       {filtered.length === 0 ? (
         <Card>
           <EmptyState
@@ -287,7 +270,6 @@ export default function VolunteersPage() {
               onClick={() => setSelectedVol(vol)}
               className="bg-white rounded-2xl border border-gray-border p-4 text-left hover:border-primary transition-all flex gap-4"
             >
-              {/* Avatar */}
               <div className="size-14 rounded-xl overflow-hidden shrink-0 bg-muted relative">
                 {vol.photo ? (
                   <ImageFallback
@@ -301,7 +283,7 @@ export default function VolunteersPage() {
                   <div
                     className={cn(
                       "w-full h-full flex items-center justify-center text-base font-bold",
-                      vol.user_id
+                      vol.userId
                         ? "bg-green-100 text-green-700"
                         : "bg-yellow-100 text-yellow-700",
                     )}
@@ -311,14 +293,13 @@ export default function VolunteersPage() {
                   </div>
                 )}
               </div>
-              {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
                   <p className="font-semibold text-sm truncate">
                     {vol.name}
                     {vol.surname ? ` ${vol.surname}` : ""}
                   </p>
-                  {vol.user_id ? (
+                  {vol.userId ? (
                     <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-green-600">
                       <IconCircleCheckFilled size={10} />
                       Активний
@@ -342,11 +323,6 @@ export default function VolunteersPage() {
                       {vol.phone}
                     </span>
                   )}
-                  {vol.instagram && (
-                    <span className="flex items-center gap-0.5">
-                      <IconBrandInstagram size={10} />@{vol.instagram}
-                    </span>
-                  )}
                 </div>
               </div>
             </button>
@@ -354,7 +330,6 @@ export default function VolunteersPage() {
         </div>
       )}
 
-      {/* Detail modal */}
       <Dialog
         open={!!selectedVol}
         onOpenChange={(open) => {
@@ -364,7 +339,6 @@ export default function VolunteersPage() {
         <DialogContent className="p-0 overflow-hidden">
           {selectedVol && (
             <>
-              {/* Header with photo */}
               <div className="relative h-20 bg-primary/30" />
               <div className="px-5 -mt-10 mb-4">
                 <div className="size-20 rounded-2xl overflow-hidden border-4 border-white shadow-sm bg-muted relative">
@@ -380,13 +354,12 @@ export default function VolunteersPage() {
                     <div
                       className={cn(
                         "w-full h-full flex items-center justify-center text-xl font-bold",
-                        selectedVol.user_id
+                        selectedVol.userId
                           ? "bg-green-100 text-green-700"
                           : "bg-yellow-100 text-yellow-700",
                       )}
                     >
                       {selectedVol.name.charAt(0)}
-                      {selectedVol.surname ? selectedVol.surname.charAt(0) : ""}
                     </div>
                   )}
                 </div>
@@ -397,7 +370,7 @@ export default function VolunteersPage() {
                     {selectedVol.name}
                     {selectedVol.surname ? ` ${selectedVol.surname}` : ""}
                   </h2>
-                  {selectedVol.user_id ? (
+                  {selectedVol.userId ? (
                     <Badge variant="success" size="sm">
                       Активний
                     </Badge>
@@ -413,7 +386,6 @@ export default function VolunteersPage() {
                   </p>
                 )}
 
-                {/* Contacts */}
                 {(selectedVol.phone ||
                   selectedVol.email ||
                   selectedVol.instagram ||
@@ -421,10 +393,7 @@ export default function VolunteersPage() {
                   <div className="space-y-2 mb-4">
                     {selectedVol.phone && (
                       <div className="flex items-center gap-2.5 text-sm">
-                        <IconPhoneFilled
-                          size={14}
-                          className="text-gray-medium"
-                        />
+                        <IconPhoneFilled size={14} className="text-gray-medium" />
                         <a
                           href={`tel:${selectedVol.phone}`}
                           className="hover:underline"
@@ -435,10 +404,7 @@ export default function VolunteersPage() {
                     )}
                     {selectedVol.email && (
                       <div className="flex items-center gap-2.5 text-sm">
-                        <IconMailFilled
-                          size={14}
-                          className="text-gray-medium"
-                        />
+                        <IconMailFilled size={14} className="text-gray-medium" />
                         <a
                           href={`mailto:${selectedVol.email}`}
                           className="hover:underline"
@@ -453,14 +419,7 @@ export default function VolunteersPage() {
                           size={14}
                           className="text-gray-medium"
                         />
-                        <a
-                          href={`https://instagram.com/${selectedVol.instagram}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:underline"
-                        >
-                          @{selectedVol.instagram}
-                        </a>
+                        <span>@{selectedVol.instagram}</span>
                       </div>
                     )}
                     {selectedVol.telegram && (
@@ -469,20 +428,12 @@ export default function VolunteersPage() {
                           size={14}
                           className="text-gray-medium"
                         />
-                        <a
-                          href={`https://t.me/${selectedVol.telegram}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:underline"
-                        >
-                          @{selectedVol.telegram}
-                        </a>
+                        <span>@{selectedVol.telegram}</span>
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* Actions */}
                 {isOwner && (
                   <div className="flex gap-2">
                     <Button
@@ -496,7 +447,7 @@ export default function VolunteersPage() {
                     >
                       <IconEdit size={14} /> Редагувати
                     </Button>
-                    {!selectedVol.user_id && (
+                    {!selectedVol.userId && selectedVol.inviteToken && (
                       <Button
                         variant="subtle"
                         size="lg"
@@ -525,7 +476,6 @@ export default function VolunteersPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Add/Edit modal */}
       <Dialog
         open={showForm}
         onOpenChange={(open) => {
@@ -542,7 +492,6 @@ export default function VolunteersPage() {
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-3">
-            {/* Photo */}
             <div className="flex items-center gap-4">
               <div className="size-16 rounded-xl overflow-hidden shrink-0 bg-muted relative">
                 {form.photo ? (
@@ -565,21 +514,12 @@ export default function VolunteersPage() {
                   onClick={() => fileRef.current?.click()}
                   className="text-sm font-medium text-green-secondary hover:underline"
                 >
-                  {uploading
+                  {uploadMutation.isPending
                     ? "Завантаження..."
                     : form.photo
                       ? "Змінити фото"
                       : "Додати фото"}
                 </button>
-                {form.photo && (
-                  <button
-                    type="button"
-                    onClick={() => setForm({ ...form, photo: "" })}
-                    className="block text-xs text-destructive mt-0.5"
-                  >
-                    Видалити
-                  </button>
-                )}
               </div>
               <input
                 ref={fileRef}
@@ -591,81 +531,59 @@ export default function VolunteersPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <p className="text-xs text-gray-medium mb-1">Ім&apos;я *</p>
-                <Input
-                  type="text"
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Ім'я"
-                />
-              </div>
-              <div>
-                <p className="text-xs text-gray-medium mb-1">Прізвище</p>
-                <Input
-                  type="text"
-                  value={form.surname}
-                  onChange={(e) =>
-                    setForm({ ...form, surname: e.target.value })
-                  }
-                  placeholder="Прізвище"
-                />
-              </div>
+              <Input
+                type="text"
+                required
+                placeholder="Ім'я *"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+              <Input
+                type="text"
+                placeholder="Прізвище"
+                value={form.surname}
+                onChange={(e) => setForm({ ...form, surname: e.target.value })}
+              />
             </div>
-            <div>
-              <p className="text-xs text-gray-medium mb-1">Опис / роль</p>
-              <Textarea
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-                rows={2}
-                placeholder="Чим займається"
+            <Textarea
+              value={form.description}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
+              rows={2}
+              placeholder="Чим займається"
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                type="tel"
+                placeholder="Телефон"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
+              <Input
+                type="email"
+                placeholder="Email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <p className="text-xs text-gray-medium mb-1">Телефон</p>
-                <Input
-                  type="tel"
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  placeholder="+380..."
-                />
-              </div>
-              <div>
-                <p className="text-xs text-gray-medium mb-1">Email</p>
-                <Input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <p className="text-xs text-gray-medium mb-1">Instagram</p>
-                <Input
-                  type="text"
-                  value={form.instagram}
-                  onChange={(e) =>
-                    setForm({ ...form, instagram: e.target.value })
-                  }
-                  placeholder="@username"
-                />
-              </div>
-              <div>
-                <p className="text-xs text-gray-medium mb-1">Telegram</p>
-                <Input
-                  type="text"
-                  value={form.telegram}
-                  onChange={(e) =>
-                    setForm({ ...form, telegram: e.target.value })
-                  }
-                  placeholder="@username"
-                />
-              </div>
+              <Input
+                type="text"
+                placeholder="Instagram"
+                value={form.instagram}
+                onChange={(e) =>
+                  setForm({ ...form, instagram: e.target.value })
+                }
+              />
+              <Input
+                type="text"
+                placeholder="Telegram"
+                value={form.telegram}
+                onChange={(e) =>
+                  setForm({ ...form, telegram: e.target.value })
+                }
+              />
             </div>
             <Button
               type="submit"

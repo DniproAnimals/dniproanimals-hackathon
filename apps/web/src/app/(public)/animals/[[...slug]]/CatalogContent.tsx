@@ -1,8 +1,14 @@
 "use client";
-import AnimalCard from "@/components/AnimalCard";
-import FilterBar from "@/components/FilterBar";
-import { useUser } from "@/shared/lib/UserContext";
-import type { Animal } from "@/shared/lib/db";
+import AnimalCard from "@/shared/components/AnimalCard";
+import FilterBar from "@/shared/components/FilterBar";
+import { useAnimalsQuery, useMeQuery } from "@/shared/query-hooks";
+import type {
+  Animal,
+  AnimalSex,
+  AnimalSize,
+  AnimalType,
+  ListAnimalsSort,
+} from "@dniproanimals/contracts";
 import {
   IconAdjustmentsHorizontal,
   IconPlus,
@@ -23,7 +29,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
-import { Suspense, useEffect, useState, useTransition } from "react";
+import { Suspense, useState } from "react";
 
 const typeValueToSlug: Record<string, string> = {
   dog: "dogs",
@@ -59,49 +65,41 @@ function CatalogInner({
   seoDescription,
 }: Props) {
   const router = useRouter();
-  const [fetchedAnimals, setFetchedAnimals] = useState<Animal[] | null>(null);
-  const [loading, startTransition] = useTransition();
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const { user } = useUser();
+  const { data: user } = useMeQuery();
 
   const [secondary, setSecondary] = useQueryStates(secondaryParsers);
 
-  // Build API query from all filters
-  const apiQuery = (() => {
-    const p = new URLSearchParams();
-    if (slugType) p.set("type", slugType);
-    if (slugSex) p.set("sex", slugSex);
-    if (slugSize) p.set("size", slugSize);
-    Object.entries(secondary).forEach(([k, v]) => {
-      if (v) p.set(k, v);
-    });
-    return p.toString();
-  })();
-
-  // Re-fetch when secondary filters change
   const hasSecondary = Object.values(secondary).some((v) => v != null);
 
-  const animals =
-    hasSecondary && fetchedAnimals ? fetchedAnimals : initialAnimals;
+  const { data: fetchedAnimals, isFetching } = useAnimalsQuery(
+    {
+      type: slugType ?? undefined,
+      sex: slugSex ?? undefined,
+      size: slugSize ?? undefined,
+      breed: secondary.breed ?? undefined,
+      color: secondary.color ?? undefined,
+      vaccinated:
+        secondary.vaccinated === "1" || secondary.vaccinated === "0"
+          ? (secondary.vaccinated as "0" | "1")
+          : undefined,
+      sterilized:
+        secondary.sterilized === "1" || secondary.sterilized === "0"
+          ? (secondary.sterilized as "0" | "1")
+          : undefined,
+      trained:
+        secondary.trained === "1" || secondary.trained === "0"
+          ? (secondary.trained as "0" | "1")
+          : undefined,
+      q: secondary.q ?? undefined,
+      sort: (secondary.sort as ListAnimalsSort | null) ?? undefined,
+    },
+    { enabled: hasSecondary, initialData: hasSecondary ? undefined : initialAnimals },
+  );
 
-  useEffect(() => {
-    if (!hasSecondary) return;
-    let cancelled = false;
-    startTransition(async () => {
-      try {
-        const r = await fetch(`/api/animals?${apiQuery}`);
-        const data = await r.json();
-        if (!cancelled) setFetchedAnimals(data);
-      } catch {
-        /* ignore */
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [apiQuery, hasSecondary]);
+  const animals = hasSecondary ? (fetchedAnimals ?? []) : initialAnimals;
+  const loading = hasSecondary && isFetching;
 
-  // Navigate to slug URL when type/sex/size change
   const handlePrimaryChange = (key: string, value: string | null) => {
     let t = slugType,
       s = slugSex,
@@ -110,18 +108,16 @@ function CatalogInner({
     if (key === "sex") s = s === value ? null : value;
     if (key === "size") sz = sz === value ? null : value;
 
-    // If type is deselected, also clear sex/size (they depend on type for slug)
     if (!t) {
       s = null;
       sz = null;
     }
 
     const parts: string[] = [];
-    if (t) parts.push(typeValueToSlug[t]);
-    if (s) parts.push(s);
-    if (sz) parts.push(sz);
+    if (t) parts.push(typeValueToSlug[t as AnimalType]!);
+    if (s) parts.push(s as AnimalSex);
+    if (sz) parts.push(sz as AnimalSize);
 
-    // Preserve secondary query params
     const query = new URLSearchParams(
       Object.entries(secondary).filter(([, v]) => v != null) as [
         string,
@@ -133,7 +129,6 @@ function CatalogInner({
     router.push(url, { scroll: false });
   };
 
-  // Mobile filter count
   let mobileFilterCount = 0;
   if (slugType) mobileFilterCount++;
   if (slugSex) mobileFilterCount++;

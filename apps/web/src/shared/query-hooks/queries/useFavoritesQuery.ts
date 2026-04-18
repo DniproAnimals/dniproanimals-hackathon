@@ -1,11 +1,18 @@
 "use client";
-import { apiClient, queryKeys } from "@/shared/query-client";
+import { apiClient } from "@/shared/api-client";
+import type { OmitQueryOptions } from "@/shared/types/react-query";
+import { endpoints } from "@dniproanimals/endpoints";
 import { useQuery } from "@tanstack/react-query";
 
-export function useFavoritesQuery(enabled = true) {
+export const useFavoritesQuery = (
+  options: OmitQueryOptions<
+    typeof apiClient.favorites.list,
+    "queryKey" | "queryFn"
+  > = {},
+) => {
   return useQuery({
-    queryKey: queryKeys.favorites.list,
+    queryKey: [endpoints.favorites.list()],
     queryFn: () => apiClient.favorites.list(),
-    enabled,
+    ...options,
   });
-}
+};

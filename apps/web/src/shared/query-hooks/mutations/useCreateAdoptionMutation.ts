@@ -1,11 +1,16 @@
 "use client";
-import { apiClient, queryKeys } from "@/shared/query-client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/shared/api-client";
+import type { OmitMutationOptions } from "@/shared/types/react-query";
+import { useMutation } from "@tanstack/react-query";
 
-export function useCreateAdoptionMutation() {
-  const qc = useQueryClient();
+export const useCreateAdoptionMutation = (
+  options: OmitMutationOptions<
+    typeof apiClient.adoption.create,
+    "mutationFn"
+  > = {},
+) => {
   return useMutation({
     mutationFn: apiClient.adoption.create,
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.adoption.all }),
+    ...options,
   });
-}
+};

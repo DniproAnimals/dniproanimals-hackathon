@@ -8,10 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "type-check": "tsc --noEmit",
-    "seed": "npx tsx scripts/seed.ts",
-    "db:drop": "npx tsx scripts/drop.ts",
-    "stripe": "stripe listen --forward-to localhost:3000/api/stripe/webhook"
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@dniproanimals/api-client": "*",
@@ -21,8 +18,6 @@
     "@dniproanimals/env": "*",
     "@dniproanimals/icons": "*",
     "@dniproanimals/ui": "*",
-    "@supabase/ssr": "^0.10.0",
-    "@supabase/supabase-js": "^2.101.1",
     "@tanstack/react-query": "^5.62.0",
     "motion": "^12.38.0",
     "next": "16.2.1",

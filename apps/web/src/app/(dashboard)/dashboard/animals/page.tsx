@@ -1,21 +1,17 @@
 "use client";
-import ImageFallback from "@/components/ImageFallback";
-import { cn } from "@/shared/lib/utils";
-import { IconChevronDown, IconPhoto, IconX } from "@dniproanimals/icons";
+import ImageFallback from "@/shared/components/ImageFallback";
+import {
+  useAnimalsQuery,
+  useDeleteAnimalMutation,
+} from "@/shared/query-hooks";
+import type { AnimalStatus, AnimalType } from "@dniproanimals/contracts";
+import { endpoints } from "@dniproanimals/endpoints";
 import {
   Badge,
   Button,
   Card,
-  Checkbox,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
   EmptyState,
   Input,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
   Select,
   SelectContent,
   SelectItem,
@@ -27,153 +23,37 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Textarea,
 } from "@dniproanimals/ui";
+import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useDashboard } from "../layout";
 
-const colorOptions = [
-  { value: "Білий", color: "#ffffff" },
-  { value: "Чорний", color: "#1a1a1a" },
-  { value: "Сірий", color: "#9e9e9e" },
-  { value: "Рудий", color: "#c45e1a" },
-  { value: "Коричневий", color: "#6d4c2e" },
-  { value: "Золотистий", color: "#d4a017" },
-  { value: "Кремовий", color: "#f5deb3" },
-  { value: "Тигровий", color: "#8B6914" },
-  {
-    value: "Чорно-білий",
-    color: "linear-gradient(135deg, #1a1a1a 50%, #fff 50%)",
-  },
-];
-
-type Animal = {
-  id: number;
-  name: string;
-  type: "dog" | "cat" | "other";
-  breed: string | null;
-  sex: "male" | "female" | null;
-  age_months: number | null;
-  size: "small" | "medium" | "large" | null;
-  status: "available" | "adopted" | "reserved";
-  photos: string;
-  created_at: string;
-};
-
-const emptyForm = {
-  name: "",
-  description: "",
-  type: "dog" as string,
-  breed: "",
-  sex: "",
-  age_months: "",
-  weight_kg: "",
-  size: "",
-  color: "",
-  vaccinated: false,
-  sterilized: false,
-  trained: false,
-  photos: "[]",
-  status: "available",
-  contact_name: "",
-  contact_phone: "",
-  contact_email: "",
-  contact_instagram: "",
-  contact_telegram: "",
-  contact_facebook: "",
-  contact_location: "",
-};
-
 export default function AnimalsPage() {
+  const qc = useQueryClient();
   const { org } = useDashboard();
-  const [animals, setAnimals] = useState<Animal[]>([]);
   const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [form, setForm] = useState(emptyForm);
-  const [submitting, setSubmitting] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [typeFilter, setTypeFilter] = useState<AnimalType | "">("");
+  const [statusFilter, setStatusFilter] = useState<AnimalStatus | "">("");
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    setUploading(true);
-    const currentPhotos: string[] = JSON.parse(form.photos || "[]");
-    for (const file of Array.from(files)) {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      if (res.ok) {
-        const { url } = await res.json();
-        currentPhotos.push(url);
-      }
-    }
-    setForm((prev) => ({ ...prev, photos: JSON.stringify(currentPhotos) }));
-    setUploading(false);
-    if (fileRef.current) fileRef.current.value = "";
-  };
+  const { data: animals = [] } = useAnimalsQuery(
+    {
+      orgId: org?.id,
+      type: typeFilter || undefined,
+      status: statusFilter || undefined,
+      q: search || undefined,
+    },
+    { enabled: !!org?.id },
+  );
 
-  const toggleColor = (value: string) => {
-    const next = selectedColors.includes(value)
-      ? selectedColors.filter((c) => c !== value)
-      : [...selectedColors, value];
-    setSelectedColors(next);
-    setForm((prev) => ({ ...prev, color: next.join(", ") }));
-  };
+  const deleteMut = useDeleteAnimalMutation({
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: [endpoints.animals.list()] }),
+  });
 
-  const fetchAnimals = useCallback(() => {
-    if (!org) return;
-    const params = new URLSearchParams();
-    params.set("org_id", String(org.id));
-    if (typeFilter) params.set("type", typeFilter);
-    if (statusFilter) params.set("status", statusFilter);
-    if (search) params.set("q", search);
-    fetch(`/api/animals?${params}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) setAnimals(data);
-      });
-  }, [org, typeFilter, statusFilter, search]);
-
-  useEffect(() => {
-    fetchAnimals();
-  }, [fetchAnimals]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    const body = {
-      ...form,
-      age_months: form.age_months ? Number(form.age_months) : null,
-      weight_kg: form.weight_kg ? Number(form.weight_kg) : null,
-      photos: JSON.parse(form.photos || "[]"),
-    };
-    const url = editingId ? `/api/animals/${editingId}` : "/api/animals";
-    const method = editingId ? "PUT" : "POST";
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    if (res.ok) {
-      setShowForm(false);
-      setEditingId(null);
-      setForm(emptyForm);
-      fetchAnimals();
-    }
-    setSubmitting(false);
-  };
-
-  const handleDelete = async (id: number) => {
+  const handleDelete = (id: number) => {
     if (!confirm("Видалити тварину?")) return;
-    const res = await fetch(`/api/animals/${id}`, { method: "DELETE" });
-    if (res.ok) setAnimals((prev) => prev.filter((a) => a.id !== id));
+    deleteMut.mutate(id);
   };
 
   const typeLabel = (t: string) =>
@@ -189,15 +69,6 @@ export default function AnimalsPage() {
   const sexLabel = (s: string | null) =>
     s === "male" ? "Хлопчик" : s === "female" ? "Дівчинка" : "";
 
-  const getPhoto = (photos: string) => {
-    try {
-      const arr = JSON.parse(photos);
-      return Array.isArray(arr) && arr.length > 0 ? arr[0] : null;
-    } catch {
-      return null;
-    }
-  };
-
   return (
     <div className="max-w-5xl">
       <div className="flex items-center justify-between mb-6">
@@ -207,7 +78,6 @@ export default function AnimalsPage() {
         </Button>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <Input
           type="text"
@@ -218,7 +88,9 @@ export default function AnimalsPage() {
         />
         <Select
           value={typeFilter || "all"}
-          onValueChange={(v) => setTypeFilter(v === "all" ? "" : v)}
+          onValueChange={(v) =>
+            setTypeFilter(v === "all" ? "" : (v as AnimalType))
+          }
         >
           <SelectTrigger className="bg-white w-auto">
             <SelectValue placeholder="Усі види" />
@@ -232,7 +104,9 @@ export default function AnimalsPage() {
         </Select>
         <Select
           value={statusFilter || "all"}
-          onValueChange={(v) => setStatusFilter(v === "all" ? "" : v)}
+          onValueChange={(v) =>
+            setStatusFilter(v === "all" ? "" : (v as AnimalStatus))
+          }
         >
           <SelectTrigger className="bg-white w-auto">
             <SelectValue placeholder="Усі статуси" />
@@ -249,7 +123,6 @@ export default function AnimalsPage() {
         </span>
       </div>
 
-      {/* Table */}
       {animals.length === 0 ? (
         <Card>
           <EmptyState title="Немає тварин" />
@@ -268,9 +141,9 @@ export default function AnimalsPage() {
             </TableHeader>
             <TableBody>
               {animals.map((a) => {
-                const photo = getPhoto(a.photos);
+                const photo = a.photos[0];
                 return (
-                  <TableRow key={a.id} className="cursor-pointer">
+                  <TableRow key={a.id}>
                     <TableCell>
                       <Link
                         href={`/animals/${a.id}`}
@@ -328,11 +201,7 @@ export default function AnimalsPage() {
                           variant="ghost"
                           size="sm"
                           className="text-xs text-destructive hover:bg-red-50"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            event.preventDefault();
-                            handleDelete(a.id);
-                          }}
+                          onClick={() => handleDelete(a.id)}
                         >
                           Видалити
                         </Button>
@@ -345,299 +214,6 @@ export default function AnimalsPage() {
           </Table>
         </Card>
       )}
-
-      {/* Quick add/edit modal */}
-      <Dialog
-        open={showForm}
-        onOpenChange={(open) => {
-          if (!open) {
-            setShowForm(false);
-            setEditingId(null);
-          } else {
-            setShowForm(true);
-          }
-        }}
-      >
-        <DialogContent hideClose className="p-0 overflow-hidden">
-          <DialogHeader className="bg-primary px-5 py-4 flex flex-row items-center justify-between space-y-0">
-            <DialogTitle>
-              {editingId ? "Редагувати тварину" : "Додати тварину"}
-            </DialogTitle>
-            <button
-              type="button"
-              onClick={() => {
-                setShowForm(false);
-                setEditingId(null);
-              }}
-              className="text-foreground/60 hover:text-foreground"
-            >
-              <IconX size={20} />
-            </button>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="p-5 space-y-3">
-            {/* Photos */}
-            <div>
-              <p className="text-xs text-gray-medium mb-1">Фото</p>
-              <div className="flex items-center gap-2 flex-wrap">
-                {(() => {
-                  try {
-                    const arr = JSON.parse(form.photos || "[]");
-                    return Array.isArray(arr) ? arr : [];
-                  } catch {
-                    return [];
-                  }
-                })().map((url: string, i: number) => (
-                  <div
-                    key={i}
-                    className="relative size-14 rounded-lg overflow-hidden group"
-                  >
-                    <ImageFallback
-                      src={url}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="56px"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const arr = JSON.parse(form.photos || "[]");
-                        arr.splice(i, 1);
-                        setForm({ ...form, photos: JSON.stringify(arr) });
-                      }}
-                      className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-sm"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => fileRef.current?.click()}
-                  className="size-14 rounded-lg border-2 border-dashed border-gray-border flex items-center justify-center hover:border-primary hover:bg-primary/5 transition-colors"
-                >
-                  <IconPhoto size={18} className="text-gray-medium" />
-                </button>
-              </div>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                multiple
-                onChange={handlePhotoUpload}
-                className="hidden"
-              />
-              {uploading && (
-                <p className="text-[11px] text-gray-medium mt-1">
-                  Завантаження...
-                </p>
-              )}
-            </div>
-
-            <div>
-              <p className="text-xs text-gray-medium mb-1">Ім&apos;я *</p>
-              <Input
-                type="text"
-                required
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Ім'я тварини"
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <div>
-                <p className="text-xs text-gray-medium mb-1">Вид *</p>
-                <Select
-                  value={form.type}
-                  onValueChange={(v) => setForm({ ...form, type: v })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="dog">🐕 Собака</SelectItem>
-                    <SelectItem value="cat">🐈 Кіт</SelectItem>
-                    <SelectItem value="other">🐾 Інше</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <p className="text-xs text-gray-medium mb-1">Стать</p>
-                <Select
-                  value={form.sex || "none"}
-                  onValueChange={(v) =>
-                    setForm({ ...form, sex: v === "none" ? "" : v })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">—</SelectItem>
-                    <SelectItem value="male">Хлопчик</SelectItem>
-                    <SelectItem value="female">Дівчинка</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <p className="text-xs text-gray-medium mb-1">Розмір</p>
-                <Select
-                  value={form.size || "none"}
-                  onValueChange={(v) =>
-                    setForm({ ...form, size: v === "none" ? "" : v })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">—</SelectItem>
-                    <SelectItem value="small">Малий</SelectItem>
-                    <SelectItem value="medium">Середній</SelectItem>
-                    <SelectItem value="large">Великий</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div>
-              <p className="text-xs text-gray-medium mb-1">Порода</p>
-              <Input
-                type="text"
-                value={form.breed}
-                onChange={(e) => setForm({ ...form, breed: e.target.value })}
-                placeholder="Мікс"
-              />
-            </div>
-
-            {/* Color picker */}
-            <div>
-              <p className="text-xs text-gray-medium mb-1">Колір</p>
-              <Popover open={showColorPicker} onOpenChange={setShowColorPicker}>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className="w-full h-10 px-4 rounded-xl border border-gray-border bg-gray-light text-sm text-left flex items-center justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
-                  >
-                    {selectedColors.length > 0 ? (
-                      <span className="flex items-center gap-1.5 flex-wrap">
-                        {selectedColors.map((c) => {
-                          const opt = colorOptions.find((o) => o.value === c);
-                          return (
-                            <span
-                              key={c}
-                              className="flex items-center gap-1 text-xs"
-                            >
-                              <span
-                                className="size-3 rounded-full border border-gray-border shrink-0"
-                                style={{ background: opt?.color || "#ccc" }}
-                              />
-                              {c}
-                            </span>
-                          );
-                        })}
-                      </span>
-                    ) : (
-                      <span className="text-gray-medium">Оберіть колір</span>
-                    )}
-                    <IconChevronDown
-                      size={14}
-                      className={cn(
-                        "text-gray-medium transition-transform",
-                        showColorPicker && "rotate-180",
-                      )}
-                    />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  align="start"
-                  className="w-(--radix-popover-trigger-width) p-1 max-h-48 overflow-auto"
-                >
-                  {colorOptions.map((c) => {
-                    const sel = selectedColors.includes(c.value);
-                    const isG = c.color.includes("gradient");
-                    return (
-                      <button
-                        key={c.value}
-                        type="button"
-                        onClick={() => toggleColor(c.value)}
-                        className="w-full flex items-center justify-between px-3 py-2 text-xs hover:bg-muted rounded-lg"
-                      >
-                        <span className="flex items-center gap-2">
-                          <span
-                            className="size-4 rounded-full border border-gray-border shrink-0"
-                            style={
-                              isG
-                                ? { background: c.color }
-                                : { backgroundColor: c.color }
-                            }
-                          />
-                          <span className={sel ? "font-medium" : ""}>
-                            {c.value}
-                          </span>
-                        </span>
-                        {sel && (
-                          <span className="text-primary font-bold">✓</span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </PopoverContent>
-              </Popover>
-            </div>
-            <div>
-              <p className="text-xs text-gray-medium mb-1">Опис</p>
-              <Textarea
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-                rows={2}
-                placeholder="Характер, особливості..."
-              />
-            </div>
-            <div className="flex gap-3">
-              <label
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-xl border text-xs cursor-pointer transition-colors",
-                  form.vaccinated
-                    ? "bg-primary/20 border-primary"
-                    : "border-gray-border",
-                )}
-              >
-                <Checkbox
-                  checked={form.vaccinated}
-                  onCheckedChange={(v) => setForm({ ...form, vaccinated: !!v })}
-                  className="size-4"
-                />
-                <span>💉 Вакциновано</span>
-              </label>
-              <label
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-xl border text-xs cursor-pointer transition-colors",
-                  form.sterilized
-                    ? "bg-primary/20 border-primary"
-                    : "border-gray-border",
-                )}
-              >
-                <Checkbox
-                  checked={form.sterilized}
-                  onCheckedChange={(v) => setForm({ ...form, sterilized: !!v })}
-                  className="size-4"
-                />
-                <span>✂️ Стерилізовано</span>
-              </label>
-            </div>
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={submitting}
-              className="w-full"
-            >
-              {submitting ? "Зачекайте..." : editingId ? "Зберегти" : "Додати"}
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

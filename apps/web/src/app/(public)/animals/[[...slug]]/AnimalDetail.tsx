@@ -1,8 +1,14 @@
 "use client";
-import ImageFallback from "@/components/ImageFallback";
-import { useUser } from "@/shared/lib/UserContext";
-import type { Animal } from "@/shared/lib/db";
-import { cn } from "@/shared/lib/utils";
+import ImageFallback from "@/shared/components/ImageFallback";
+import {
+  useAnimalQuery,
+  useCreateAdoptionMutation,
+  useDeleteAnimalMutation,
+  useFavoritesQuery,
+  useMeQuery,
+  useToggleFavoriteMutation,
+} from "@/shared/query-hooks";
+import { endpoints } from "@dniproanimals/endpoints";
 import {
   IconBook,
   IconBrandFacebook,
@@ -33,6 +39,7 @@ import {
 import {
   Badge,
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -45,10 +52,11 @@ import {
   PopoverTrigger,
   Textarea,
 } from "@dniproanimals/ui";
+import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function getAgeLabel(months: number | null): string {
   if (!months) return "Невідомо";
@@ -73,43 +81,43 @@ function getTypeLabel(type: string): string {
   return "Інше";
 }
 
-// Maps common color names to CSS colors for the circle
 const colorMap: Record<string, string> = {
   білий: "#ffffff",
   чорний: "#1a1a1a",
   рудий: "#c45e1a",
   сірий: "#9e9e9e",
   коричневий: "#6d4c2e",
-  рижий: "#d4762c",
-  кремовий: "#f5deb3",
-  золотий: "#d4a017",
-  триколірний:
-    "linear-gradient(135deg, #1a1a1a 33%, #c45e1a 33%, #c45e1a 66%, #fff 66%)",
-  "чорно-білий": "linear-gradient(135deg, #1a1a1a 50%, #fff 50%)",
-  тигровий: "#8B6914",
-  плямистий: "linear-gradient(135deg, #fff 40%, #6d4c2e 40%)",
-  white: "#ffffff",
-  black: "#1a1a1a",
-  brown: "#6d4c2e",
-  golden: "#d4a017",
-  gray: "#9e9e9e",
-  grey: "#9e9e9e",
-  red: "#c45e1a",
-  cream: "#f5deb3",
-  orange: "#d4762c",
 };
 
 function getColorStyle(color: string): string {
-  const lower = color.toLowerCase().trim();
-  return colorMap[lower] || "#ced48c";
+  return colorMap[color.toLowerCase().trim()] || "#ced48c";
 }
 
 export default function AnimalDetailPage({ id }: { id: string }) {
   const router = useRouter();
-  const [animal, setAnimal] = useState<Animal | null>(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const animalId = Number(id);
+  const { data, isLoading: loading } = useAnimalQuery(animalId, {
+    enabled: !!animalId,
+  });
+  const animal = data ?? null;
+  const org = data?.org ?? null;
+  const { data: user } = useMeQuery();
+  const { data: favorites } = useFavoritesQuery({ enabled: !!user });
+  const toggleFavMut = useToggleFavoriteMutation();
+  const deleteMut = useDeleteAnimalMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [endpoints.animals.list()] });
+      router.push("/");
+    },
+  });
+  const adoptionMut = useCreateAdoptionMutation({
+    onSuccess: () => setSubmitted(true),
+  });
+
   const [activePhoto, setActivePhoto] = useState(0);
   const [showAdoptForm, setShowAdoptForm] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -120,44 +128,15 @@ export default function AnimalDetailPage({ id }: { id: string }) {
     location: "",
     message: "",
   });
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [visibleContacts, setVisibleContacts] = useState<string[]>(["email"]);
   const [addContactOpen, setAddContactOpen] = useState(false);
-  const [org, setOrg] = useState<{
-    id: number;
-    name: string;
-    photo: string | null;
-    location: string | null;
-  } | null>(null);
-  const { user, favoriteIds, toggleFavorite } = useUser();
-  const isFav = animal ? favoriteIds.includes(animal.id) : false;
 
-  useEffect(() => {
-    fetch(`/api/animals/${id}`)
-      .then((r) => {
-        if (!r.ok) throw new Error();
-        return r.json();
-      })
-      .then((data) => {
-        const { org: orgData, ...animalData } = data;
-        setAnimal(animalData);
-        if (orgData) setOrg(orgData);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [id]);
+  const isFav = animal ? (favorites ?? []).some((f) => f.id === animal.id) : false;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    const res = await fetch("/api/adoption", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ animal_id: Number(id), ...formData }),
-    });
-    if (res.ok) setSubmitted(true);
-    setSubmitting(false);
+    if (!animal) return;
+    adoptionMut.mutate({ animalId: animal.id, ...formData });
   };
 
   if (loading) {
@@ -194,13 +173,12 @@ export default function AnimalDetailPage({ id }: { id: string }) {
     );
   }
 
-  const photos: string[] = JSON.parse(animal.photos || "[]");
+  const photos: string[] = animal.photos ?? [];
   const colorStyle = animal.color ? getColorStyle(animal.color) : null;
   const isGradient = colorStyle?.includes("gradient");
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-6 pb-24 md:pb-10">
-      {/* Back */}
       <Button
         variant="ghost"
         size="sm"
@@ -212,7 +190,6 @@ export default function AnimalDetailPage({ id }: { id: string }) {
       </Button>
 
       <div className="md:grid md:grid-cols-2 md:gap-10">
-        {/* Photos */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
@@ -222,7 +199,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
             <>
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-light group/photo">
                 <ImageFallback
-                  src={photos[activePhoto]}
+                  src={photos[activePhoto]!}
                   alt={animal.name}
                   fill
                   className="object-cover"
@@ -232,7 +209,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                 {photos.length > 1 && (
                   <>
                     <Button
-                      type="button"
+                      
                       variant="ghost"
                       size="icon"
                       shape="pill"
@@ -246,7 +223,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                       <IconChevronLeft size={18} color="#1a1a1a" stroke={2.5} />
                     </Button>
                     <Button
-                      type="button"
+                      
                       variant="ghost"
                       size="icon"
                       shape="pill"
@@ -294,15 +271,10 @@ export default function AnimalDetailPage({ id }: { id: string }) {
             </>
           ) : (
             <div className="aspect-square rounded-2xl bg-gray-light flex items-center justify-center text-7xl">
-              {animal.type === "dog"
-                ? "🐕"
-                : animal.type === "cat"
-                  ? "🐈"
-                  : "🐾"}
+              {animal.type === "dog" ? "🐕" : animal.type === "cat" ? "🐈" : "🐾"}
             </div>
           )}
 
-          {/* Description — under photos */}
           {animal.description && (
             <div className="mt-5">
               <h2 className="text-sm font-semibold mb-2">Інформація</h2>
@@ -313,14 +285,12 @@ export default function AnimalDetailPage({ id }: { id: string }) {
           )}
         </motion.div>
 
-        {/* Info */}
         <motion.div
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
           className="mt-6 md:mt-0"
         >
-          {/* Name + adopt button */}
           <div className="flex items-center justify-between gap-3 mb-1">
             <div className="flex items-center gap-2.5">
               <h1 className="text-2xl md:text-3xl font-bold text-foreground">
@@ -336,10 +306,10 @@ export default function AnimalDetailPage({ id }: { id: string }) {
               </span>
               {user && (
                 <Button
-                  type="button"
+                  
                   variant="ghost"
                   size="icon-sm"
-                  onClick={() => toggleFavorite(animal.id)}
+                  onClick={() => toggleFavMut.mutate({ animalId: animal.id })}
                   aria-label={
                     isFav ? "Прибрати з обраного" : "Додати до обраного"
                   }
@@ -369,12 +339,9 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    onClick={async () => {
+                    onClick={() => {
                       if (!confirm("Видалити цю тварину?")) return;
-                      const res = await fetch(`/api/animals/${animal.id}`, {
-                        method: "DELETE",
-                      });
-                      if (res.ok) router.push("/");
+                      deleteMut.mutate(animal.id);
                     }}
                     className="bg-red-50 text-red-600 hover:bg-red-100"
                     title="Видалити"
@@ -387,7 +354,6 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                 !showAdoptForm &&
                 !submitted && (
                   <Button
-                    type="button"
                     variant="primary"
                     size="md"
                     onClick={() => setShowAdoptForm(true)}
@@ -413,7 +379,6 @@ export default function AnimalDetailPage({ id }: { id: string }) {
             {animal.breed || "Мікс порід"}
           </p>
 
-          {/* Metadata — list */}
           <div className="divide-y divide-gray-border mb-6">
             <div className="flex items-center gap-2.5 py-3">
               <IconPaw size={16} className="text-gray-400 shrink-0" />
@@ -433,18 +398,22 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                 </span>
               </div>
             )}
-            <div className="flex items-center gap-2.5 py-3">
-              <IconUser size={16} className="text-gray-400 shrink-0" />
-              <span className="text-sm font-medium text-foreground">Стать</span>
-              <span className="text-sm text-gray-medium ml-auto">
-                {animal.sex === "male" ? "Хлопчик" : "Дівчинка"}
-              </span>
-            </div>
+            {animal.sex && (
+              <div className="flex items-center gap-2.5 py-3">
+                <IconUser size={16} className="text-gray-400 shrink-0" />
+                <span className="text-sm font-medium text-foreground">
+                  Стать
+                </span>
+                <span className="text-sm text-gray-medium ml-auto">
+                  {animal.sex === "male" ? "Хлопчик" : "Дівчинка"}
+                </span>
+              </div>
+            )}
             <div className="flex items-center gap-2.5 py-3">
               <IconCalendar size={16} className="text-gray-400 shrink-0" />
               <span className="text-sm font-medium text-foreground">Вік</span>
               <span className="text-sm text-gray-medium ml-auto">
-                {getAgeLabel(animal.age_months)}
+                {getAgeLabel(animal.ageMonths)}
               </span>
             </div>
             <div className="flex items-center gap-2.5 py-3">
@@ -456,14 +425,14 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                 {getSizeLabel(animal.size)}
               </span>
             </div>
-            {animal.weight_kg && (
+            {animal.weightKg && (
               <div className="flex items-center gap-2.5 py-3">
                 <IconWeight size={16} className="text-gray-400 shrink-0" />
                 <span className="text-sm font-medium text-foreground">
                   Вага
                 </span>
                 <span className="text-sm text-gray-medium ml-auto">
-                  {animal.weight_kg} кг
+                  {animal.weightKg} кг
                 </span>
               </div>
             )}
@@ -515,7 +484,6 @@ export default function AnimalDetailPage({ id }: { id: string }) {
             </div>
           </div>
 
-          {/* Organization */}
           {org && (
             <div className="mb-6">
               <h2 className="text-sm font-semibold mb-3">Організація</h2>
@@ -557,96 +525,95 @@ export default function AnimalDetailPage({ id }: { id: string }) {
             </div>
           )}
 
-          {/* Contact info */}
-          {(animal.contact_name ||
-            animal.contact_phone ||
-            animal.contact_email ||
-            animal.contact_instagram ||
-            animal.contact_telegram ||
-            animal.contact_facebook ||
-            animal.contact_location) && (
+          {(animal.contactName ||
+            animal.contactPhone ||
+            animal.contactEmail ||
+            animal.contactInstagram ||
+            animal.contactTelegram ||
+            animal.contactFacebook ||
+            animal.contactLocation) && (
             <div className="mb-6">
               <h2 className="text-sm font-semibold mb-3">Контакти</h2>
               <div className="space-y-2.5">
-                {animal.contact_name && (
+                {animal.contactName && (
                   <div className="flex items-center gap-2.5 text-sm">
                     <IconUser size={16} className="text-gray-400 shrink-0" />
                     <span className="text-foreground font-medium">
-                      {animal.contact_name}
+                      {animal.contactName}
                     </span>
                   </div>
                 )}
-                {animal.contact_phone && (
+                {animal.contactPhone && (
                   <div className="flex items-center gap-2.5 text-sm">
                     <IconPhone size={16} className="text-gray-400 shrink-0" />
                     <a
-                      href={`tel:${animal.contact_phone}`}
+                      href={`tel:${animal.contactPhone}`}
                       className="text-foreground hover:underline"
                     >
-                      {animal.contact_phone}
+                      {animal.contactPhone}
                     </a>
                   </div>
                 )}
-                {animal.contact_email && (
+                {animal.contactEmail && (
                   <div className="flex items-center gap-2.5 text-sm">
                     <IconMail size={16} className="text-gray-400 shrink-0" />
                     <a
-                      href={`mailto:${animal.contact_email}`}
+                      href={`mailto:${animal.contactEmail}`}
                       className="text-foreground hover:underline"
                     >
-                      {animal.contact_email}
+                      {animal.contactEmail}
                     </a>
                   </div>
                 )}
-                {animal.contact_instagram && (
+                {animal.contactInstagram && (
                   <div className="flex items-center gap-2.5 text-sm">
                     <IconBrandInstagram
                       size={16}
                       className="text-gray-400 shrink-0"
                     />
                     <a
-                      href={`https://instagram.com/${animal.contact_instagram}`}
+                      href={`https://instagram.com/${animal.contactInstagram}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-foreground hover:underline"
                     >
-                      @{animal.contact_instagram}
+                      @{animal.contactInstagram}
                     </a>
                   </div>
                 )}
-                {animal.contact_telegram && (
+                {animal.contactTelegram && (
                   <div className="flex items-center gap-2.5 text-sm">
                     <IconBrandTelegram
                       size={16}
                       className="text-gray-400 shrink-0"
                     />
                     <a
-                      href={`https://t.me/${animal.contact_telegram}`}
+                      href={`https://t.me/${animal.contactTelegram}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-foreground hover:underline"
                     >
-                      @{animal.contact_telegram}
+                      @{animal.contactTelegram}
                     </a>
                   </div>
                 )}
-                {animal.contact_facebook && (
+                {animal.contactFacebook && (
                   <div className="flex items-center gap-2.5 text-sm">
                     <IconBrandFacebook
                       size={16}
                       className="text-gray-400 shrink-0"
                     />
                     <a
-                      href={`https://facebook.com/${animal.contact_facebook}`}
+                      href={`https://facebook.com/${animal.contactFacebook}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-foreground hover:underline"
                     >
-                      {animal.contact_facebook}
+                      {animal.contactFacebook}
                     </a>
                   </div>
                 )}
-                {animal.contact_location && (
+                {animal.contactLocation && (
                   <div className="pt-1">
                     <div className="flex items-center gap-2.5 text-sm mb-2">
                       <IconMapPin
@@ -654,34 +621,14 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                         className="text-gray-400 shrink-0"
                       />
                       <a
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(animal.contact_location)}`}
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(animal.contactLocation)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-foreground hover:underline"
                       >
-                        {animal.contact_location}
+                        {animal.contactLocation}
                       </a>
                     </div>
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(animal.contact_location)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block rounded-xl overflow-hidden border border-gray-border hover:border-primary transition-colors"
-                    >
-                      <iframe
-                        title="Карта"
-                        width="100%"
-                        height="120"
-                        style={{ border: 0, pointerEvents: "none" }}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        src={`https://maps.google.com/maps?q=${encodeURIComponent(animal.contact_location)}&output=embed&z=13`}
-                      />
-                      <div className="px-3 py-1.5 flex items-center gap-1.5 text-xs text-gray-medium">
-                        <IconMapPin size={12} />
-                        Відкрити в Google Maps
-                      </div>
-                    </a>
                   </div>
                 )}
               </div>
@@ -690,7 +637,6 @@ export default function AnimalDetailPage({ id }: { id: string }) {
         </motion.div>
       </div>
 
-      {/* Adopt form — modal */}
       <Dialog
         open={showAdoptForm && !submitted}
         onOpenChange={(open) => {
@@ -705,7 +651,6 @@ export default function AnimalDetailPage({ id }: { id: string }) {
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-3">
-            {/* Name */}
             <InputWithIcon icon={<IconUser size={16} />}>
               <Input
                 type="text"
@@ -717,8 +662,6 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                 }
               />
             </InputWithIcon>
-
-            {/* Phone */}
             <InputWithIcon icon={<IconPhone size={16} />}>
               <Input
                 type="tel"
@@ -730,8 +673,6 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                 }
               />
             </InputWithIcon>
-
-            {/* Місто */}
             <InputWithIcon icon={<IconMapPin size={16} />}>
               <Input
                 type="text"
@@ -742,7 +683,6 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                 }
               />
             </InputWithIcon>
-
             <Textarea
               placeholder="Розкажіть про себе та умови утримання... *"
               rows={3}
@@ -753,7 +693,6 @@ export default function AnimalDetailPage({ id }: { id: string }) {
               }
             />
 
-            {/* Dynamic extra contact fields */}
             {visibleContacts.map((type) => (
               <div key={type} className="relative animate-modal-in">
                 {type === "email" && (
@@ -809,7 +748,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                   </InputWithIcon>
                 )}
                 <Button
-                  type="button"
+                  
                   variant="ghost"
                   size="icon-sm"
                   onClick={() =>
@@ -824,12 +763,10 @@ export default function AnimalDetailPage({ id }: { id: string }) {
               </div>
             ))}
 
-            {/* Add contact button */}
             {visibleContacts.length < 4 && (
               <Popover open={addContactOpen} onOpenChange={setAddContactOpen}>
                 <PopoverTrigger asChild>
                   <Button
-                    type="button"
                     variant="ghost"
                     size="sm"
                     className="flex items-center gap-1.5 text-[13px] text-gray-medium hover:text-foreground font-normal -ml-3"
@@ -839,57 +776,22 @@ export default function AnimalDetailPage({ id }: { id: string }) {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="start" className="w-48 p-1">
-                  {!visibleContacts.includes("email") && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setVisibleContacts([...visibleContacts, "email"]);
-                        setAddContactOpen(false);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light rounded-lg transition-colors"
-                    >
-                      <IconMail size={14} className="text-gray-400" />
-                      Email
-                    </button>
-                  )}
-                  {!visibleContacts.includes("instagram") && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setVisibleContacts([...visibleContacts, "instagram"]);
-                        setAddContactOpen(false);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light rounded-lg transition-colors"
-                    >
-                      <IconBrandInstagram size={14} className="text-gray-400" />
-                      Instagram
-                    </button>
-                  )}
-                  {!visibleContacts.includes("telegram") && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setVisibleContacts([...visibleContacts, "telegram"]);
-                        setAddContactOpen(false);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light rounded-lg transition-colors"
-                    >
-                      <IconBrandTelegram size={14} className="text-gray-400" />
-                      Telegram
-                    </button>
-                  )}
-                  {!visibleContacts.includes("facebook") && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setVisibleContacts([...visibleContacts, "facebook"]);
-                        setAddContactOpen(false);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light rounded-lg transition-colors"
-                    >
-                      <IconBrandFacebook size={14} className="text-gray-400" />
-                      Facebook
-                    </button>
+                  {(
+                    ["email", "instagram", "telegram", "facebook"] as const
+                  ).map((t) =>
+                    visibleContacts.includes(t) ? null : (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => {
+                          setVisibleContacts([...visibleContacts, t]);
+                          setAddContactOpen(false);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-gray-light rounded-lg transition-colors"
+                      >
+                        {t}
+                      </button>
+                    ),
                   )}
                 </PopoverContent>
               </Popover>
@@ -897,16 +799,15 @@ export default function AnimalDetailPage({ id }: { id: string }) {
             <Button
               type="submit"
               variant="primary"
-              disabled={submitting}
+              disabled={adoptionMut.isPending}
               className="w-full py-3 h-auto"
             >
-              {submitting ? "Надсилання..." : "Надіслати заявку"}
+              {adoptionMut.isPending ? "Надсилання..." : "Надіслати заявку"}
             </Button>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* Success — modal */}
       <Dialog
         open={submitted}
         onOpenChange={(open) => {
@@ -923,7 +824,7 @@ export default function AnimalDetailPage({ id }: { id: string }) {
               Вашу заявку отримано. Ми зв&apos;яжемося з вами найближчим часом.
             </p>
             <Button
-              type="button"
+              
               variant="primary"
               size="md"
               onClick={() => setSubmitted(false)}

@@ -1,16 +1,25 @@
 "use client";
-import { apiClient, queryKeys } from "@/shared/query-client";
-import type { UpdateAnimalBody } from "@dniproanimals/contracts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/shared/api-client";
+import type {
+  UpdateAnimalBody,
+  UpdateAnimalResponse,
+} from "@dniproanimals/contracts";
+import {
+  useMutation,
+  type UseMutationOptions,
+} from "@tanstack/react-query";
 
-export function useUpdateAnimalMutation() {
-  const qc = useQueryClient();
+type UpdateAnimalArgs = { id: number; body: UpdateAnimalBody };
+
+export const useUpdateAnimalMutation = (
+  options: Omit<
+    UseMutationOptions<UpdateAnimalResponse, Error, UpdateAnimalArgs>,
+    "mutationFn"
+  > = {},
+) => {
   return useMutation({
-    mutationFn: ({ id, body }: { id: number; body: UpdateAnimalBody }) =>
+    mutationFn: ({ id, body }: UpdateAnimalArgs) =>
       apiClient.animals.update(id, body),
-    onSuccess: (_data, { id }) => {
-      qc.invalidateQueries({ queryKey: queryKeys.animals.all });
-      qc.invalidateQueries({ queryKey: queryKeys.animals.detail(id) });
-    },
+    ...options,
   });
-}
+};

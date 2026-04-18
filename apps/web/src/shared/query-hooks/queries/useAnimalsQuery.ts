@@ -1,11 +1,20 @@
 "use client";
-import { apiClient, queryKeys } from "@/shared/query-client";
+import { apiClient } from "@/shared/api-client";
+import type { OmitQueryOptions } from "@/shared/types/react-query";
 import type { ListAnimalsQuery } from "@dniproanimals/contracts";
+import { endpoints } from "@dniproanimals/endpoints";
 import { useQuery } from "@tanstack/react-query";
 
-export function useAnimalsQuery(query?: ListAnimalsQuery) {
+export const useAnimalsQuery = (
+  query: ListAnimalsQuery = {},
+  options: OmitQueryOptions<
+    typeof apiClient.animals.list,
+    "queryKey" | "queryFn"
+  > = {},
+) => {
   return useQuery({
-    queryKey: queryKeys.animals.list(query),
+    queryKey: [endpoints.animals.list(), query],
     queryFn: () => apiClient.animals.list(query),
+    ...options,
   });
-}
+};

@@ -1,6 +1,13 @@
 "use client";
-import ImageFallback from "@/components/ImageFallback";
-import { useUser } from "@/shared/lib/UserContext";
+import ImageFallback from "@/shared/components/ImageFallback";
+import {
+  useCreateOrganizationMutation,
+  useLoginMutation,
+  useMeQuery,
+  useRegisterMutation,
+  useUploadImageMutation,
+} from "@/shared/query-hooks";
+import { endpoints } from "@dniproanimals/endpoints";
 import {
   IconBrandFacebook,
   IconBrandInstagram,
@@ -32,6 +39,7 @@ import {
   InputWithIcon,
   Textarea,
 } from "@dniproanimals/ui";
+import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -46,7 +54,8 @@ const contactTypes = [
 
 export default function CreateOrgPage() {
   const router = useRouter();
-  const { user, refresh } = useUser();
+  const queryClient = useQueryClient();
+  const { data: user } = useMeQuery();
   const fileRef = useRef<HTMLInputElement>(null);
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "register">("register");
@@ -56,8 +65,6 @@ export default function CreateOrgPage() {
     password: "",
   });
   const [authError, setAuthError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [visibleContacts, setVisibleContacts] = useState<string[]>([]);
   const [form, setForm] = useState({
     name: "",
@@ -72,61 +79,65 @@ export default function CreateOrgPage() {
     website: "",
   });
 
+  const uploadMutation = useUploadImageMutation({
+    onSuccess: ({ url }) => setForm((prev) => ({ ...prev, photo: url })),
+  });
+  const loginMutation = useLoginMutation({
+    onSuccess: (u) => {
+      queryClient.setQueryData([endpoints.auth.me()], u);
+      setShowAuth(false);
+    },
+    onError: (err) => setAuthError(err.message || "Помилка"),
+  });
+  const registerMutation = useRegisterMutation({
+    onSuccess: (u) => {
+      queryClient.setQueryData([endpoints.auth.me()], u);
+      setShowAuth(false);
+    },
+    onError: (err) => setAuthError(err.message || "Помилка"),
+  });
+  const createOrgMutation = useCreateOrganizationMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [endpoints.auth.me()] });
+      queryClient.invalidateQueries({
+        queryKey: [endpoints.organizations.list()],
+      });
+      router.push("/dashboard");
+    },
+  });
+
+  const submitting =
+    createOrgMutation.isPending ||
+    loginMutation.isPending ||
+    registerMutation.isPending;
+
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
-    if (res.ok) {
-      const { url } = await res.json();
-      setForm((prev) => ({ ...prev, photo: url }));
-    }
-    setUploading(false);
+    await uploadMutation.mutateAsync(file);
     if (fileRef.current) fileRef.current.value = "";
   };
 
-  const handleAuth = async (e: React.FormEvent) => {
+  const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
     setAuthError("");
-    const url = authMode === "login" ? "/api/auth/login" : "/api/auth/register";
-    const body =
-      authMode === "login"
-        ? { email: authForm.email, password: authForm.password }
-        : authForm;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const data = await res.json();
-    if (!res.ok) setAuthError(data.error || "Помилка");
-    else {
-      refresh();
-      setShowAuth(false);
+    if (authMode === "login") {
+      loginMutation.mutate({
+        email: authForm.email,
+        password: authForm.password,
+      });
+    } else {
+      registerMutation.mutate(authForm);
     }
-    setSubmitting(false);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
       setShowAuth(true);
       return;
     }
-    setSubmitting(true);
-    const res = await fetch("/api/organizations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    if (res.ok) {
-      refresh();
-      router.push("/dashboard");
-    }
-    setSubmitting(false);
+    createOrgMutation.mutate(form);
   };
 
   return (
@@ -136,7 +147,6 @@ export default function CreateOrgPage() {
       transition={{ duration: 0.5 }}
       className="max-w-2xl mx-auto px-6 py-6 pb-24 md:pb-6"
     >
-      {/* Header — back + logo */}
       <div className="flex items-center justify-between mb-8">
         <Button
           variant="ghost"
@@ -154,10 +164,9 @@ export default function CreateOrgPage() {
           height={36}
           className="rounded-full object-cover"
         />
-        <div className="w-16" /> {/* spacer */}
+        <div className="w-16" />
       </div>
 
-      {/* Title */}
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold mb-1">Створити організацію</h1>
         <p className="text-sm text-gray-medium">
@@ -166,7 +175,6 @@ export default function CreateOrgPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Photo */}
         <div>
           <p className="text-xs text-gray-medium mb-2">Фото організації</p>
           {form.photo ? (
@@ -179,7 +187,6 @@ export default function CreateOrgPage() {
                 sizes="100vw"
               />
               <Button
-                type="button"
                 variant="secondary"
                 size="icon-sm"
                 shape="pill"
@@ -196,7 +203,9 @@ export default function CreateOrgPage() {
             >
               <IconPhoto size={32} className="text-gray-400 mb-2" />
               <p className="text-sm text-gray-medium font-medium">
-                {uploading ? "Завантаження..." : "Натисніть, щоб додати фото"}
+                {uploadMutation.isPending
+                  ? "Завантаження..."
+                  : "Натисніть, щоб додати фото"}
               </p>
               <p className="text-xs text-gray-400 mt-0.5">JPG, PNG до 5 МБ</p>
             </div>
@@ -210,7 +219,6 @@ export default function CreateOrgPage() {
           />
         </div>
 
-        {/* Name */}
         <div>
           <p className="text-xs text-gray-medium mb-1.5">Назва організації *</p>
           <Input
@@ -222,7 +230,6 @@ export default function CreateOrgPage() {
           />
         </div>
 
-        {/* Description */}
         <div>
           <p className="text-xs text-gray-medium mb-1.5">Опис</p>
           <Textarea
@@ -233,7 +240,6 @@ export default function CreateOrgPage() {
           />
         </div>
 
-        {/* Location */}
         <div>
           <p className="text-xs text-gray-medium mb-1.5">Місцезнаходження *</p>
           <InputWithIcon icon={<IconMapPinFilled />}>
@@ -247,13 +253,11 @@ export default function CreateOrgPage() {
           </InputWithIcon>
         </div>
 
-        {/* Contacts */}
         <div>
           <p className="text-sm font-semibold text-gray-medium uppercase tracking-wider mb-3">
             Контакти
           </p>
           <div className="space-y-2.5">
-            {/* Phone */}
             <InputWithIcon icon={<IconPhoneFilled />}>
               <Input
                 type="tel"
@@ -264,7 +268,6 @@ export default function CreateOrgPage() {
               />
             </InputWithIcon>
 
-            {/* Email */}
             <InputWithIcon icon={<IconMailFilled />}>
               <Input
                 type="email"
@@ -274,7 +277,6 @@ export default function CreateOrgPage() {
               />
             </InputWithIcon>
 
-            {/* Dynamic contacts */}
             {visibleContacts.map((type) => {
               const ct = contactTypes.find((c) => c.key === type);
               if (!ct) return null;
@@ -307,7 +309,6 @@ export default function CreateOrgPage() {
               );
             })}
 
-            {/* Add contact — dropdown picker */}
             {visibleContacts.length < contactTypes.length && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -347,7 +348,6 @@ export default function CreateOrgPage() {
           </div>
         </div>
 
-        {/* Auth warning */}
         {!user && (
           <div className="bg-amber-50 rounded-xl p-4 text-sm text-amber-700 border border-amber-200">
             <p className="font-medium mb-1">Потрібен акаунт</p>
@@ -377,7 +377,6 @@ export default function CreateOrgPage() {
         </p>
       </form>
 
-      {/* Auth modal */}
       <Dialog open={showAuth} onOpenChange={setShowAuth}>
         <DialogContent className="max-w-sm">
           <form onSubmit={handleAuth} className="space-y-3">

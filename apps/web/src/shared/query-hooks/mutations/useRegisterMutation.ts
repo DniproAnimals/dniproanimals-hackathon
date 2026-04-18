@@ -1,22 +1,16 @@
 "use client";
-import { apiClient, queryKeys } from "@/shared/query-client";
-import type { User } from "@dniproanimals/contracts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/shared/api-client";
+import type { OmitMutationOptions } from "@/shared/types/react-query";
+import { useMutation } from "@tanstack/react-query";
 
-interface UseRegisterMutationOptions {
-  onSuccess?: (user: User) => void;
-  onError?: (error: Error) => void;
-}
-
-export function useRegisterMutation(options?: UseRegisterMutationOptions) {
-  const queryClient = useQueryClient();
-
+export const useRegisterMutation = (
+  options: OmitMutationOptions<
+    typeof apiClient.auth.register,
+    "mutationFn"
+  > = {},
+) => {
   return useMutation({
     mutationFn: apiClient.auth.register,
-    onSuccess: async (user) => {
-      queryClient.setQueryData(queryKeys.auth.me, user);
-      await options?.onSuccess?.(user);
-    },
-    onError: options?.onError,
+    ...options,
   });
-}
+};

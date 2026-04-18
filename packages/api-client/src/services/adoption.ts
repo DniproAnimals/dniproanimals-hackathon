@@ -9,8 +9,6 @@ import type {
 import { endpoints } from "@dniproanimals/endpoints";
 import type { HttpFn } from "../createHttp";
 
-const JSON_HEADERS = { "Content-Type": "application/json" };
-
 export function createAdoptionApiService(http: HttpFn) {
   return {
     list: (query?: ListAdoptionQuery) =>
@@ -23,14 +21,14 @@ export function createAdoptionApiService(http: HttpFn) {
         endpoint: endpoints.adoption.create(),
         method: "POST",
         body: JSON.stringify(body),
-        headers: JSON_HEADERS,
+        headers: { "Content-Type": "application/json" },
       }),
     updateStatus: (body: UpdateAdoptionStatusBody) =>
       http<UpdateAdoptionStatusResponse>({
         endpoint: endpoints.adoption.updateStatus(),
         method: "PATCH",
         body: JSON.stringify(body),
-        headers: JSON_HEADERS,
+        headers: { "Content-Type": "application/json" },
       }),
   };
 }

@@ -1,5 +1,11 @@
 "use client";
 import {
+  useAdoptionQuery,
+  useUpdateAdoptionStatusMutation,
+} from "@/shared/query-hooks";
+import type { AdoptionRequestWithAnimal } from "@dniproanimals/contracts";
+import { endpoints } from "@dniproanimals/endpoints";
+import {
   IconBan,
   IconBrandFacebook,
   IconBrandInstagram,
@@ -21,70 +27,42 @@ import {
   FilterChip,
   Input,
 } from "@dniproanimals/ui";
+import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useDashboard } from "../layout";
 
-type Request = {
-  id: number;
-  animal_id: number;
-  animal_name: string;
-  animal_type: string;
-  name: string;
-  email: string;
-  phone: string;
-  instagram: string | null;
-  telegram: string | null;
-  facebook: string | null;
-  location: string | null;
-  message: string | null;
-  status: "pending" | "approved" | "rejected";
-  created_at: string;
-};
-
 export default function RequestsPage() {
+  const qc = useQueryClient();
   const { org } = useDashboard();
-  const [requests, setRequests] = useState<Request[]>([]);
+  const { data: requests = [] } = useAdoptionQuery(
+    { orgId: org?.id },
+    { enabled: !!org?.id },
+  );
+  const updateMutation = useUpdateAdoptionStatusMutation({
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: [endpoints.adoption.list()] });
+      qc.invalidateQueries({ queryKey: [endpoints.animals.list()] });
+    },
+  });
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "all" | "pending" | "approved" | "rejected"
   >("all");
-  const [updating, setUpdating] = useState<number | null>(null);
-  const [selected, setSelected] = useState<Request | null>(null);
+  const [selected, setSelected] = useState<AdoptionRequestWithAnimal | null>(
+    null,
+  );
 
-  const fetchRequests = useCallback(() => {
-    if (!org) return;
-    fetch(`/api/adoption?org_id=${org.id}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) setRequests(data);
-      });
-  }, [org]);
-
-  useEffect(() => {
-    fetchRequests();
-  }, [fetchRequests]);
-
-  const updateStatus = async (id: number, status: "approved" | "rejected") => {
-    setUpdating(id);
-    const res = await fetch("/api/adoption", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status }),
-    });
-    if (res.ok) {
-      setRequests((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, status } : r)),
-      );
-      if (selected?.id === id) setSelected({ ...selected, status });
-    }
-    setUpdating(null);
+  const updateStatus = (id: number, status: "approved" | "rejected") => {
+    updateMutation.mutate({ id, status });
+    if (selected?.id === id) setSelected({ ...selected, status });
   };
 
   const filtered = requests.filter((r) => {
     const matchSearch =
       !search ||
-      `${r.name} ${r.email} ${r.animal_name}`
+      `${r.name} ${r.email} ${r.animalName || ""}`
         .toLowerCase()
         .includes(search.toLowerCase());
     const matchStatus = statusFilter === "all" || r.status === statusFilter;
@@ -95,7 +73,7 @@ export default function RequestsPage() {
     s === "pending" ? "Очікує" : s === "approved" ? "Схвалено" : "Відхилено";
   const statusVariant = (s: string): "warning" | "success" | "danger" =>
     s === "pending" ? "warning" : s === "approved" ? "success" : "danger";
-  const typeLabel = (t: string) =>
+  const typeLabel = (t: string | null) =>
     t === "dog" ? "🐕 Собака" : t === "cat" ? "🐈 Кіт" : "🐾 Інше";
 
   return (
@@ -104,11 +82,10 @@ export default function RequestsPage() {
         Анкети на усиновлення
       </h1>
 
-      {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <Input
           type="text"
-          placeholder="Пошук за ім'ям, email, тварина..."
+          placeholder="Пошук..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="bg-white w-72"
@@ -132,7 +109,6 @@ export default function RequestsPage() {
         </div>
       </div>
 
-      {/* List */}
       {filtered.length === 0 ? (
         <Card>
           <EmptyState
@@ -163,12 +139,12 @@ export default function RequestsPage() {
                     </Badge>
                   </div>
                   <p className="text-xs text-gray-medium mt-0.5">
-                    {typeLabel(r.animal_type)}:{" "}
+                    {typeLabel(r.animalType)}:{" "}
                     <span className="text-foreground font-medium">
-                      {r.animal_name}
+                      {r.animalName}
                     </span>
                     <span className="mx-1.5">·</span>
-                    {new Date(r.created_at).toLocaleDateString("uk-UA")}
+                    {new Date(r.createdAt).toLocaleDateString("uk-UA")}
                   </p>
                 </div>
               </div>
@@ -178,7 +154,6 @@ export default function RequestsPage() {
         </div>
       )}
 
-      {/* Detail modal */}
       <Dialog
         open={!!selected}
         onOpenChange={(open) => {
@@ -188,7 +163,6 @@ export default function RequestsPage() {
         <DialogContent className="max-w-lg p-0 overflow-hidden">
           {selected && (
             <>
-              {/* Header */}
               <div className="p-5 pb-0 flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div className="size-12 rounded-full bg-primary/20 flex items-center justify-center text-lg font-bold text-green-secondary">
@@ -202,27 +176,23 @@ export default function RequestsPage() {
                       </Badge>
                     </div>
                     <p className="text-xs text-gray-medium mt-0.5">
-                      {new Date(selected.created_at).toLocaleDateString(
-                        "uk-UA",
-                        { day: "numeric", month: "long", year: "numeric" },
-                      )}
+                      {new Date(selected.createdAt).toLocaleDateString("uk-UA")}
                     </p>
                   </div>
                 </div>
               </div>
 
               <div className="p-5">
-                {/* Animal info */}
                 <div className="bg-primary/10 rounded-xl p-3.5 flex items-center gap-3 mb-5">
-                  <IconPawFilled size={20} className="text-primary shrink-0" />
+                  <IconPawFilled size={20} className="text-primary" />
                   <div>
                     <p className="text-xs text-gray-medium">Тварина</p>
                     <p className="text-sm font-semibold">
-                      {selected.animal_name} · {typeLabel(selected.animal_type)}
+                      {selected.animalName} · {typeLabel(selected.animalType)}
                     </p>
                   </div>
                   <Link
-                    href={`/animals/${selected.animal_id}`}
+                    href={`/animals/${selected.animalId}`}
                     target="_blank"
                     className="ml-auto text-xs text-green-secondary font-medium hover:underline"
                   >
@@ -230,16 +200,9 @@ export default function RequestsPage() {
                   </Link>
                 </div>
 
-                {/* Contact details */}
-                <p className="text-xs font-semibold text-gray-medium uppercase tracking-wider mb-3">
-                  Контактні дані
-                </p>
                 <div className="space-y-2.5 mb-5">
                   <div className="flex items-center gap-2.5 text-sm">
-                    <IconPhoneFilled
-                      size={16}
-                      className="text-gray-medium shrink-0"
-                    />
+                    <IconPhoneFilled size={16} className="text-gray-medium" />
                     <a
                       href={`tel:${selected.phone}`}
                       className="text-foreground hover:underline"
@@ -248,10 +211,7 @@ export default function RequestsPage() {
                     </a>
                   </div>
                   <div className="flex items-center gap-2.5 text-sm">
-                    <IconMailFilled
-                      size={16}
-                      className="text-gray-medium shrink-0"
-                    />
+                    <IconMailFilled size={16} className="text-gray-medium" />
                     <a
                       href={`mailto:${selected.email}`}
                       className="text-foreground hover:underline"
@@ -261,74 +221,37 @@ export default function RequestsPage() {
                   </div>
                   {selected.location && (
                     <div className="flex items-center gap-2.5 text-sm">
-                      <IconMapPinFilled
-                        size={16}
-                        className="text-gray-medium shrink-0"
-                      />
+                      <IconMapPinFilled size={16} className="text-gray-medium" />
                       <span>{selected.location}</span>
                     </div>
                   )}
                   {selected.instagram && (
                     <div className="flex items-center gap-2.5 text-sm">
-                      <IconBrandInstagram
-                        size={16}
-                        className="text-gray-medium shrink-0"
-                      />
-                      <a
-                        href={`https://instagram.com/${selected.instagram}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-foreground hover:underline"
-                      >
-                        @{selected.instagram}
-                      </a>
+                      <IconBrandInstagram size={16} className="text-gray-medium" />
+                      <span>@{selected.instagram}</span>
                     </div>
                   )}
                   {selected.telegram && (
                     <div className="flex items-center gap-2.5 text-sm">
-                      <IconBrandTelegram
-                        size={16}
-                        className="text-gray-medium shrink-0"
-                      />
-                      <a
-                        href={`https://t.me/${selected.telegram}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-foreground hover:underline"
-                      >
-                        @{selected.telegram}
-                      </a>
+                      <IconBrandTelegram size={16} className="text-gray-medium" />
+                      <span>@{selected.telegram}</span>
                     </div>
                   )}
                   {selected.facebook && (
                     <div className="flex items-center gap-2.5 text-sm">
-                      <IconBrandFacebook
-                        size={16}
-                        className="text-gray-medium shrink-0"
-                      />
-                      <a
-                        href={`https://facebook.com/${selected.facebook}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-foreground hover:underline"
-                      >
-                        {selected.facebook}
-                      </a>
+                      <IconBrandFacebook size={16} className="text-gray-medium" />
+                      <span>{selected.facebook}</span>
                     </div>
                   )}
                 </div>
 
-                {/* Message */}
                 {selected.message && (
                   <div className="mb-5">
                     <p className="text-xs font-semibold text-gray-medium uppercase tracking-wider mb-2">
                       Повідомлення
                     </p>
                     <div className="bg-gray-light rounded-xl p-4 flex gap-2.5">
-                      <IconMessageFilled
-                        size={16}
-                        className="text-gray-medium shrink-0 mt-0.5"
-                      />
+                      <IconMessageFilled size={16} className="text-gray-medium" />
                       <p className="text-sm text-foreground leading-relaxed">
                         {selected.message}
                       </p>
@@ -336,14 +259,13 @@ export default function RequestsPage() {
                   </div>
                 )}
 
-                {/* Actions */}
                 {selected.status === "pending" ? (
                   <div className="flex gap-2">
                     <Button
                       variant="success"
                       size="lg"
                       onClick={() => updateStatus(selected.id, "approved")}
-                      disabled={updating === selected.id}
+                      disabled={updateMutation.isPending}
                       className="flex-1"
                     >
                       <IconCheck size={18} />
@@ -353,7 +275,7 @@ export default function RequestsPage() {
                       variant="destructive"
                       size="lg"
                       onClick={() => updateStatus(selected.id, "rejected")}
-                      disabled={updating === selected.id}
+                      disabled={updateMutation.isPending}
                       className="flex-1"
                     >
                       <IconBan size={18} />

@@ -1,12 +1,16 @@
 "use client";
-import { apiClient, queryKeys } from "@/shared/query-client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/shared/api-client";
+import type { OmitMutationOptions } from "@/shared/types/react-query";
+import { useMutation } from "@tanstack/react-query";
 
-export function useSuperadminDeleteOrgMutation() {
-  const qc = useQueryClient();
+export const useSuperadminDeleteOrgMutation = (
+  options: OmitMutationOptions<
+    typeof apiClient.superadmin.deleteOrg,
+    "mutationFn"
+  > = {},
+) => {
   return useMutation({
     mutationFn: apiClient.superadmin.deleteOrg,
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: queryKeys.organizations.all }),
+    ...options,
   });
-}
+};

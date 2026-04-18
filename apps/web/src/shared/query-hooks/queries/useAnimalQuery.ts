@@ -1,11 +1,19 @@
 "use client";
-import { apiClient, queryKeys } from "@/shared/query-client";
+import { apiClient } from "@/shared/api-client";
+import type { OmitQueryOptions } from "@/shared/types/react-query";
+import { endpoints } from "@dniproanimals/endpoints";
 import { useQuery } from "@tanstack/react-query";
 
-export function useAnimalQuery(id: number | null | undefined) {
+export const useAnimalQuery = (
+  id: number,
+  options: OmitQueryOptions<
+    typeof apiClient.animals.get,
+    "queryKey" | "queryFn"
+  > = {},
+) => {
   return useQuery({
-    queryKey: id ? queryKeys.animals.detail(id) : ["animals", "none"],
-    queryFn: () => apiClient.animals.get(id as number),
-    enabled: !!id,
+    queryKey: [endpoints.animals.get({ id })],
+    queryFn: () => apiClient.animals.get(id),
+    ...options,
   });
-}
+};

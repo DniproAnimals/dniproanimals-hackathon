@@ -15,4 +15,5 @@ export const userModel = z.object({
   orgId: z.number().nullable(),
   createdAt: z.string(),
 });
+
 export type User = z.infer<typeof userModel>;

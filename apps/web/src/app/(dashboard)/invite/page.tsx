@@ -1,10 +1,15 @@
 "use client";
-import { useUser } from "@/shared/lib/UserContext";
+import {
+  useAcceptInviteMutation,
+  useInviteInfoQuery,
+} from "@/shared/query-hooks";
+import { endpoints } from "@dniproanimals/endpoints";
 import { IconLockFilled, IconMailFilled } from "@dniproanimals/icons";
 import { Button, Input, InputWithIcon, Skeleton } from "@dniproanimals/ui";
+import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 
 export default function InvitePageWrapper() {
   return (
@@ -22,61 +27,33 @@ export default function InvitePageWrapper() {
 
 function InvitePage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
-  const { refresh } = useUser();
-  const token = searchParams.get("token");
-
-  const [info, setInfo] = useState<{
-    volunteer_name: string;
-    volunteer_surname: string | null;
-    org_name: string;
-  } | null>(null);
+  const token = searchParams.get("token") ?? "";
+  const {
+    data: info,
+    isLoading,
+    error: queryError,
+  } = useInviteInfoQuery(token, { enabled: !!token });
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState(() => (token ? "" : "Посилання недійсне"));
-  const [loading, setLoading] = useState(() => Boolean(token));
-  const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!token) return;
-    fetch(`/api/volunteers/invite?token=${token}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.error) setError(data.error);
-        else setInfo(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Помилка завантаження");
-        setLoading(false);
-      });
-  }, [token]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setError("");
-
-    const res = await fetch("/api/volunteers/invite", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token,
-        email: form.email,
-        password: form.password,
-      }),
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error || "Помилка");
-    } else {
-      refresh();
+  const acceptMutation = useAcceptInviteMutation({
+    onSuccess: (user) => {
+      queryClient.setQueryData([endpoints.auth.me()], user);
       router.push("/dashboard");
-    }
-    setSubmitting(false);
+    },
+    onError: (err) => setError(err.message || "Помилка"),
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token) return;
+    setError("");
+    acceptMutation.mutate({ token, email: form.email, password: form.password });
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
         <p className="text-gray-medium">Завантаження...</p>
@@ -89,7 +66,7 @@ function InvitePage() {
       <div className="min-h-[80vh] flex items-center justify-center px-4">
         <div className="text-center">
           <p className="text-destructive mb-4">
-            {error || "Запрошення недійсне"}
+            {error || queryError?.message || "Запрошення недійсне"}
           </p>
           <Button variant="ghost" size="sm" onClick={() => router.push("/")}>
             На головну
@@ -114,10 +91,10 @@ function InvitePage() {
           <p className="text-sm text-gray-medium text-center">
             Вас запрошено як волонтера{" "}
             <strong>
-              {info.volunteer_name}
-              {info.volunteer_surname ? ` ${info.volunteer_surname}` : ""}
+              {info.volunteerName}
+              {info.volunteerSurname ? ` ${info.volunteerSurname}` : ""}
             </strong>{" "}
-            до організації <strong>{info.org_name}</strong>
+            до організації <strong>{info.orgName}</strong>
           </p>
         </div>
 
@@ -153,10 +130,10 @@ function InvitePage() {
             type="submit"
             variant="primary"
             size="lg"
-            disabled={submitting}
+            disabled={acceptMutation.isPending}
             className="w-full"
           >
-            {submitting ? "Зачекайте..." : "Приєднатися"}
+            {acceptMutation.isPending ? "Зачекайте..." : "Приєднатися"}
           </Button>
         </form>
       </div>
