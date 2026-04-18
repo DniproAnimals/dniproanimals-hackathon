@@ -7,7 +7,7 @@ import type {
   UpdateAdoptionStatusResponse,
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
-import type { HttpFn } from "../createHttp";
+import type { HttpFn } from "../utils";
 
 export function createAdoptionApiService(http: HttpFn) {
   return {

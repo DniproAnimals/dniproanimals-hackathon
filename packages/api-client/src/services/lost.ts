@@ -7,7 +7,7 @@ import type {
   UpdateLostResponse,
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
-import type { HttpFn } from "../createHttp";
+import type { HttpFn } from "../utils";
 
 
 export function createLostApiService(http: HttpFn) {

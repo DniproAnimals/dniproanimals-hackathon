@@ -9,7 +9,7 @@ import type {
   UpdateAnimalResponse,
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
-import type { HttpFn } from "../createHttp";
+import type { HttpFn } from "../utils";
 
 
 export function createAnimalsApiService(http: HttpFn) {

@@ -1,4 +1,3 @@
-import { type ApiClientConfig, createHttp } from "../createHttp";
 import { createAdoptionApiService } from "../services/adoption";
 import { createAnimalsApiService } from "../services/animals";
 import { createAuthApiService } from "../services/auth";
@@ -9,6 +8,7 @@ import { createOrganizationsApiService } from "../services/organizations";
 import { createSuperadminApiService } from "../services/superadmin";
 import { createUploadApiService } from "../services/upload";
 import { createVolunteersApiService } from "../services/volunteers";
+import { createHttp, type ApiClientConfig } from "../utils";
 
 export function createApiClient(config: ApiClientConfig) {
   const http = createHttp(config);
