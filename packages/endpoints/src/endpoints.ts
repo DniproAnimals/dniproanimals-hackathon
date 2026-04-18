@@ -40,6 +40,7 @@ export const endpoints = createTypedEndpoints({
   },
   superadmin: {
     listOrgs: "/superadmin/organizations",
+    orgsStats: "/superadmin/organizations/stats",
     updateOrg: "/superadmin/organizations",
     deleteOrg: "/superadmin/organizations",
   },

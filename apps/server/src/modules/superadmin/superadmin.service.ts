@@ -1,19 +1,45 @@
+import type { SuperadminListOrgsQuery } from "@dniproanimals/contracts";
 import {
+  and,
   db,
   desc,
   eq,
   notificationsTable,
   organizationsTable,
+  sql,
   usersTable,
   volunteersTable,
 } from "@dniproanimals/database";
 
 export const superadminService = {
-  async listOrgs() {
+  async listOrgs(filters: SuperadminListOrgsQuery = {}) {
+    const conditions = [];
+    if (filters.status) {
+      conditions.push(eq(organizationsTable.status, filters.status));
+    }
+    const where = conditions.length ? and(...conditions) : undefined;
     return db
       .select()
       .from(organizationsTable)
+      .where(where)
       .orderBy(desc(organizationsTable.createdAt));
+  },
+
+  async orgsStats() {
+    const [row] = await db
+      .select({
+        total: sql<number>`count(*)::int`,
+        pending: sql<number>`count(*) filter (where ${organizationsTable.status} = 'pending')::int`,
+        approved: sql<number>`count(*) filter (where ${organizationsTable.status} = 'approved')::int`,
+        rejected: sql<number>`count(*) filter (where ${organizationsTable.status} = 'rejected')::int`,
+      })
+      .from(organizationsTable);
+    return {
+      total: row?.total ?? 0,
+      pending: row?.pending ?? 0,
+      approved: row?.approved ?? 0,
+      rejected: row?.rejected ?? 0,
+    };
   },
 
   async updateOrgStatus(

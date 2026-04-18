@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-export const orgStatusSchema = z.enum(["pending", "approved", "rejected"]);
-export type OrgStatus = z.infer<typeof orgStatusSchema>;
+export const orgStatuses = ["pending", "approved", "rejected"] as const;
+export type OrgStatus = (typeof orgStatuses)[number];
+export const orgStatusSchema = z.enum(orgStatuses);
 
 export const organizationModel = z.object({
   id: z.number(),

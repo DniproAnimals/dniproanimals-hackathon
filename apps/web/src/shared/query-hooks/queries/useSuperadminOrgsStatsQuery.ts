@@ -1,20 +1,18 @@
 "use client";
 import { apiClient } from "@/shared/api-client";
 import type { OmitQueryOptions } from "@/shared/types/react-query";
-import type { SuperadminListOrgsQuery } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import { useQuery } from "@tanstack/react-query";
 
-export const useSuperadminOrgsQuery = (
-  params: SuperadminListOrgsQuery = {},
+export const useSuperadminOrgsStatsQuery = (
   options: OmitQueryOptions<
-    typeof apiClient.superadmin.listOrgs,
+    typeof apiClient.superadmin.orgsStats,
     "queryKey" | "queryFn"
   > = {},
 ) => {
   return useQuery({
-    queryKey: [endpoints.superadmin.listOrgs(), params],
-    queryFn: () => apiClient.superadmin.listOrgs(params),
+    queryKey: [endpoints.superadmin.orgsStats()],
+    queryFn: () => apiClient.superadmin.orgsStats(),
     ...options,
   });
 };

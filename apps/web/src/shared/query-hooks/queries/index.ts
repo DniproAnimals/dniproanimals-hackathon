@@ -12,5 +12,6 @@ export * from "./useOrganizationQuery";
 export * from "./useOrganizationsQuery";
 export * from "./useOrganizationVolunteersQuery";
 export * from "./useSuperadminOrgsQuery";
+export * from "./useSuperadminOrgsStatsQuery";
 export * from "./useVolunteersQuery";
 export * from "./useVolunteersStatsQuery";

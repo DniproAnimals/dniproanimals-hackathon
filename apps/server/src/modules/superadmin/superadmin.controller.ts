@@ -1,7 +1,9 @@
 import {
   superadminDeleteOrgBodySchema,
   superadminDeleteOrgResponseSchema,
+  superadminListOrgsQuerySchema,
   superadminListOrgsResponseSchema,
+  superadminOrgsStatsResponseSchema,
   superadminUpdateOrgBodySchema,
   superadminUpdateOrgResponseSchema,
 } from "@dniproanimals/contracts";
@@ -16,11 +18,24 @@ export const superadminController = createController({
     method: "GET",
     url: endpoints.superadmin.listOrgs(),
     schema: {
+      querystring: superadminListOrgsQuerySchema,
       response: { 200: superadminListOrgsResponseSchema },
     },
-    handler: withSuperadmin(async (_request, reply) => {
-      const rows = await superadminService.listOrgs();
+    handler: withSuperadmin(async (request, reply) => {
+      const rows = await superadminService.listOrgs(request.query);
       return reply.send(rows.map(toOrganizationResponse));
+    }),
+  }),
+
+  orgsStats: defineRoute({
+    method: "GET",
+    url: endpoints.superadmin.orgsStats(),
+    schema: {
+      response: { 200: superadminOrgsStatsResponseSchema },
+    },
+    handler: withSuperadmin(async (_request, reply) => {
+      const stats = await superadminService.orgsStats();
+      return reply.send(stats);
     }),
   }),
 
