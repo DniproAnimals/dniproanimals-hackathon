@@ -7,11 +7,10 @@ import {
   FormMessage,
   Textarea,
 } from "@dniproanimals/ui";
-import { useFormContext } from "react-hook-form";
-import type { AnimalFormValues } from "../../schema";
+import { useAnimalFormContext } from "../../hooks/useAnimalForm";
 
 export function AnimalDescriptionField() {
-  const { control } = useFormContext<AnimalFormValues>();
+  const { control } = useAnimalFormContext();
   return (
     <FormField
       control={control}

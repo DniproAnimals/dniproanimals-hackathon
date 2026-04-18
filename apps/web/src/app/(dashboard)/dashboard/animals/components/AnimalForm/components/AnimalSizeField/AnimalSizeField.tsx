@@ -1,5 +1,4 @@
 "use client";
-import type { AnimalSize } from "@dniproanimals/contracts";
 import {
   FormControl,
   FormField,
@@ -7,18 +6,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@dniproanimals/ui";
-import { useFormContext } from "react-hook-form";
-import type { AnimalFormValues } from "../../schema";
-import { AnimalChipGroup, type ChipOption } from "../AnimalChipGroup";
+import { useAnimalFormContext } from "../../hooks/useAnimalForm";
+import { AnimalChipGroup } from "../AnimalChipGroup";
 
-const OPTIONS: ChipOption<AnimalSize>[] = [
+const OPTIONS = [
   { value: "small", label: "Малий" },
   { value: "medium", label: "Середній" },
   { value: "large", label: "Великий" },
 ];
 
 export function AnimalSizeField() {
-  const { control } = useFormContext<AnimalFormValues>();
+  const { control } = useAnimalFormContext();
   return (
     <FormField
       control={control}

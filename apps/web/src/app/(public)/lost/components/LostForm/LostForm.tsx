@@ -13,7 +13,7 @@ import { LostPhotosField } from "./components/LostPhotosField";
 import { LostSexField } from "./components/LostSexField";
 import { LostSizeField } from "./components/LostSizeField";
 import { LostTitleField } from "./components/LostTitleField";
-import { lostFormSchema, type LostFormValues } from "./schema";
+import { lostFormSchema, type LostFormValues } from "./constants/schema";
 
 interface LostFormProps {
   defaultValues: LostFormValues;

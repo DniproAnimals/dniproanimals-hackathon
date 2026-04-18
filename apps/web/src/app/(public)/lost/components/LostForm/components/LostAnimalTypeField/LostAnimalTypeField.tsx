@@ -7,7 +7,7 @@ import {
   FormMessage,
 } from "@dniproanimals/ui";
 import { useFormContext } from "react-hook-form";
-import type { LostFormValues } from "../../schema";
+import type { LostFormValues } from "../../constants/schema";
 import { LostChipGroup, type ChipOption } from "../LostChipGroup";
 
 const OPTIONS: ChipOption<"Собака" | "Кіт" | "Інше">[] = [

@@ -18,7 +18,7 @@
     "db:push": "turbo run db:push",
     "db:reset": "turbo run db:reset",
     "db:studio": "turbo run db:studio",
-    "seed": "turbo run seed",
+    "db:seed": "turbo run db:seed",
     "db:drop": "turbo run db:drop",
     "storybook": "turbo run start --filter=@dniproanimals/storybook"
   },

@@ -1,5 +1,4 @@
 "use client";
-import type { AnimalSex } from "@dniproanimals/contracts";
 import {
   FormControl,
   FormField,
@@ -7,17 +6,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@dniproanimals/ui";
-import { useFormContext } from "react-hook-form";
-import type { AnimalFormValues } from "../../schema";
-import { AnimalChipGroup, type ChipOption } from "../AnimalChipGroup";
+import { useAnimalFormContext } from "../../hooks/useAnimalForm";
+import { AnimalChipGroup } from "../AnimalChipGroup";
 
-const OPTIONS: ChipOption<AnimalSex>[] = [
+const OPTIONS = [
   { value: "male", label: "Хлопчик" },
   { value: "female", label: "Дівчинка" },
 ];
 
 export function AnimalSexField() {
-  const { control } = useFormContext<AnimalFormValues>();
+  const { control } = useAnimalFormContext();
   return (
     <FormField
       control={control}
@@ -30,7 +28,7 @@ export function AnimalSexField() {
               options={OPTIONS}
               value={field.value}
               onChange={field.onChange}
-              columns={2}
+              className="grid-cols-2"
             />
           </FormControl>
           <FormMessage />

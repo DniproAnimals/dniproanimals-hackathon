@@ -9,19 +9,17 @@ interface LostChipGroupProps<V extends string> {
   options: readonly ChipOption<V>[];
   value: V | "";
   onChange: (next: V) => void;
-  columns?: 2 | 3;
+  className?: string;
 }
 
 export function LostChipGroup<V extends string>({
   options,
   value,
   onChange,
-  columns = 3,
+  className,
 }: LostChipGroupProps<V>) {
-  const gridCls = columns === 2 ? "grid-cols-2" : "grid-cols-3";
-
   return (
-    <div className={cn("grid gap-2", gridCls)}>
+    <div className={cn("grid gap-2 grid-cols-3", className)}>
       {options.map((opt) => (
         <button
           key={opt.value}

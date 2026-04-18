@@ -10,7 +10,7 @@ import {
   InputWithIcon,
 } from "@dniproanimals/ui";
 import { useFormContext } from "react-hook-form";
-import type { LostFormValues } from "../../schema";
+import type { LostFormValues } from "../../constants/schema";
 
 export function LostLastSeenLocationField() {
   const { control, setValue } = useFormContext<LostFormValues>();

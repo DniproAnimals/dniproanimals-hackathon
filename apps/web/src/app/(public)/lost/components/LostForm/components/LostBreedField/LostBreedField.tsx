@@ -14,7 +14,7 @@ import {
 } from "@dniproanimals/ui";
 import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-import type { LostFormValues } from "../../schema";
+import type { LostFormValues } from "../../constants/schema";
 
 export function LostBreedField() {
   const { control } = useFormContext<LostFormValues>();

@@ -6,28 +6,17 @@ import {
   FormMessage,
   Input,
 } from "@dniproanimals/ui";
-import { useFormContext } from "react-hook-form";
-import type { AnimalFormValues } from "../../schema";
+import { useAnimalFormContext } from "../../hooks/useAnimalForm";
 
-type ContactFieldName =
-  | "contactName"
-  | "contactPhone"
-  | "contactEmail"
-  | "contactLocation";
-
-const FIELDS: {
-  name: ContactFieldName;
-  type: "text" | "tel" | "email";
-  placeholder: string;
-}[] = [
+const FIELDS = [
   { name: "contactName", type: "text", placeholder: "Ім'я" },
   { name: "contactPhone", type: "tel", placeholder: "Телефон" },
   { name: "contactEmail", type: "email", placeholder: "Email" },
   { name: "contactLocation", type: "text", placeholder: "Місто / район" },
-];
+] as const;
 
 export function AnimalContactsFields() {
-  const { control } = useFormContext<AnimalFormValues>();
+  const { control } = useAnimalFormContext();
   return (
     <div>
       <p className="text-sm font-semibold text-gray-medium uppercase tracking-wider mb-2">

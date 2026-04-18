@@ -1,7 +1,5 @@
 "use client";
 import { Button, Form } from "@dniproanimals/ui";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { AnimalAgeField } from "./components/AnimalAgeField";
 import { AnimalBreedField } from "./components/AnimalBreedField";
 import { AnimalColorField } from "./components/AnimalColorField";
@@ -14,11 +12,8 @@ import { AnimalSexField } from "./components/AnimalSexField";
 import { AnimalSizeField } from "./components/AnimalSizeField";
 import { AnimalTypeField } from "./components/AnimalTypeField";
 import { AnimalWeightField } from "./components/AnimalWeightField";
-import {
-  ANIMAL_FORM_DEFAULTS,
-  animalFormSchema,
-  type AnimalFormValues,
-} from "./schema";
+import { useAnimalForm } from "./hooks/useAnimalForm";
+import { ANIMAL_FORM_DEFAULTS, type AnimalFormValues } from "./schema";
 
 interface AnimalFormProps {
   defaultValues?: AnimalFormValues;
@@ -33,11 +28,7 @@ export function AnimalForm({
   submitting,
   submitLabel,
 }: AnimalFormProps) {
-  const form = useForm<AnimalFormValues>({
-    resolver: zodResolver(animalFormSchema),
-    defaultValues,
-  });
-
+  const form = useAnimalForm();
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">

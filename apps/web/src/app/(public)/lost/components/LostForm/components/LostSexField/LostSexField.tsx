@@ -7,7 +7,7 @@ import {
   FormMessage,
 } from "@dniproanimals/ui";
 import { useFormContext } from "react-hook-form";
-import type { LostFormValues } from "../../schema";
+import type { LostFormValues } from "../../constants/schema";
 import { LostChipGroup, type ChipOption } from "../LostChipGroup";
 
 const OPTIONS: ChipOption<"male" | "female">[] = [
@@ -29,7 +29,7 @@ export function LostSexField() {
               options={OPTIONS}
               value={field.value as "male" | "female" | ""}
               onChange={field.onChange}
-              columns={2}
+              className="grid-cols-2"
             />
           </FormControl>
           <FormMessage />

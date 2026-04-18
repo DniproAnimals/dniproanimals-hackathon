@@ -13,7 +13,7 @@ import {
 } from "@dniproanimals/ui";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
-import type { LostFormValues } from "../../schema";
+import type { LostFormValues } from "../../constants/schema";
 
 export function LostColorField() {
   const { control } = useFormContext<LostFormValues>();

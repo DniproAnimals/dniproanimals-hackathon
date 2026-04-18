@@ -6,18 +6,16 @@ import {
   FormItem,
   FormLabel,
 } from "@dniproanimals/ui";
-import { useFormContext } from "react-hook-form";
-import type { AnimalFormValues } from "../../schema";
+import { useAnimalFormContext } from "../../hooks/useAnimalForm";
 
-type HealthKey = "vaccinated" | "sterilized" | "trained";
-const OPTIONS: { key: HealthKey; label: string; icon: string }[] = [
+const OPTIONS = [
   { key: "vaccinated", label: "Вакциновано", icon: "💉" },
   { key: "sterilized", label: "Стерилізовано", icon: "✂️" },
   { key: "trained", label: "Навчено", icon: "🎓" },
-];
+] as const;
 
 export function AnimalHealthField() {
-  const { control } = useFormContext<AnimalFormValues>();
+  const { control } = useAnimalFormContext();
   return (
     <FormItem>
       <FormLabel>Здоров&apos;я</FormLabel>

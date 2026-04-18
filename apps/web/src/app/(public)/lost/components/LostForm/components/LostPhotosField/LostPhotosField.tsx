@@ -5,7 +5,7 @@ import { FormField, FormItem, FormLabel, FormMessage } from "@dniproanimals/ui";
 import Image from "next/image";
 import { useRef } from "react";
 import { useFormContext } from "react-hook-form";
-import type { LostFormValues } from "../../schema";
+import type { LostFormValues } from "../../constants/schema";
 
 export function LostPhotosField() {
   const { control } = useFormContext<LostFormValues>();

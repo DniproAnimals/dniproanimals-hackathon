@@ -4,11 +4,10 @@ import { IconPhoto } from "@dniproanimals/icons";
 import { FormField, FormItem, FormLabel, FormMessage } from "@dniproanimals/ui";
 import Image from "next/image";
 import { useRef } from "react";
-import { useFormContext } from "react-hook-form";
-import type { AnimalFormValues } from "../../schema";
+import { useAnimalFormContext } from "../../hooks/useAnimalForm";
 
 export function AnimalPhotoField() {
-  const { control } = useFormContext<AnimalFormValues>();
+  const { control } = useAnimalFormContext();
   const fileRef = useRef<HTMLInputElement>(null);
   const uploadMutation = useUploadImageMutation();
 

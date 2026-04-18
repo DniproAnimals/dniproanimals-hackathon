@@ -9,7 +9,7 @@ import {
   InputWithIcon,
 } from "@dniproanimals/ui";
 import { useFormContext } from "react-hook-form";
-import type { LostFormValues } from "../../schema";
+import type { LostFormValues } from "../../constants/schema";
 
 export function LostContactsFields() {
   const { control } = useFormContext<LostFormValues>();

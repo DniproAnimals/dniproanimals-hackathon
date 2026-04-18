@@ -1,5 +1,4 @@
 "use client";
-import type { AnimalType } from "@dniproanimals/contracts";
 import {
   FormControl,
   FormField,
@@ -7,18 +6,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@dniproanimals/ui";
-import { useFormContext } from "react-hook-form";
-import type { AnimalFormValues } from "../../schema";
-import { AnimalChipGroup, type ChipOption } from "../AnimalChipGroup";
+import { useAnimalFormContext } from "../../hooks/useAnimalForm";
+import { AnimalChipGroup } from "../AnimalChipGroup";
 
-const OPTIONS: ChipOption<AnimalType>[] = [
+const OPTIONS = [
   { value: "dog", label: "🐕 Собака" },
   { value: "cat", label: "🐈 Кіт" },
   { value: "other", label: "🐾 Інше" },
 ];
 
 export function AnimalTypeField() {
-  const { control, setValue } = useFormContext<AnimalFormValues>();
+  const { control, setValue } = useAnimalFormContext();
   return (
     <FormField
       control={control}

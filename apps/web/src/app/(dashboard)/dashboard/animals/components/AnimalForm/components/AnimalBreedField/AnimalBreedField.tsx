@@ -12,11 +12,11 @@ import {
   PopoverTrigger,
 } from "@dniproanimals/ui";
 import { useState } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
-import type { AnimalFormValues } from "../../schema";
+import { useWatch } from "react-hook-form";
+import { useAnimalFormContext } from "../../hooks/useAnimalForm";
 
 export function AnimalBreedField() {
-  const { control } = useFormContext<AnimalFormValues>();
+  const { control } = useAnimalFormContext();
   const type = useWatch({ control, name: "type" });
   const [open, setOpen] = useState(false);
 
