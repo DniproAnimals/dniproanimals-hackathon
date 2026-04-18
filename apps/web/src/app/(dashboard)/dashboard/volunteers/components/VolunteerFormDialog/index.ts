@@ -1,1 +1,1 @@
-export { VolunteerFormDialog } from "./VolunteerFormDialog";
+export * from "./VolunteerFormDialog";

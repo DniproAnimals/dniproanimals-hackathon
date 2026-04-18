@@ -10,7 +10,10 @@ export const useLogOut = () => {
     },
   });
 
-  const handleLogout = useCallback(() => logoutMutation.mutate(undefined), []);
+  const handleLogout = useCallback(
+    () => logoutMutation.mutate(undefined),
+    [logoutMutation],
+  );
 
   return handleLogout;
 };

@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";
 import { cn } from "../utils";
 
-const buttonVariants = cva(
+export const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
@@ -49,7 +49,7 @@ export type ButtonProps = ComponentProps<"button"> &
     asChild?: boolean;
   };
 
-function Button({
+export function Button({
   className,
   variant,
   size,
@@ -68,5 +68,3 @@ function Button({
     />
   );
 }
-
-export { Button, buttonVariants };

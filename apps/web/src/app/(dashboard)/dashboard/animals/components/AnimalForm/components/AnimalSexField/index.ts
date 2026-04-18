@@ -1,1 +1,1 @@
-export { AnimalSexField } from "./AnimalSexField";
+export * from "./AnimalSexField";

@@ -1,1 +1,1 @@
-export { LostPhotosField } from "./LostPhotosField";
+export * from "./LostPhotosField";

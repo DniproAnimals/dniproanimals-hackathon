@@ -32,7 +32,7 @@ const socials = [
   },
 ];
 
-export default function Footer() {
+export function Footer() {
   return (
     <footer className="bg-primary mt-16 pb-16 md:pb-0">
       <div className="max-w-6xl mx-auto px-6 py-10">

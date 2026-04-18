@@ -1,4 +1,4 @@
-import ImageFallback from "@/shared/components/ImageFallback";
+import { ImageFallback } from "@/shared/components/ImageFallback";
 import type { AnimalOrgRef } from "@dniproanimals/contracts";
 import { IconBuildingCommunity, IconChevronRight } from "@dniproanimals/icons";
 import Link from "next/link";

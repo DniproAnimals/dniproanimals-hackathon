@@ -1,1 +1,1 @@
-export { AdoptionMessageField } from "./AdoptionMessageField";
+export * from "./AdoptionMessageField";

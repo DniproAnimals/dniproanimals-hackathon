@@ -1,5 +1,5 @@
 "use client";
-import ImageFallback from "@/shared/components/ImageFallback";
+import { ImageFallback } from "@/shared/components/ImageFallback";
 import type { LostAnimal } from "@dniproanimals/contracts";
 import { IconMapPin, IconPaw } from "@dniproanimals/icons";
 import { cn } from "@dniproanimals/ui";

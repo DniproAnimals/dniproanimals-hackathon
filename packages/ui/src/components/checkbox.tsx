@@ -4,7 +4,7 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import type { ComponentProps } from "react";
 import { cn } from "../utils";
 
-function Checkbox({
+export function Checkbox({
   className,
   ...props
 }: ComponentProps<typeof CheckboxPrimitive.Root>) {
@@ -23,5 +23,3 @@ function Checkbox({
     </CheckboxPrimitive.Root>
   );
 }
-
-export { Checkbox };

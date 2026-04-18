@@ -1,1 +1,1 @@
-export { DailyNeedsSection } from "./DailyNeedsSection";
+export * from "./DailyNeedsSection";

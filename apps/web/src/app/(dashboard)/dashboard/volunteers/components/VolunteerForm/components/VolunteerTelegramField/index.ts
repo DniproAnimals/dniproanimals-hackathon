@@ -1,1 +1,1 @@
-export { VolunteerTelegramField } from "./VolunteerTelegramField";
+export * from "./VolunteerTelegramField";

@@ -1,1 +1,1 @@
-export { LostContactsFields } from "./LostContactsFields";
+export * from "./LostContactsFields";

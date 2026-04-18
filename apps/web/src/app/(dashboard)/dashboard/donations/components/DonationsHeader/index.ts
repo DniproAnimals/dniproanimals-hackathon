@@ -1,1 +1,1 @@
-export { DonationsHeader } from "./DonationsHeader";
+export * from "./DonationsHeader";

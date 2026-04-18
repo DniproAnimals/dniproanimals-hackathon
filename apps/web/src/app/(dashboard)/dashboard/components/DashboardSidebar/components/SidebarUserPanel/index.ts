@@ -1,1 +1,1 @@
-export { SidebarUserPanel } from "./SidebarUserPanel";
+export * from "./SidebarUserPanel";

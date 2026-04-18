@@ -1,5 +1,5 @@
 "use client";
-import ImageFallback from "@/shared/components/ImageFallback";
+import { ImageFallback } from "@/shared/components/ImageFallback";
 import {
   useCreateOrganizationMutation,
   useLoginMutation,

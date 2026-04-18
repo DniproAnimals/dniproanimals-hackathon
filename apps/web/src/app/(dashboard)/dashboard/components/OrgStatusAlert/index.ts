@@ -1,1 +1,1 @@
-export { OrgStatusAlert } from "./OrgStatusAlert";
+export * from "./OrgStatusAlert";

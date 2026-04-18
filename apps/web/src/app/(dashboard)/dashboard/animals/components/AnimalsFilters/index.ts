@@ -1,1 +1,1 @@
-export { AnimalsFilters } from "./AnimalsFilters";
+export * from "./AnimalsFilters";

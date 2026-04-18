@@ -1,1 +1,1 @@
-export { LostAnimalTypeField } from "./LostAnimalTypeField";
+export * from "./LostAnimalTypeField";

@@ -1,1 +1,1 @@
-export { AnimalChipGroup, type ChipOption } from "./AnimalChipGroup";
+export * from "./AnimalChipGroup";

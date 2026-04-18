@@ -1,1 +1,1 @@
-export { AnimalOrgCard } from "./AnimalOrgCard";
+export * from "./AnimalOrgCard";

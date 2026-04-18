@@ -1,1 +1,1 @@
-export { NotOwnerMessage } from "./NotOwnerMessage";
+export * from "./NotOwnerMessage";

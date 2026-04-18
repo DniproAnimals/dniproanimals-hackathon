@@ -1,1 +1,1 @@
-export { VolunteerSurnameField } from "./VolunteerSurnameField";
+export * from "./VolunteerSurnameField";

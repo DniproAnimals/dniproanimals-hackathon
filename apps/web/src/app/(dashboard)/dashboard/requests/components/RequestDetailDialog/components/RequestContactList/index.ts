@@ -1,1 +1,1 @@
-export { RequestContactList } from "./RequestContactList";
+export * from "./RequestContactList";

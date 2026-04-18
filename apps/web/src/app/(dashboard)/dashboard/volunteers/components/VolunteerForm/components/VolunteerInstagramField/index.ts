@@ -1,1 +1,1 @@
-export { VolunteerInstagramField } from "./VolunteerInstagramField";
+export * from "./VolunteerInstagramField";

@@ -1,1 +1,1 @@
-export { MonobankJarSection } from "./MonobankJarSection";
+export * from "./MonobankJarSection";

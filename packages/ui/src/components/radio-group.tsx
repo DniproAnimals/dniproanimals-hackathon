@@ -4,7 +4,7 @@ import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import type { ComponentProps } from "react";
 import { cn } from "../utils";
 
-function RadioGroup({
+export function RadioGroup({
   className,
   ...props
 }: ComponentProps<typeof RadioGroupPrimitive.Root>) {
@@ -16,7 +16,7 @@ function RadioGroup({
   );
 }
 
-function RadioGroupItem({
+export function RadioGroupItem({
   className,
   ...props
 }: ComponentProps<typeof RadioGroupPrimitive.Item>) {
@@ -34,5 +34,3 @@ function RadioGroupItem({
     </RadioGroupPrimitive.Item>
   );
 }
-
-export { RadioGroup, RadioGroupItem };

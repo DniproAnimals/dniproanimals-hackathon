@@ -1,4 +1,4 @@
-import ImageFallback from "@/shared/components/ImageFallback";
+import { ImageFallback } from "@/shared/components/ImageFallback";
 import type { Volunteer } from "@dniproanimals/contracts";
 import { cn } from "@dniproanimals/ui";
 

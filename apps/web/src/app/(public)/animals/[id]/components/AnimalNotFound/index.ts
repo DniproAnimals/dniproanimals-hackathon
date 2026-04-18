@@ -1,1 +1,1 @@
-export { AnimalNotFound } from "./AnimalNotFound";
+export * from "./AnimalNotFound";

@@ -1,5 +1,5 @@
 "use client";
-import ImageFallback from "@/shared/components/ImageFallback";
+import { ImageFallback } from "@/shared/components/ImageFallback";
 import { getAnimalAgeLabel, getAnimalSizeLabel } from "@/shared/constants";
 import {
   useFavoritesQuery,
@@ -32,7 +32,7 @@ const tintColors = [
   "bg-violet-50",
 ];
 
-export default function AnimalCard({
+export function AnimalCard({
   animal,
   index = 0,
 }: {

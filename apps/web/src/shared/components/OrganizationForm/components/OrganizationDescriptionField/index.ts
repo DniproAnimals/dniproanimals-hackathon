@@ -1,1 +1,1 @@
-export { OrganizationDescriptionField } from "./OrganizationDescriptionField";
+export * from "./OrganizationDescriptionField";

@@ -1,1 +1,1 @@
-export { SidebarOrgInfo } from "./SidebarOrgInfo";
+export * from "./SidebarOrgInfo";

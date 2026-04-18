@@ -1,1 +1,1 @@
-export { JarDetectedBadge } from "./JarDetectedBadge";
+export * from "./JarDetectedBadge";

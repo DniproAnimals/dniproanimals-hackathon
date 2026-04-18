@@ -1,1 +1,1 @@
-export { LostContactsPanel } from "./LostContactsPanel";
+export * from "./LostContactsPanel";

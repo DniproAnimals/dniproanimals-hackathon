@@ -1,1 +1,1 @@
-export { OrganizationsFilters } from "./OrganizationsFilters";
+export * from "./OrganizationsFilters";

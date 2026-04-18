@@ -1,1 +1,1 @@
-export { AdoptionContactFieldsGroup } from "./AdoptionContactFieldsGroup";
+export * from "./AdoptionContactFieldsGroup";

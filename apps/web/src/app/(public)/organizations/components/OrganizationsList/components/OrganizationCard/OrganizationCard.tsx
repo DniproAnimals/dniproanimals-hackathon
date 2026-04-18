@@ -1,4 +1,4 @@
-import ImageFallback from "@/shared/components/ImageFallback";
+import { ImageFallback } from "@/shared/components/ImageFallback";
 import type { Organization } from "@dniproanimals/contracts";
 import {
   IconBrandFacebook,

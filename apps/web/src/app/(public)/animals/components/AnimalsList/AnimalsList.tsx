@@ -1,5 +1,5 @@
 "use client";
-import AnimalCard from "@/shared/components/AnimalCard";
+import { AnimalCard } from "@/shared/components/AnimalCard";
 import { Animal } from "@dniproanimals/contracts";
 import { motion } from "motion/react";
 import { AnimalsListEmpty } from "./components/AnimalsListEmpty";

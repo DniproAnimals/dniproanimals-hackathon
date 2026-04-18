@@ -1,1 +1,1 @@
-export { AdoptionNameField } from "./AdoptionNameField";
+export * from "./AdoptionNameField";

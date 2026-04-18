@@ -1,4 +1,5 @@
 "use client";
+import { useLogOut } from "@/shared/hooks";
 import { useLostQuery, useMeQuery } from "@/shared/query-hooks";
 import {
   IconChevronDown,
@@ -22,7 +23,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useLogOut } from "../hooks";
 
 const navItems = [
   { href: "/", label: "Про нас" },
@@ -32,7 +32,7 @@ const navItems = [
   { href: "/donate", label: "Допомогти" },
 ];
 
-export default function Header() {
+export function Header() {
   const pathname = usePathname();
   const { data: user } = useMeQuery();
   const { data: lostItems } = useLostQuery({ type: "lost" });

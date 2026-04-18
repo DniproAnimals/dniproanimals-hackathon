@@ -1,1 +1,1 @@
-export { AnimalDetailHeader } from "./AnimalDetailHeader";
+export * from "./AnimalDetailHeader";

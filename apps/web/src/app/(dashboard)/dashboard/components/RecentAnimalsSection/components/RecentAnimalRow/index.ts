@@ -1,1 +1,1 @@
-export { RecentAnimalRow } from "./RecentAnimalRow";
+export * from "./RecentAnimalRow";

@@ -1,5 +1,5 @@
 "use client";
-import ImageFallback from "@/shared/components/ImageFallback";
+import { ImageFallback } from "@/shared/components/ImageFallback";
 import { IconChevronLeft, IconChevronRight } from "@dniproanimals/icons";
 import { Button, cn } from "@dniproanimals/ui";
 import { useState } from "react";

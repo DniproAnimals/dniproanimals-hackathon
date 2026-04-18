@@ -1,1 +1,1 @@
-export { AnimalsTable } from "./AnimalsTable";
+export * from "./AnimalsTable";

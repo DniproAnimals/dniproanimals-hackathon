@@ -1,1 +1,1 @@
-export { MissionGrid } from "./MissionGrid";
+export * from "./MissionGrid";

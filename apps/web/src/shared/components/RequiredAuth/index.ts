@@ -1,1 +1,1 @@
-export { RequiredAuth } from "./RequiredAuth";
+export * from "./RequiredAuth";

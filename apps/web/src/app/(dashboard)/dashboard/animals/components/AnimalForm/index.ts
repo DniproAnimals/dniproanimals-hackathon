@@ -1,6 +1,2 @@
-export { AnimalForm } from "./AnimalForm";
-export {
-  ANIMAL_FORM_DEFAULTS,
-  animalFormValuesToBody,
-  type AnimalFormValues,
-} from "./schema";
+export * from "./AnimalForm";
+export * from "./schema";

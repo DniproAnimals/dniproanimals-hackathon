@@ -1,1 +1,1 @@
-export { AnimalPhotoField } from "./AnimalPhotoField";
+export * from "./AnimalPhotoField";

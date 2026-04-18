@@ -1,1 +1,1 @@
-export { RequestsList } from "./RequestsList";
+export * from "./RequestsList";

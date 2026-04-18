@@ -11,7 +11,7 @@ const sizes = {
   lg: "size-6 border-2",
 };
 
-function Spinner({ className, size = "md", ...props }: SpinnerProps) {
+export function Spinner({ className, size = "md", ...props }: SpinnerProps) {
   return (
     <div
       role="status"
@@ -26,5 +26,3 @@ function Spinner({ className, size = "md", ...props }: SpinnerProps) {
     />
   );
 }
-
-export { Spinner };

@@ -1,1 +1,1 @@
-export { RequestMessage } from "./RequestMessage";
+export * from "./RequestMessage";

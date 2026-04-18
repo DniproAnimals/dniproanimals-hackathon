@@ -1,1 +1,1 @@
-export { AnimalBackButton } from "./AnimalBackButton";
+export * from "./AnimalBackButton";

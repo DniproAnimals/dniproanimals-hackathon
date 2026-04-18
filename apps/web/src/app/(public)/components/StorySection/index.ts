@@ -1,1 +1,1 @@
-export { StorySection } from "./StorySection";
+export * from "./StorySection";

@@ -1,1 +1,1 @@
-export { AnimalsCount } from "./AnimalsCount";
+export * from "./AnimalsCount";

@@ -1,1 +1,1 @@
-export { AnimalContactRow } from "./AnimalContactRow";
+export * from "./AnimalContactRow";

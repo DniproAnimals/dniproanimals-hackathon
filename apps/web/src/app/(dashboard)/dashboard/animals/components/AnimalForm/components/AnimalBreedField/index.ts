@@ -1,1 +1,1 @@
-export { AnimalBreedField } from "./AnimalBreedField";
+export * from "./AnimalBreedField";

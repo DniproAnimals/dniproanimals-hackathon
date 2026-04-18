@@ -8,11 +8,11 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import type { ComponentProps } from "react";
 import { cn } from "../utils";
 
-const Select = SelectPrimitive.Root;
-const SelectGroup = SelectPrimitive.Group;
-const SelectValue = SelectPrimitive.Value;
+export const Select = SelectPrimitive.Root;
+export const SelectGroup = SelectPrimitive.Group;
+export const SelectValue = SelectPrimitive.Value;
 
-function SelectTrigger({
+export function SelectTrigger({
   className,
   children,
   ...props
@@ -34,7 +34,7 @@ function SelectTrigger({
   );
 }
 
-function SelectScrollUpButton({
+export function SelectScrollUpButton({
   className,
   ...props
 }: ComponentProps<typeof SelectPrimitive.ScrollUpButton>) {
@@ -52,7 +52,7 @@ function SelectScrollUpButton({
   );
 }
 
-function SelectScrollDownButton({
+export function SelectScrollDownButton({
   className,
   ...props
 }: ComponentProps<typeof SelectPrimitive.ScrollDownButton>) {
@@ -70,7 +70,7 @@ function SelectScrollDownButton({
   );
 }
 
-function SelectContent({
+export function SelectContent({
   className,
   children,
   position = "popper",
@@ -105,7 +105,7 @@ function SelectContent({
   );
 }
 
-function SelectLabel({
+export function SelectLabel({
   className,
   ...props
 }: ComponentProps<typeof SelectPrimitive.Label>) {
@@ -121,7 +121,7 @@ function SelectLabel({
   );
 }
 
-function SelectItem({
+export function SelectItem({
   className,
   children,
   ...props
@@ -145,7 +145,7 @@ function SelectItem({
   );
 }
 
-function SelectSeparator({
+export function SelectSeparator({
   className,
   ...props
 }: ComponentProps<typeof SelectPrimitive.Separator>) {
@@ -157,16 +157,3 @@ function SelectSeparator({
     />
   );
 }
-
-export {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectScrollDownButton,
-  SelectScrollUpButton,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue,
-};

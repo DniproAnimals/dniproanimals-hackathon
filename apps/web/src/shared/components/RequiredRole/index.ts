@@ -1,1 +1,1 @@
-export { RequiredRole } from "./RequiredRole";
+export * from "./RequiredRole";

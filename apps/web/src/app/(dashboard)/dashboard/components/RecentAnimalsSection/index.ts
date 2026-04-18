@@ -1,1 +1,1 @@
-export { RecentAnimalsSection } from "./RecentAnimalsSection";
+export * from "./RecentAnimalsSection";

@@ -1,1 +1,1 @@
-export { SidebarLogo } from "./SidebarLogo";
+export * from "./SidebarLogo";

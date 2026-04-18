@@ -1,1 +1,1 @@
-export { AnimalAttributeRow } from "./AnimalAttributeRow";
+export * from "./AnimalAttributeRow";

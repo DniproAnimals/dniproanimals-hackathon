@@ -1,1 +1,1 @@
-export { AcceptInvitePasswordField } from "./AcceptInvitePasswordField";
+export * from "./AcceptInvitePasswordField";

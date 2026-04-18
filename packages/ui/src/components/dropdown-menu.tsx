@@ -4,14 +4,14 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import type { ComponentProps } from "react";
 import { cn } from "../utils";
 
-const DropdownMenu = DropdownMenuPrimitive.Root;
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
-const DropdownMenuGroup = DropdownMenuPrimitive.Group;
-const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
-const DropdownMenuSub = DropdownMenuPrimitive.Sub;
-const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
+export const DropdownMenu = DropdownMenuPrimitive.Root;
+export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
+export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
+export const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
+export const DropdownMenuSub = DropdownMenuPrimitive.Sub;
+export const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 
-function DropdownMenuSubTrigger({
+export function DropdownMenuSubTrigger({
   className,
   inset,
   children,
@@ -35,7 +35,7 @@ function DropdownMenuSubTrigger({
   );
 }
 
-function DropdownMenuSubContent({
+export function DropdownMenuSubContent({
   className,
   ...props
 }: ComponentProps<typeof DropdownMenuPrimitive.SubContent>) {
@@ -51,7 +51,7 @@ function DropdownMenuSubContent({
   );
 }
 
-function DropdownMenuContent({
+export function DropdownMenuContent({
   className,
   sideOffset = 6,
   ...props
@@ -71,7 +71,7 @@ function DropdownMenuContent({
   );
 }
 
-function DropdownMenuItem({
+export function DropdownMenuItem({
   className,
   inset,
   destructive,
@@ -95,7 +95,7 @@ function DropdownMenuItem({
   );
 }
 
-function DropdownMenuCheckboxItem({
+export function DropdownMenuCheckboxItem({
   className,
   children,
   checked,
@@ -121,7 +121,7 @@ function DropdownMenuCheckboxItem({
   );
 }
 
-function DropdownMenuRadioItem({
+export function DropdownMenuRadioItem({
   className,
   children,
   ...props
@@ -145,7 +145,7 @@ function DropdownMenuRadioItem({
   );
 }
 
-function DropdownMenuLabel({
+export function DropdownMenuLabel({
   className,
   inset,
   ...props
@@ -165,7 +165,7 @@ function DropdownMenuLabel({
   );
 }
 
-function DropdownMenuSeparator({
+export function DropdownMenuSeparator({
   className,
   ...props
 }: ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
@@ -178,7 +178,10 @@ function DropdownMenuSeparator({
   );
 }
 
-function DropdownMenuShortcut({ className, ...props }: ComponentProps<"span">) {
+export function DropdownMenuShortcut({
+  className,
+  ...props
+}: ComponentProps<"span">) {
   return (
     <span
       data-slot="dropdown-menu-shortcut"
@@ -190,21 +193,3 @@ function DropdownMenuShortcut({ className, ...props }: ComponentProps<"span">) {
     />
   );
 }
-
-export {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-};

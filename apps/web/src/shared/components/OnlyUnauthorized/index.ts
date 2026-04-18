@@ -1,1 +1,1 @@
-export { OnlyUnauthorized } from "./OnlyUnauthorized";
+export * from "./OnlyUnauthorized";

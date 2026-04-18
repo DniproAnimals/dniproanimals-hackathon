@@ -1,1 +1,1 @@
-export { DashboardOverviewHeader } from "./DashboardOverviewHeader";
+export * from "./DashboardOverviewHeader";

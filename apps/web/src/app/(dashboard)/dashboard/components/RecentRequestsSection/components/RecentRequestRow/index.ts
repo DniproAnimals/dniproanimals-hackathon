@@ -1,1 +1,1 @@
-export { RecentRequestRow } from "./RecentRequestRow";
+export * from "./RecentRequestRow";

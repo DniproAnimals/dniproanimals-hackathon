@@ -1,1 +1,1 @@
-export { ShareDonateLinkSection } from "./ShareDonateLinkSection";
+export * from "./ShareDonateLinkSection";

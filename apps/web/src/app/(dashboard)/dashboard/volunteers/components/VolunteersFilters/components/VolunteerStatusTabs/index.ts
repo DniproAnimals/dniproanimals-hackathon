@@ -1,1 +1,1 @@
-export { VolunteerStatusTabs } from "./VolunteerStatusTabs";
+export * from "./VolunteerStatusTabs";

@@ -3,11 +3,11 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import type { ComponentProps } from "react";
 import { cn } from "../utils";
 
-const Popover = PopoverPrimitive.Root;
-const PopoverTrigger = PopoverPrimitive.Trigger;
-const PopoverAnchor = PopoverPrimitive.Anchor;
+export const Popover = PopoverPrimitive.Root;
+export const PopoverTrigger = PopoverPrimitive.Trigger;
+export const PopoverAnchor = PopoverPrimitive.Anchor;
 
-function PopoverContent({
+export function PopoverContent({
   className,
   align = "center",
   sideOffset = 6,
@@ -28,5 +28,3 @@ function PopoverContent({
     </PopoverPrimitive.Portal>
   );
 }
-
-export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger };

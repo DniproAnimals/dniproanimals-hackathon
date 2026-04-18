@@ -3,7 +3,7 @@ import * as SwitchPrimitive from "@radix-ui/react-switch";
 import type { ComponentProps } from "react";
 import { cn } from "../utils";
 
-function Switch({
+export function Switch({
   className,
   ...props
 }: ComponentProps<typeof SwitchPrimitive.Root>) {
@@ -23,5 +23,3 @@ function Switch({
     </SwitchPrimitive.Root>
   );
 }
-
-export { Switch };

@@ -1,1 +1,1 @@
-export { LostHeader } from "./LostHeader";
+export * from "./LostHeader";

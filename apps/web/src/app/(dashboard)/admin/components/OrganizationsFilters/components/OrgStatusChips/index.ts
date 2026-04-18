@@ -1,1 +1,1 @@
-export { OrgStatusChips } from "./OrgStatusChips";
+export * from "./OrgStatusChips";

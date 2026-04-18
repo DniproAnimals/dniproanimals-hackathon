@@ -1,1 +1,1 @@
-export { InvalidInvite } from "./InvalidInvite";
+export * from "./InvalidInvite";

@@ -1,1 +1,1 @@
-export { OrganizationsEmpty } from "./OrganizationsEmpty";
+export * from "./OrganizationsEmpty";

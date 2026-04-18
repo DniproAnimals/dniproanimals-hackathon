@@ -1,1 +1,1 @@
-export { LostList } from "./LostList";
+export * from "./LostList";

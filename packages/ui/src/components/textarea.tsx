@@ -1,9 +1,8 @@
+"use client";
 import type { ComponentProps } from "react";
 import { cn } from "../utils";
 
-export type TextareaProps = ComponentProps<"textarea">;
-
-function Textarea({ className, ...props }: TextareaProps) {
+export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
   return (
     <textarea
       data-slot="textarea"
@@ -15,5 +14,3 @@ function Textarea({ className, ...props }: TextareaProps) {
     />
   );
 }
-
-export { Textarea };

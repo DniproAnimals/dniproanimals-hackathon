@@ -1,1 +1,1 @@
-export { LostDetailDialog } from "./LostDetailDialog";
+export * from "./LostDetailDialog";

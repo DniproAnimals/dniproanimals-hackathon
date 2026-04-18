@@ -1,1 +1,1 @@
-export { RequestsHeader } from "./RequestsHeader";
+export * from "./RequestsHeader";

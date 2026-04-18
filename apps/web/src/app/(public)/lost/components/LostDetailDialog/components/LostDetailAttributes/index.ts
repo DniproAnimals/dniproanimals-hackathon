@@ -1,1 +1,1 @@
-export { LostDetailAttributes } from "./LostDetailAttributes";
+export * from "./LostDetailAttributes";

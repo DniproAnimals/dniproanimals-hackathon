@@ -1,1 +1,1 @@
-export { VolunteerPhotoField } from "./VolunteerPhotoField";
+export * from "./VolunteerPhotoField";

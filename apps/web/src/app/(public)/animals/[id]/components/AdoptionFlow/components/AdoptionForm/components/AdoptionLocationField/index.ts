@@ -1,1 +1,1 @@
-export { AdoptionLocationField } from "./AdoptionLocationField";
+export * from "./AdoptionLocationField";

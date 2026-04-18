@@ -1,1 +1,1 @@
-export { AdoptionSuccess } from "./AdoptionSuccess";
+export * from "./AdoptionSuccess";

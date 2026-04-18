@@ -1,1 +1,1 @@
-export { OverviewStats } from "./OverviewStats";
+export * from "./OverviewStats";

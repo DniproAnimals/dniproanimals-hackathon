@@ -28,7 +28,7 @@ export function AnimalForm({
   submitting,
   submitLabel,
 }: AnimalFormProps) {
-  const form = useAnimalForm();
+  const form = useAnimalForm(defaultValues);
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">

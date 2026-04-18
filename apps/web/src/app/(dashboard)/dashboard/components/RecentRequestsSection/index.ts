@@ -1,1 +1,1 @@
-export { RecentRequestsSection } from "./RecentRequestsSection";
+export * from "./RecentRequestsSection";

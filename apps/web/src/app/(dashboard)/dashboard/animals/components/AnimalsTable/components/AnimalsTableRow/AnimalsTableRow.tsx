@@ -1,5 +1,5 @@
 "use client";
-import ImageFallback from "@/shared/components/ImageFallback";
+import { ImageFallback } from "@/shared/components/ImageFallback";
 import {
   ANIMAL_STATUS_BADGE_VARIANT,
   ANIMAL_STATUS_LABEL,

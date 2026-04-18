@@ -1,1 +1,1 @@
-export { OtherMethodsSection } from "./OtherMethodsSection";
+export * from "./OtherMethodsSection";

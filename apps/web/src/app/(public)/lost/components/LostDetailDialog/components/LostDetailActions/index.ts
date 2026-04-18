@@ -1,1 +1,1 @@
-export { LostDetailActions } from "./LostDetailActions";
+export * from "./LostDetailActions";

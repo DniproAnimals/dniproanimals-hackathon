@@ -4,14 +4,14 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import type { ComponentProps } from "react";
 import { cn } from "../utils";
 
-const Dialog = DialogPrimitive.Root;
-const DialogTrigger = DialogPrimitive.Trigger;
-const DialogPortal = DialogPrimitive.Portal;
-const DialogClose = DialogPrimitive.Close;
+export const Dialog = DialogPrimitive.Root;
+export const DialogTrigger = DialogPrimitive.Trigger;
+export const DialogPortal = DialogPrimitive.Portal;
+export const DialogClose = DialogPrimitive.Close;
 
-type DialogProps = ComponentProps<typeof Dialog>;
+export type DialogProps = ComponentProps<typeof Dialog>;
 
-function DialogOverlay({
+export function DialogOverlay({
   className,
   ...props
 }: ComponentProps<typeof DialogPrimitive.Overlay>) {
@@ -27,7 +27,7 @@ function DialogOverlay({
   );
 }
 
-function DialogContent({
+export function DialogContent({
   className,
   children,
   hideClose,
@@ -58,7 +58,7 @@ function DialogContent({
   );
 }
 
-function DialogHeader({ className, ...props }: ComponentProps<"div">) {
+export function DialogHeader({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
@@ -68,7 +68,7 @@ function DialogHeader({ className, ...props }: ComponentProps<"div">) {
   );
 }
 
-function DialogFooter({ className, ...props }: ComponentProps<"div">) {
+export function DialogFooter({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-footer"
@@ -81,7 +81,7 @@ function DialogFooter({ className, ...props }: ComponentProps<"div">) {
   );
 }
 
-function DialogTitle({
+export function DialogTitle({
   className,
   ...props
 }: ComponentProps<typeof DialogPrimitive.Title>) {
@@ -94,7 +94,7 @@ function DialogTitle({
   );
 }
 
-function DialogDescription({
+export function DialogDescription({
   className,
   ...props
 }: ComponentProps<typeof DialogPrimitive.Description>) {
@@ -106,17 +106,3 @@ function DialogDescription({
     />
   );
 }
-
-export {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle,
-  DialogTrigger,
-};
-export type { DialogProps };

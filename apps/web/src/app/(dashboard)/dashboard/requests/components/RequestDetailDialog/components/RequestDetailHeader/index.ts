@@ -1,1 +1,1 @@
-export { RequestDetailHeader } from "./RequestDetailHeader";
+export * from "./RequestDetailHeader";

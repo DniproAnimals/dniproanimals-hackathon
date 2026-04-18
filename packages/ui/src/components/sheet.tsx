@@ -5,12 +5,12 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";
 import { cn } from "../utils";
 
-const Sheet = DialogPrimitive.Root;
-const SheetTrigger = DialogPrimitive.Trigger;
-const SheetPortal = DialogPrimitive.Portal;
-const SheetClose = DialogPrimitive.Close;
+export const Sheet = DialogPrimitive.Root;
+export const SheetTrigger = DialogPrimitive.Trigger;
+export const SheetPortal = DialogPrimitive.Portal;
+export const SheetClose = DialogPrimitive.Close;
 
-function SheetOverlay({
+export function SheetOverlay({
   className,
   ...props
 }: ComponentProps<typeof DialogPrimitive.Overlay>) {
@@ -50,7 +50,7 @@ type SheetContentProps = ComponentProps<typeof DialogPrimitive.Content> &
     hideClose?: boolean;
   };
 
-function SheetContent({
+export function SheetContent({
   className,
   children,
   side,
@@ -77,7 +77,7 @@ function SheetContent({
   );
 }
 
-function SheetHeader({ className, ...props }: ComponentProps<"div">) {
+export function SheetHeader({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       data-slot="sheet-header"
@@ -87,7 +87,7 @@ function SheetHeader({ className, ...props }: ComponentProps<"div">) {
   );
 }
 
-function SheetFooter({ className, ...props }: ComponentProps<"div">) {
+export function SheetFooter({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       data-slot="sheet-footer"
@@ -97,7 +97,7 @@ function SheetFooter({ className, ...props }: ComponentProps<"div">) {
   );
 }
 
-function SheetTitle({
+export function SheetTitle({
   className,
   ...props
 }: ComponentProps<typeof DialogPrimitive.Title>) {
@@ -110,7 +110,7 @@ function SheetTitle({
   );
 }
 
-function SheetDescription({
+export function SheetDescription({
   className,
   ...props
 }: ComponentProps<typeof DialogPrimitive.Description>) {
@@ -122,16 +122,3 @@ function SheetDescription({
     />
   );
 }
-
-export {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetOverlay,
-  SheetPortal,
-  SheetTitle,
-  SheetTrigger,
-};

@@ -1,5 +1,5 @@
 "use client";
-import ImageFallback from "@/shared/components/ImageFallback";
+import { ImageFallback } from "@/shared/components/ImageFallback";
 import { useUploadImageMutation } from "@/shared/query-hooks";
 import { IconPhoto } from "@dniproanimals/icons";
 import { FormField, FormItem, FormMessage } from "@dniproanimals/ui";

@@ -1,1 +1,1 @@
-export { RequestsStatusTabs } from "./RequestsStatusTabs";
+export * from "./RequestsStatusTabs";

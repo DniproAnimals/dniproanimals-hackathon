@@ -1,1 +1,1 @@
-export { DashboardTopBar } from "./DashboardTopBar";
+export * from "./DashboardTopBar";

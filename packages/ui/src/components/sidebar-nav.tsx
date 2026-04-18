@@ -12,7 +12,7 @@ interface SidebarNavItemProps extends Omit<
   active?: boolean;
 }
 
-function SidebarNavItem({
+export function SidebarNavItem({
   className,
   href,
   icon,
@@ -38,5 +38,3 @@ function SidebarNavItem({
     </Link>
   );
 }
-
-export { SidebarNavItem };

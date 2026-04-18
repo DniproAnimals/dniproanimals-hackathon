@@ -1,1 +1,1 @@
-export { AdoptionForm } from "./AdoptionForm";
+export * from "./AdoptionForm";

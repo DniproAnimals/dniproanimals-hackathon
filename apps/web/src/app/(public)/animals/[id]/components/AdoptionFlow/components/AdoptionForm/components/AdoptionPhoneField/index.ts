@@ -1,1 +1,1 @@
-export { AdoptionPhoneField } from "./AdoptionPhoneField";
+export * from "./AdoptionPhoneField";

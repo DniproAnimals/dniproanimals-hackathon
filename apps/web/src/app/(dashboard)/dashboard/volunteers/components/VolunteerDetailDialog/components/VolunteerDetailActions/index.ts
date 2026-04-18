@@ -1,1 +1,1 @@
-export { VolunteerDetailActions } from "./VolunteerDetailActions";
+export * from "./VolunteerDetailActions";

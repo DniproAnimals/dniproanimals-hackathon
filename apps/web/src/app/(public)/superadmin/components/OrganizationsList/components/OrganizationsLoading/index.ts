@@ -1,1 +1,1 @@
-export { OrganizationsLoading } from "./OrganizationsLoading";
+export * from "./OrganizationsLoading";

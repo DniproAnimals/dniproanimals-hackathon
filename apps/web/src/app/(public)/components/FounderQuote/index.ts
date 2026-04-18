@@ -1,1 +1,1 @@
-export { FounderQuote } from "./FounderQuote";
+export * from "./FounderQuote";

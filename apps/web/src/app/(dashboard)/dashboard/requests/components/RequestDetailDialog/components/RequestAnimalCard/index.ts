@@ -1,1 +1,1 @@
-export { RequestAnimalCard } from "./RequestAnimalCard";
+export * from "./RequestAnimalCard";

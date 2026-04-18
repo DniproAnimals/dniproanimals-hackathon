@@ -1,1 +1,1 @@
-export { FilterBarSearchField } from "./FilterBarSearchField";
+export * from "./FilterBarSearchField";

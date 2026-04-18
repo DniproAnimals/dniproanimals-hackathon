@@ -1,5 +1,5 @@
 "use client";
-import AnimalCard from "@/shared/components/AnimalCard";
+import { AnimalCard } from "@/shared/components/AnimalCard";
 import { useOrganizationAnimalsQuery } from "@/shared/query-hooks";
 import { IconPawFilled } from "@dniproanimals/icons";
 import { motion } from "motion/react";

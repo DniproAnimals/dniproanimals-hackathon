@@ -1,1 +1,1 @@
-export { OrganizationCard } from "./OrganizationCard";
+export * from "./OrganizationCard";

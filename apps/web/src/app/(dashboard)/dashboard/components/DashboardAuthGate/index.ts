@@ -1,1 +1,1 @@
-export { DashboardAuthGate } from "./DashboardAuthGate";
+export * from "./DashboardAuthGate";

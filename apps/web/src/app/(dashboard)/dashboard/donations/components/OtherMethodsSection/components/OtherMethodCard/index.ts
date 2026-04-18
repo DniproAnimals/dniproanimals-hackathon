@@ -1,1 +1,1 @@
-export { OtherMethodCard } from "./OtherMethodCard";
+export * from "./OtherMethodCard";

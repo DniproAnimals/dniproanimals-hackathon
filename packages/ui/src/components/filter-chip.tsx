@@ -34,7 +34,7 @@ export type FilterChipProps = ComponentProps<"button"> &
     count?: number;
   };
 
-function FilterChip({
+export function FilterChip({
   className,
   variant,
   size,
@@ -74,5 +74,3 @@ function FilterChip({
     </button>
   );
 }
-
-export { FilterChip, filterChipVariants };

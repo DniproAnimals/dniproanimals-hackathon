@@ -6,7 +6,7 @@ interface InputWithIconProps extends ComponentProps<"div"> {
   iconPosition?: "left" | "right";
 }
 
-function InputWithIcon({
+export function InputWithIcon({
   className,
   icon,
   iconPosition = "left",
@@ -44,5 +44,3 @@ function InputWithIcon({
     </div>
   );
 }
-
-export { InputWithIcon };

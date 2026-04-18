@@ -1,1 +1,1 @@
-export { RequestsFilters } from "./RequestsFilters";
+export * from "./RequestsFilters";

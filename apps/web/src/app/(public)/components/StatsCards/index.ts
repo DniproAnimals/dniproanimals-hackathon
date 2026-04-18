@@ -1,1 +1,1 @@
-export { StatsCards } from "./StatsCards";
+export * from "./StatsCards";

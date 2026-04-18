@@ -1,1 +1,1 @@
-export { OverviewStatCard } from "./OverviewStatCard";
+export * from "./OverviewStatCard";

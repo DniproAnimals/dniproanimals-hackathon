@@ -1,1 +1,1 @@
-export { HeroIntro } from "./HeroIntro";
+export * from "./HeroIntro";

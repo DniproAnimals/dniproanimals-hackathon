@@ -1,1 +1,1 @@
-export { ContactsSection } from "./ContactsSection";
+export * from "./ContactsSection";

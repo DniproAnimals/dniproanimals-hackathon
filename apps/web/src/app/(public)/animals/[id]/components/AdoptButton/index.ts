@@ -1,1 +1,1 @@
-export { AdoptButton } from "./AdoptButton";
+export * from "./AdoptButton";

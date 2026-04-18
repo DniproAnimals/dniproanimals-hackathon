@@ -1,1 +1,1 @@
-export { TeamMemberChip } from "./TeamMemberChip";
+export * from "./TeamMemberChip";

@@ -1,1 +1,1 @@
-export { BackgroundPaws } from "./BackgroundPaws";
+export * from "./BackgroundPaws";

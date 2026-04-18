@@ -14,7 +14,7 @@ import {
 import { cn } from "../utils";
 import { Label } from "./label";
 
-const Form = FormProvider;
+export const Form = FormProvider;
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
@@ -27,7 +27,7 @@ const FormFieldContext = createContext<FormFieldContextValue>(
   {} as FormFieldContextValue,
 );
 
-function FormField<
+export function FormField<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({ ...props }: ControllerProps<TFieldValues, TName>) {
@@ -38,7 +38,7 @@ function FormField<
   );
 }
 
-function useFormField() {
+export function useFormField() {
   const fieldContext = useContext(FormFieldContext);
   const itemContext = useContext(FormItemContext);
   const { getFieldState } = useFormContext();
@@ -67,7 +67,7 @@ const FormItemContext = createContext<FormItemContextValue>(
   {} as FormItemContextValue,
 );
 
-function FormItem({ className, ...props }: ComponentProps<"div">) {
+export function FormItem({ className, ...props }: ComponentProps<"div">) {
   const id = useId();
   return (
     <FormItemContext.Provider value={{ id }}>
@@ -80,7 +80,7 @@ function FormItem({ className, ...props }: ComponentProps<"div">) {
   );
 }
 
-function FormLabel({
+export function FormLabel({
   className,
   ...props
 }: ComponentProps<typeof LabelPrimitive.Root>) {
@@ -96,7 +96,7 @@ function FormLabel({
   );
 }
 
-function FormControl({ ...props }: ComponentProps<typeof Slot>) {
+export function FormControl({ ...props }: ComponentProps<typeof Slot>) {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
   return (
@@ -114,7 +114,7 @@ function FormControl({ ...props }: ComponentProps<typeof Slot>) {
   );
 }
 
-function FormDescription({ className, ...props }: ComponentProps<"p">) {
+export function FormDescription({ className, ...props }: ComponentProps<"p">) {
   const { formDescriptionId } = useFormField();
   return (
     <p
@@ -126,7 +126,11 @@ function FormDescription({ className, ...props }: ComponentProps<"p">) {
   );
 }
 
-function FormMessage({ className, children, ...props }: ComponentProps<"p">) {
+export function FormMessage({
+  className,
+  children,
+  ...props
+}: ComponentProps<"p">) {
   const { error, formMessageId } = useFormField();
   const body = error ? String(error?.message ?? "") : children;
   if (!body) return null;
@@ -141,14 +145,3 @@ function FormMessage({ className, children, ...props }: ComponentProps<"p">) {
     </p>
   );
 }
-
-export {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  useFormField,
-};

@@ -1,4 +1,1 @@
-export {
-  VolunteerStatusBadge,
-  VolunteerStatusChip,
-} from "./VolunteerStatusBadge";
+export * from "./VolunteerStatusBadge";

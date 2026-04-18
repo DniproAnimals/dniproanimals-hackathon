@@ -8,7 +8,7 @@ interface EmptyStateProps extends Omit<ComponentProps<"div">, "title"> {
   action?: ReactNode;
 }
 
-function EmptyState({
+export function EmptyState({
   className,
   icon,
   title,
@@ -40,5 +40,3 @@ function EmptyState({
     </div>
   );
 }
-
-export { EmptyState };

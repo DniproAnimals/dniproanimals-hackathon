@@ -1,1 +1,1 @@
-export { RegisterOrganizationButton } from "./RegisterOrganizationButton";
+export * from "./RegisterOrganizationButton";

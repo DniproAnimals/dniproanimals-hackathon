@@ -1,1 +1,1 @@
-export { OrganizationCardActions } from "./OrganizationCardActions";
+export * from "./OrganizationCardActions";

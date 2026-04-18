@@ -1,1 +1,1 @@
-export { LostChipGroup, type ChipOption } from "./LostChipGroup";
+export * from "./LostChipGroup";
