@@ -1,5 +1,4 @@
 @import "@dniproanimals/ui/theme.css";
-@source "../../../../packages/ui/src";
 
 ::-webkit-scrollbar {
   width: 4px;
