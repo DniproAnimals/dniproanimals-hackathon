@@ -19,7 +19,7 @@ import { LostPhotoCarousel } from "./components/LostPhotoCarousel";
 
 interface LostDetailDialogProps extends Omit<DialogProps, "children"> {
   item: LostAnimal | null;
-  onEdit: (id: number) => void;
+  onEdit: (item: LostAnimal) => void;
   onClose: () => void;
 }
 

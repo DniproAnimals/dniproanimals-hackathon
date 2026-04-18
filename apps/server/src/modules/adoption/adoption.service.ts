@@ -8,6 +8,7 @@ import {
   db,
   desc,
   eq,
+  sql,
 } from "@dniproanimals/database";
 
 type AdoptionInsert = typeof adoptionRequestsTable.$inferInsert;
@@ -32,7 +33,7 @@ export const adoptionService = {
 
     const q = filters.q?.toLowerCase();
 
-    return rows
+    const filtered = rows
       .filter((r) => (filters.orgId ? r.animal?.orgId === filters.orgId : true))
       .filter((r) =>
         filters.status ? r.request.status === filters.status : true,
@@ -48,6 +49,30 @@ export const adoptionService = {
         animalName: r.animal?.name ?? null,
         animalType: r.animal?.type ?? null,
       }));
+
+    return filters.limit ? filtered.slice(0, filters.limit) : filtered;
+  },
+
+  async statsByOrg(orgId: number) {
+    const [row] = await db
+      .select({
+        total: sql<number>`count(*)::int`,
+        pending: sql<number>`count(*) filter (where ${adoptionRequestsTable.status} = 'pending')::int`,
+        approved: sql<number>`count(*) filter (where ${adoptionRequestsTable.status} = 'approved')::int`,
+        rejected: sql<number>`count(*) filter (where ${adoptionRequestsTable.status} = 'rejected')::int`,
+      })
+      .from(adoptionRequestsTable)
+      .leftJoin(
+        animalsTable,
+        eq(adoptionRequestsTable.animalId, animalsTable.id),
+      )
+      .where(eq(animalsTable.orgId, orgId));
+    return {
+      total: row?.total ?? 0,
+      pending: row?.pending ?? 0,
+      approved: row?.approved ?? 0,
+      rejected: row?.rejected ?? 0,
+    };
   },
 
   async create(body: CreateAdoptionBody) {

@@ -40,11 +40,12 @@ export const volunteersService = {
       conditions.push(isNull(volunteersTable.userId));
     }
 
-    return db
+    const base = db
       .select()
       .from(volunteersTable)
       .where(and(...conditions))
       .orderBy(desc(volunteersTable.createdAt));
+    return filters.limit ? base.limit(filters.limit) : base;
   },
 
   async statsByOrg(orgId: number) {

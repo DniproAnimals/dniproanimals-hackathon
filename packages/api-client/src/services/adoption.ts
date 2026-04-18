@@ -1,4 +1,5 @@
 import type {
+  AdoptionStatsResponse,
   CreateAdoptionBody,
   CreateAdoptionResponse,
   ListAdoptionQuery,
@@ -15,6 +16,10 @@ export function createAdoptionApiService(http: HttpFn) {
       http<ListAdoptionResponse>({
         endpoint: endpoints.adoption.list(),
         query,
+      }),
+    stats: () =>
+      http<AdoptionStatsResponse>({
+        endpoint: endpoints.adoption.stats(),
       }),
     create: (body: CreateAdoptionBody) =>
       http<CreateAdoptionResponse>({

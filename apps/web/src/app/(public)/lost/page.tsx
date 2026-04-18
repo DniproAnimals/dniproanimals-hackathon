@@ -1,18 +1,48 @@
-import type { Metadata } from "next";
+"use client";
+import type { LostAnimal } from "@dniproanimals/contracts";
+import { useState } from "react";
+import { LostDetailDialog } from "./components/LostDetailDialog";
+import { LostFormDialog } from "./components/LostFormDialog";
 import { LostHeader } from "./components/LostHeader";
 import { LostList } from "./components/LostList";
 
-export const metadata: Metadata = {
-  title: "Загублені тварини у Дніпрі | DniproAnimals",
-  description:
-    "Допоможіть знайти господарів для загублених тварин у Дніпрі. Оголошення про зниклих собак, котів та інших хвостиків.",
-};
+export default function LostPage() {
+  const [viewing, setViewing] = useState<LostAnimal | null>(null);
+  const [editing, setEditing] = useState<LostAnimal | null>(null);
+  const [creating, setCreating] = useState(false);
 
-export default async function LostPage() {
+  const openCreate = () => setCreating(true);
+  const openView = (item: LostAnimal) => setViewing(item);
+  const openEdit = (item: LostAnimal) => {
+    setViewing(null);
+    setEditing(item);
+  };
+  const closeView = () => setViewing(null);
+  const closeForm = () => {
+    setCreating(false);
+    setEditing(null);
+  };
+
+  const formOpen = creating || editing != null;
+
   return (
-    <div className="max-w-6xl mx-auto px-6 py-6 pb-24 md:pb-6">
-      <LostHeader />
-      <LostList />
-    </div>
+    <>
+      <LostHeader onCreate={openCreate} />
+      <LostList onView={openView} />
+
+      <LostDetailDialog
+        open={viewing != null}
+        onOpenChange={(o) => !o && closeView()}
+        item={viewing}
+        onEdit={openEdit}
+        onClose={closeView}
+      />
+      <LostFormDialog
+        open={formOpen}
+        onOpenChange={(o) => !o && closeForm()}
+        item={editing}
+        onClose={closeForm}
+      />
+    </>
   );
 }

@@ -2,16 +2,22 @@
 import { useCurrentOrg } from "@/shared/query-hooks";
 import { IconPlus } from "@dniproanimals/icons";
 import { Button } from "@dniproanimals/ui";
-import { useState } from "react";
 
-export function AddVolunteerButton({ size = "md" }: { size?: "sm" | "md" }) {
+interface AddVolunteerButtonProps {
+  onClick: () => void;
+  size?: "sm" | "md";
+}
+
+export function AddVolunteerButton({
+  onClick,
+  size = "md",
+}: AddVolunteerButtonProps) {
   const { isOwner } = useCurrentOrg();
-  const [, setCreateOpen] = useState(false);
 
   if (!isOwner) return null;
 
   return (
-    <Button variant="primary" size={size} onClick={() => setCreateOpen(true)}>
+    <Button variant="primary" size={size} onClick={onClick}>
       <IconPlus size={size === "sm" ? 14 : 16} /> Додати
     </Button>
   );

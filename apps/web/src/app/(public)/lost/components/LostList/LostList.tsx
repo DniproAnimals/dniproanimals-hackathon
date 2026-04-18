@@ -1,28 +1,21 @@
 "use client";
 import { useLostQuery } from "@/shared/query-hooks";
+import { repeat } from "@/shared/utils";
+import type { LostAnimal } from "@dniproanimals/contracts";
 import { Skeleton } from "@dniproanimals/ui";
-import { parseAsInteger, useQueryState } from "nuqs";
 import { LostCard } from "../LostCard";
-import { LostDetailDialog } from "../LostDetailDialog";
 
-export function LostList() {
+interface LostListProps {
+  onView: (item: LostAnimal) => void;
+}
+
+export function LostList({ onView }: LostListProps) {
   const { data: items = [], isLoading } = useLostQuery({ type: "lost" });
-  const [viewId, setViewId] = useQueryState("viewLost", parseAsInteger);
-  const [, setEditId] = useQueryState("editLost", parseAsInteger);
-
-  const selected =
-    viewId != null ? (items.find((i) => i.id === viewId) ?? null) : null;
-
-  const closeView = () => setViewId(null);
-  const handleEdit = async (id: number) => {
-    await setViewId(null);
-    await setEditId(id);
-  };
 
   if (isLoading) {
     return (
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array.from({ length: 6 }).map((_, i) => (
+        {repeat(6).map((_, i) => (
           <Skeleton key={i} className="rounded-2xl h-48" />
         ))}
       </div>
@@ -38,23 +31,10 @@ export function LostList() {
   }
 
   return (
-    <>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {items.map((item) => (
-          <LostCard
-            key={item.id}
-            item={item}
-            onClick={() => setViewId(item.id)}
-          />
-        ))}
-      </div>
-      <LostDetailDialog
-        open={selected != null}
-        onOpenChange={(o) => !o && closeView()}
-        item={selected}
-        onEdit={handleEdit}
-        onClose={closeView}
-      />
-    </>
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {items.map((item) => (
+        <LostCard key={item.id} item={item} onClick={() => onView(item)} />
+      ))}
+    </div>
   );
 }

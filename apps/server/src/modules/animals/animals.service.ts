@@ -93,11 +93,30 @@ export const animalsService = {
       if (qFilter) filters.push(qFilter);
     }
 
-    return db
+    const base = db
       .select()
       .from(animalsTable)
       .where(filters.length ? and(...filters) : undefined)
       .orderBy(orderBy(query.sort));
+    return query.limit ? base.limit(query.limit) : base;
+  },
+
+  async statsByOrg(orgId: number) {
+    const [row] = await db
+      .select({
+        total: sql<number>`count(*)::int`,
+        available: sql<number>`count(*) filter (where ${animalsTable.status} = 'available')::int`,
+        reserved: sql<number>`count(*) filter (where ${animalsTable.status} = 'reserved')::int`,
+        adopted: sql<number>`count(*) filter (where ${animalsTable.status} = 'adopted')::int`,
+      })
+      .from(animalsTable)
+      .where(eq(animalsTable.orgId, orgId));
+    return {
+      total: row?.total ?? 0,
+      available: row?.available ?? 0,
+      reserved: row?.reserved ?? 0,
+      adopted: row?.adopted ?? 0,
+    };
   },
 
   async getById(id: number) {

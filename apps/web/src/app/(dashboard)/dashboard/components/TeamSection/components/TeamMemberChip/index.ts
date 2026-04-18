@@ -1,0 +1,1 @@
+export { TeamMemberChip } from "./TeamMemberChip";

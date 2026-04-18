@@ -1,0 +1,1 @@
+export { AnimalsTable } from "./AnimalsTable";

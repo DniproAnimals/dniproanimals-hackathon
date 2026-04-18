@@ -2,8 +2,8 @@
 import {
   useCreateVolunteerMutation,
   useUpdateVolunteerMutation,
-  useVolunteersQuery,
 } from "@/shared/query-hooks";
+import type { Volunteer } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import {
   Dialog,
@@ -22,20 +22,17 @@ import {
 } from "../VolunteerForm";
 
 interface VolunteerFormDialogProps extends Omit<DialogProps, "children"> {
-  editId: number | null;
+  volunteer: Volunteer | null;
   onClose: () => void;
 }
 
 export function VolunteerFormDialog({
-  editId,
+  volunteer,
   onClose,
   ...dialogProps
 }: VolunteerFormDialogProps) {
   const queryClient = useQueryClient();
-  const { data: volunteers = [] } = useVolunteersQuery();
-  const existing =
-    editId != null ? volunteers.find((v) => v.id === editId) : null;
-  const isEditing = editId != null;
+  const isEditing = volunteer != null;
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: [endpoints.volunteers.list()] });
@@ -54,14 +51,14 @@ export function VolunteerFormDialog({
     },
   });
 
-  const defaultValues: VolunteerFormValues = existing
-    ? volunteerToFormValues(existing)
+  const defaultValues: VolunteerFormValues = volunteer
+    ? volunteerToFormValues(volunteer)
     : VOLUNTEER_FORM_DEFAULTS;
 
   const handleSubmit = (values: VolunteerFormValues) => {
     const body = volunteerFormValuesToBody(values);
-    if (editId != null) {
-      updateMutation.mutate({ id: editId, ...body });
+    if (volunteer) {
+      updateMutation.mutate({ id: volunteer.id, ...body });
     } else {
       createMutation.mutate(body);
     }
@@ -78,7 +75,7 @@ export function VolunteerFormDialog({
           </DialogTitle>
         </DialogHeader>
         <VolunteerForm
-          key={editId ?? "create"}
+          key={volunteer?.id ?? "create"}
           defaultValues={defaultValues}
           onSubmit={handleSubmit}
           submitting={submitting}

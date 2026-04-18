@@ -1,4 +1,5 @@
 import {
+  adoptionStatsResponseSchema,
   createAdoptionBodySchema,
   createAdoptionResponseSchema,
   listAdoptionQuerySchema,
@@ -33,6 +34,20 @@ export const adoptionController = createController({
         })),
       );
     },
+  }),
+
+  stats: defineRoute({
+    method: "GET",
+    url: endpoints.adoption.stats(),
+    schema: {
+      response: { 200: adoptionStatsResponseSchema },
+    },
+    handler: withAuth(async (request, reply) => {
+      const user = await usersService.getById(request.session.userId);
+      if (!user?.orgId) throw new UnauthorizedError();
+      const stats = await adoptionService.statsByOrg(user.orgId);
+      return reply.send(stats);
+    }),
   }),
 
   create: defineRoute({

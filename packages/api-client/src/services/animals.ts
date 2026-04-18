@@ -1,4 +1,5 @@
 import type {
+  AnimalsStatsResponse,
   CreateAnimalBody,
   CreateAnimalResponse,
   DeleteAnimalResponse,
@@ -17,6 +18,10 @@ export function createAnimalsApiService(http: HttpFn) {
       http<ListAnimalsResponse>({
         endpoint: endpoints.animals.list(),
         query,
+      }),
+    stats: () =>
+      http<AnimalsStatsResponse>({
+        endpoint: endpoints.animals.stats(),
       }),
     get: (id: number) =>
       http<GetAnimalResponse>({

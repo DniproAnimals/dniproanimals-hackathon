@@ -1,0 +1,1 @@
+export { RecentAnimalRow } from "./RecentAnimalRow";

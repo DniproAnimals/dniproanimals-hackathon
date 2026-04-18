@@ -1,0 +1,1 @@
+export { AnimalsCount } from "./AnimalsCount";

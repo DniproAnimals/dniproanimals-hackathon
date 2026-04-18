@@ -1,0 +1,1 @@
+export { OtherMethodCard } from "./OtherMethodCard";

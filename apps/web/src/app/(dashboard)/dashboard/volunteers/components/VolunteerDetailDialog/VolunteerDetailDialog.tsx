@@ -15,7 +15,7 @@ import { VolunteerDetailActions } from "./components/VolunteerDetailActions";
 
 interface VolunteerDetailDialogProps extends Omit<DialogProps, "children"> {
   volunteer: Volunteer | null;
-  onEdit: (id: number) => void;
+  onEdit: (volunteer: Volunteer) => void;
   onClose: () => void;
 }
 

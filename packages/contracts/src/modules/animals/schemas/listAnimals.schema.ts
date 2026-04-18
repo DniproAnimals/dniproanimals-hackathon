@@ -33,9 +33,18 @@ export const listAnimalsQuerySchema = z.object({
   color: commaSeparatedArraySchema().nullish(),
   q: z.string().nullish(),
   sort: listAnimalsSortSchema.nullish(),
+  limit: z.coerce.number().int().positive().max(100).nullish(),
 });
 
 export type ListAnimalsQuery = z.infer<typeof listAnimalsQuerySchema>;
 
 export const listAnimalsResponseSchema = z.array(animalModel);
 export type ListAnimalsResponse = z.infer<typeof listAnimalsResponseSchema>;
+
+export const animalsStatsResponseSchema = z.object({
+  total: z.number(),
+  available: z.number(),
+  reserved: z.number(),
+  adopted: z.number(),
+});
+export type AnimalsStatsResponse = z.infer<typeof animalsStatsResponseSchema>;

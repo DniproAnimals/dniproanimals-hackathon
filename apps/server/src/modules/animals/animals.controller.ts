@@ -1,4 +1,5 @@
 import {
+  animalsStatsResponseSchema,
   createAnimalBodySchema,
   createAnimalResponseSchema,
   deleteAnimalParamsSchema,
@@ -12,7 +13,7 @@ import {
   updateAnimalResponseSchema,
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
-import { NotFoundError } from "../../shared/errors";
+import { NotFoundError, UnauthorizedError } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
 import { toAnimalResponse } from "../../shared/utils/serializers";
 import { withAuth } from "../auth/auth.guard";
@@ -31,6 +32,20 @@ export const animalsController = createController({
       const rows = await animalsService.list(request.query);
       return reply.send(rows.map(toAnimalResponse));
     },
+  }),
+
+  stats: defineRoute({
+    method: "GET",
+    url: endpoints.animals.stats(),
+    schema: {
+      response: { 200: animalsStatsResponseSchema },
+    },
+    handler: withAuth(async (request, reply) => {
+      const user = await usersService.getById(request.session.userId);
+      if (!user?.orgId) throw new UnauthorizedError();
+      const stats = await animalsService.statsByOrg(user.orgId);
+      return reply.send(stats);
+    }),
   }),
 
   get: defineRoute({

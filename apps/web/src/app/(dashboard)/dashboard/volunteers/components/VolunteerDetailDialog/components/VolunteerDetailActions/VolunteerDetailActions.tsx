@@ -12,7 +12,7 @@ import { useState } from "react";
 
 interface VolunteerDetailActionsProps {
   volunteer: Volunteer;
-  onEdit: (id: number) => void;
+  onEdit: (volunteer: Volunteer) => void;
   onClose: () => void;
 }
 
@@ -58,7 +58,7 @@ export function VolunteerDetailActions({
       <Button
         variant="soft"
         size="lg"
-        onClick={() => onEdit(volunteer.id)}
+        onClick={() => onEdit(volunteer)}
         className="flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100"
       >
         <IconEdit size={14} /> Редагувати

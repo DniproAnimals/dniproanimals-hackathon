@@ -9,6 +9,7 @@ export type VolunteerStatusFilter = z.infer<typeof volunteerStatusFilterSchema>;
 export const listVolunteersQuerySchema = z.object({
   q: z.string().optional(),
   status: volunteerStatusFilterSchema.optional(),
+  limit: z.coerce.number().int().positive().max(100).optional(),
 });
 export type ListVolunteersQuery = z.infer<typeof listVolunteersQuerySchema>;
 

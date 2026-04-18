@@ -1,0 +1,1 @@
+export { AnimalsSearchField } from "./AnimalsSearchField";

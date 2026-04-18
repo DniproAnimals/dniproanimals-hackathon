@@ -1,9 +1,9 @@
 "use client";
 import {
   useCreateLostMutation,
-  useLostQuery,
   useUpdateLostMutation,
 } from "@/shared/query-hooks";
+import type { LostAnimal } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import { IconEdit, IconSearch, IconX } from "@dniproanimals/icons";
 import {
@@ -25,19 +25,17 @@ import {
 } from "../LostForm";
 
 interface LostFormDialogProps extends Omit<DialogProps, "children"> {
-  editId: number | null;
+  item: LostAnimal | null;
   onClose: () => void;
 }
 
 export function LostFormDialog({
-  editId,
+  item,
   onClose,
   ...dialogProps
 }: LostFormDialogProps) {
   const queryClient = useQueryClient();
-  const { data: items = [] } = useLostQuery({ type: "lost" });
-  const existing = editId != null ? items.find((i) => i.id === editId) : null;
-  const isEditing = editId != null;
+  const isEditing = item != null;
 
   const invalidate = () =>
     queryClient.invalidateQueries({ queryKey: [endpoints.lost.list()] });
@@ -54,14 +52,14 @@ export function LostFormDialog({
     },
   });
 
-  const defaultValues: LostFormValues = existing
-    ? lostToFormValues(existing)
+  const defaultValues: LostFormValues = item
+    ? lostToFormValues(item)
     : LOST_FORM_DEFAULTS;
 
   const handleSubmit = (values: LostFormValues) => {
     const body = lostFormValuesToBody(values);
-    if (editId != null) {
-      updateMutation.mutate({ id: editId, body });
+    if (item) {
+      updateMutation.mutate({ id: item.id, body });
     } else {
       createMutation.mutate(body);
     }
@@ -96,7 +94,7 @@ export function LostFormDialog({
           </Button>
         </div>
         <LostForm
-          key={editId ?? "create"}
+          key={item?.id ?? "create"}
           defaultValues={defaultValues}
           onSubmit={handleSubmit}
           submitting={submitting}

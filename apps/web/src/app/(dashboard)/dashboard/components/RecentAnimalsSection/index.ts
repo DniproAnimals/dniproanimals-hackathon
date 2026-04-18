@@ -1,0 +1,1 @@
+export { RecentAnimalsSection } from "./RecentAnimalsSection";

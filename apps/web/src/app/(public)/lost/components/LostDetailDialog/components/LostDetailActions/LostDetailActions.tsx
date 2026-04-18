@@ -8,7 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 interface LostDetailActionsProps {
   item: LostAnimal;
-  onEdit: (id: number) => void;
+  onEdit: (item: LostAnimal) => void;
   onClose: () => void;
 }
 
@@ -31,7 +31,7 @@ export function LostDetailActions({
 
   return (
     <div className="flex gap-2 mb-4">
-      <Button variant="outline" size="sm" onClick={() => onEdit(item.id)}>
+      <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
         <IconEdit size={15} />
         Редагувати
       </Button>
