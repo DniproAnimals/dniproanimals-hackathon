@@ -9,6 +9,8 @@ const DialogTrigger = DialogPrimitive.Trigger;
 const DialogPortal = DialogPrimitive.Portal;
 const DialogClose = DialogPrimitive.Close;
 
+type DialogProps = ComponentProps<typeof Dialog>;
+
 function DialogOverlay({
   className,
   ...props
@@ -117,3 +119,4 @@ export {
   DialogTitle,
   DialogTrigger,
 };
+export type { DialogProps };

@@ -1,0 +1,1 @@
+export { AnimalDetailHeader } from "./AnimalDetailHeader";

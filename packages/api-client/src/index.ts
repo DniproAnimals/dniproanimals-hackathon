@@ -1,3 +1,3 @@
 export * from "./client";
-export * from "./utils";
 export * from "./services";
+export * from "./utils";

@@ -1,4 +1,5 @@
 "use client";
+import { ORG_STATUS_BADGE_VARIANT, ORG_STATUS_LABEL } from "@/shared/constants";
 import {
   useMeQuery,
   useOrganizationsQuery,
@@ -38,15 +39,6 @@ export default function SuperAdminPage() {
 
   if (loading || user?.role !== "superadmin") return null;
 
-  const statusVariant = (
-    status: string,
-  ): "warning" | "success" | "danger" | "default" => {
-    if (status === "pending") return "warning";
-    if (status === "approved") return "success";
-    if (status === "rejected") return "danger";
-    return "default";
-  };
-
   return (
     <div className="max-w-4xl mx-auto px-6 py-6 pb-24 md:pb-6">
       <h1 className="text-2xl font-bold mb-1">Суперадмін</h1>
@@ -62,12 +54,11 @@ export default function SuperAdminPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-semibold">{org.name}</h3>
-                    <Badge variant={statusVariant(org.status)} size="sm">
-                      {org.status === "pending"
-                        ? "На модерації"
-                        : org.status === "approved"
-                          ? "Схвалено"
-                          : "Відхилено"}
+                    <Badge
+                      variant={ORG_STATUS_BADGE_VARIANT[org.status]}
+                      size="sm"
+                    >
+                      {ORG_STATUS_LABEL[org.status]}
                     </Badge>
                   </div>
                   {org.location && (

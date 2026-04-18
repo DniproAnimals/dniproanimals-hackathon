@@ -1,0 +1,1 @@
+export { AnimalStatusBadge } from "./AnimalStatusBadge";

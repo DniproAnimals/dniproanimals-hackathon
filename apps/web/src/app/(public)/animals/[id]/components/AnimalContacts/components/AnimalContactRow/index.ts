@@ -1,0 +1,1 @@
+export { AnimalContactRow } from "./AnimalContactRow";

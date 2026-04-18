@@ -17,7 +17,6 @@ import {
   organizationsTable,
   sql,
 } from "@dniproanimals/database";
-import type { SQL } from "drizzle-orm";
 
 type AnimalInsert = typeof animalsTable.$inferInsert;
 

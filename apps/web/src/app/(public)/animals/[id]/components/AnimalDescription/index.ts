@@ -1,0 +1,1 @@
+export { AnimalDescription } from "./AnimalDescription";

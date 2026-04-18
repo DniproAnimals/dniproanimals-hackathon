@@ -1,5 +1,5 @@
 "use client";
-import { useUpdateJarMutation } from "@/shared/query-hooks";
+import { useCurrentOrg, useUpdateJarMutation } from "@/shared/query-hooks";
 import {
   IconCheck,
   IconCoin,
@@ -9,10 +9,9 @@ import {
 import { Badge, Button, Card, Input } from "@dniproanimals/ui";
 import Link from "next/link";
 import { useState } from "react";
-import { useDashboard } from "../layout";
 
 export default function DonationsPage() {
-  const { org, isOwner, refreshOrg } = useDashboard();
+  const { org, isOwner, refetch: refreshOrg } = useCurrentOrg();
   const [jarId, setJarId] = useState(org?.monobankJarId ?? "");
   const [jarInput, setJarInput] = useState(
     org?.monobankJarId

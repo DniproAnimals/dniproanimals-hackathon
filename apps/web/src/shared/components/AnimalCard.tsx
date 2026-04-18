@@ -1,5 +1,6 @@
 "use client";
 import ImageFallback from "@/shared/components/ImageFallback";
+import { getAnimalAgeLabel, getAnimalSizeLabel } from "@/shared/constants";
 import {
   useFavoritesQuery,
   useMeQuery,
@@ -19,21 +20,6 @@ import {
 import { Badge, cn } from "@dniproanimals/ui";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-
-function getAgeLabel(months: number | null): string {
-  if (!months) return "Невідомо";
-  if (months < 12) return `${months} міс.`;
-  const years = Math.floor(months / 12);
-  const yWord = years === 1 ? "рік" : years < 5 ? "роки" : "років";
-  return `${years} ${yWord}`;
-}
-
-function getSizeLabel(size: string | null): string {
-  if (size === "small") return "Малий";
-  if (size === "medium") return "Середній";
-  if (size === "large") return "Великий";
-  return "—";
-}
 
 const tintColors = [
   "bg-green-50",
@@ -213,7 +199,7 @@ export default function AnimalCard({
                     Розмір
                   </span>
                   <span className="text-[11px] text-foreground/70 ml-auto">
-                    {getSizeLabel(animal.size)}
+                    {getAnimalSizeLabel(animal.size)}
                     {animal.weightKg ? ` · ${animal.weightKg} кг` : ""}
                   </span>
                 </div>
@@ -343,7 +329,7 @@ export default function AnimalCard({
           </span>
         </div>
         <p className="text-xs text-gray-medium mt-0.5">
-          {getAgeLabel(animal.ageMonths)} | {animal.breed || "Мікс"}
+          {getAnimalAgeLabel(animal.ageMonths)} | {animal.breed || "Мікс"}
         </p>
       </div>
     </div>

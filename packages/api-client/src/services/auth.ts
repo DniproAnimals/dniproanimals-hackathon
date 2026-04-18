@@ -1,8 +1,8 @@
 import type {
-  User,
   LoginBody,
   LogoutResponse,
   RegisterBody,
+  User,
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import type { HttpFn } from "../utils";

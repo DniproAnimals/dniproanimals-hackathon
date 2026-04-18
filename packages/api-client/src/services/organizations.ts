@@ -15,7 +15,6 @@ import type {
 import { endpoints } from "@dniproanimals/endpoints";
 import type { HttpFn } from "../utils";
 
-
 export function createOrganizationsApiService(http: HttpFn) {
   return {
     list: () =>

@@ -44,6 +44,7 @@ export const endpoints = createTypedEndpoints({
   },
   volunteers: {
     list: "/volunteers",
+    stats: "/volunteers/stats",
     create: "/volunteers",
     update: "/volunteers",
     delete: "/volunteers",

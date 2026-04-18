@@ -1,4 +1,5 @@
 "use client";
+import { ORG_STATUS_BADGE_VARIANT, ORG_STATUS_LABEL } from "@/shared/constants";
 import {
   useMeQuery,
   useOrganizationsQuery,
@@ -58,18 +59,6 @@ export default function SuperadminPage() {
   const filtered =
     filter === "all" ? orgs : orgs.filter((o) => o.status === filter);
 
-  const statusLabel = (s: string) => {
-    if (s === "pending") return "На модерації";
-    if (s === "approved") return "Схвалено";
-    return "Відхилено";
-  };
-
-  const statusVariant = (s: string): "warning" | "success" | "danger" => {
-    if (s === "pending") return "warning";
-    if (s === "approved") return "success";
-    return "danger";
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-border">
@@ -116,7 +105,7 @@ export default function SuperadminPage() {
                     : orgs.filter((o) => o.status === f).length
                 }
               >
-                {f === "all" ? "Усі" : statusLabel(f)}
+                {f === "all" ? "Усі" : ORG_STATUS_LABEL[f]}
               </FilterChip>
             ))}
           </div>
@@ -140,8 +129,11 @@ export default function SuperadminPage() {
                       <h3 className="font-semibold text-foreground truncate">
                         {org.name}
                       </h3>
-                      <Badge variant={statusVariant(org.status)} size="sm">
-                        {statusLabel(org.status)}
+                      <Badge
+                        variant={ORG_STATUS_BADGE_VARIANT[org.status]}
+                        size="sm"
+                      >
+                        {ORG_STATUS_LABEL[org.status]}
                       </Badge>
                     </div>
                     {org.description && (

@@ -50,7 +50,11 @@ function InvitePage() {
     e.preventDefault();
     if (!token) return;
     setError("");
-    acceptMutation.mutate({ token, email: form.email, password: form.password });
+    acceptMutation.mutate({
+      token,
+      email: form.email,
+      password: form.password,
+    });
   };
 
   if (isLoading) {

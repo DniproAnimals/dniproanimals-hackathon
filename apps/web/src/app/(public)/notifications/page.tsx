@@ -4,7 +4,11 @@ import {
   useLostQuery,
   useMeQuery,
 } from "@/shared/query-hooks";
-import { IconBellFilled, IconHeartFilled, IconSearch } from "@dniproanimals/icons";
+import {
+  IconBellFilled,
+  IconHeartFilled,
+  IconSearch,
+} from "@dniproanimals/icons";
 import {
   Badge,
   Card,

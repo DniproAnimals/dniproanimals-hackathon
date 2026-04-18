@@ -1,4 +1,7 @@
-import type { CreateAdoptionBody } from "@dniproanimals/contracts";
+import type {
+  CreateAdoptionBody,
+  ListAdoptionQuery,
+} from "@dniproanimals/contracts";
 import {
   adoptionRequestsTable,
   animalsTable,
@@ -10,7 +13,7 @@ import {
 type AdoptionInsert = typeof adoptionRequestsTable.$inferInsert;
 
 export const adoptionService = {
-  async list(orgId?: number) {
+  async list(filters: ListAdoptionQuery = {}) {
     const rows = await db
       .select({
         request: adoptionRequestsTable,
@@ -27,8 +30,19 @@ export const adoptionService = {
       )
       .orderBy(desc(adoptionRequestsTable.createdAt));
 
+    const q = filters.q?.toLowerCase();
+
     return rows
-      .filter((r) => (orgId ? r.animal?.orgId === orgId : true))
+      .filter((r) => (filters.orgId ? r.animal?.orgId === filters.orgId : true))
+      .filter((r) =>
+        filters.status ? r.request.status === filters.status : true,
+      )
+      .filter((r) => {
+        if (!q) return true;
+        const hay =
+          `${r.request.name} ${r.request.email} ${r.animal?.name ?? ""}`.toLowerCase();
+        return hay.includes(q);
+      })
       .map((r) => ({
         ...r.request,
         animalName: r.animal?.name ?? null,

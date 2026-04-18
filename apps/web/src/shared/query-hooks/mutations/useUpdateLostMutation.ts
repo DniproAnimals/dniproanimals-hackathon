@@ -4,10 +4,7 @@ import type {
   UpdateLostBody,
   UpdateLostResponse,
 } from "@dniproanimals/contracts";
-import {
-  useMutation,
-  type UseMutationOptions,
-} from "@tanstack/react-query";
+import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 
 type UpdateLostArgs = { id: number; body: UpdateLostBody };
 

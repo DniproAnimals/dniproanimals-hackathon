@@ -1,46 +1,5 @@
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../utils";
-import { Label } from "./label";
-
-interface FormFieldProps extends ComponentProps<"div"> {
-  label?: ReactNode;
-  htmlFor?: string;
-  hint?: ReactNode;
-  error?: ReactNode;
-  required?: boolean;
-}
-
-function FormField({
-  className,
-  label,
-  htmlFor,
-  hint,
-  error,
-  required,
-  children,
-  ...props
-}: FormFieldProps) {
-  return (
-    <div
-      data-slot="form-field"
-      className={cn("space-y-1.5", className)}
-      {...props}
-    >
-      {label && (
-        <Label htmlFor={htmlFor}>
-          {label}
-          {required && <span className="text-destructive ml-0.5">*</span>}
-        </Label>
-      )}
-      {children}
-      {error ? (
-        <p className="text-xs text-destructive">{error}</p>
-      ) : hint ? (
-        <p className="text-xs text-gray-medium">{hint}</p>
-      ) : null}
-    </div>
-  );
-}
 
 interface InputWithIconProps extends ComponentProps<"div"> {
   icon?: ReactNode;
@@ -86,4 +45,4 @@ function InputWithIcon({
   );
 }
 
-export { FormField, InputWithIcon };
+export { InputWithIcon };

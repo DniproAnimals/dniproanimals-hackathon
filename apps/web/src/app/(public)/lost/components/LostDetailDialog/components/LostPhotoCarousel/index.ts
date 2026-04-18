@@ -1,0 +1,1 @@
+export { LostPhotoCarousel } from "./LostPhotoCarousel";

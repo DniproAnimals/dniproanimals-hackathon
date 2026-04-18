@@ -1,0 +1,1 @@
+export { AnimalNotFound } from "./AnimalNotFound";

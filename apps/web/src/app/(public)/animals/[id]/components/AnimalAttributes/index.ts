@@ -1,0 +1,1 @@
+export { AnimalAttributes } from "./AnimalAttributes";

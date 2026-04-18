@@ -4,10 +4,7 @@ import type {
   UpdateAnimalBody,
   UpdateAnimalResponse,
 } from "@dniproanimals/contracts";
-import {
-  useMutation,
-  type UseMutationOptions,
-} from "@tanstack/react-query";
+import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 
 type UpdateAnimalArgs = { id: number; body: UpdateAnimalBody };
 

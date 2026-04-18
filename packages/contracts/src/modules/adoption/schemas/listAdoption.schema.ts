@@ -1,8 +1,13 @@
 import { z } from "zod";
-import { adoptionRequestWithAnimalModel } from "../models";
+import {
+  adoptionRequestWithAnimalModel,
+  adoptionStatusSchema,
+} from "../models";
 
 export const listAdoptionQuerySchema = z.object({
   orgId: z.coerce.number().optional(),
+  q: z.string().optional(),
+  status: adoptionStatusSchema.optional(),
 });
 export type ListAdoptionQuery = z.infer<typeof listAdoptionQuerySchema>;
 

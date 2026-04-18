@@ -1,10 +1,22 @@
 "use client";
 import {
+  ADOPTION_STATUS_BADGE_VARIANT,
+  ADOPTION_STATUS_LABEL,
+  ANIMAL_TYPE_EMOJI,
+  getAnimalTypeLabel,
+} from "@/shared/constants";
+import {
   useAdoptionQuery,
+  useCurrentOrg,
   useUpdateAdoptionStatusMutation,
 } from "@/shared/query-hooks";
-import type { AdoptionRequestWithAnimal } from "@dniproanimals/contracts";
+import type {
+  AdoptionRequestWithAnimal,
+  AnimalType,
+} from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
+
+import { SearchField } from "@/shared/components/SearchField";
 import {
   IconBan,
   IconBrandFacebook,
@@ -25,31 +37,43 @@ import {
   DialogContent,
   EmptyState,
   FilterChip,
-  Input,
 } from "@dniproanimals/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
-import { useDashboard } from "../layout";
+import { useRequestsFilterState } from "./hooks/useRequestsFilterState";
+
+function getRequestAnimalTypeLabel(type: string | null): string {
+  const emoji =
+    (type && ANIMAL_TYPE_EMOJI[type as AnimalType]) ?? ANIMAL_TYPE_EMOJI.other;
+  return `${emoji} ${getAnimalTypeLabel(type)}`;
+}
 
 export default function RequestsPage() {
-  const qc = useQueryClient();
-  const { org } = useDashboard();
+  const queryClient = useQueryClient();
+  const { org } = useCurrentOrg();
+  const [filters, setFilters] = useRequestsFilterState();
+
   const { data: requests = [] } = useAdoptionQuery(
+    {
+      orgId: org?.id,
+      q: filters.q ?? undefined,
+      status: filters.status ?? undefined,
+    },
+    { enabled: !!org?.id },
+  );
+  const { data: allRequests = [] } = useAdoptionQuery(
     { orgId: org?.id },
     { enabled: !!org?.id },
   );
+
   const updateMutation = useUpdateAdoptionStatusMutation({
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: [endpoints.adoption.list()] });
-      qc.invalidateQueries({ queryKey: [endpoints.animals.list()] });
+      queryClient.invalidateQueries({ queryKey: [endpoints.adoption.list()] });
+      queryClient.invalidateQueries({ queryKey: [endpoints.animals.list()] });
     },
   });
 
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "pending" | "approved" | "rejected"
-  >("all");
   const [selected, setSelected] = useState<AdoptionRequestWithAnimal | null>(
     null,
   );
@@ -59,23 +83,6 @@ export default function RequestsPage() {
     if (selected?.id === id) setSelected({ ...selected, status });
   };
 
-  const filtered = requests.filter((r) => {
-    const matchSearch =
-      !search ||
-      `${r.name} ${r.email} ${r.animalName || ""}`
-        .toLowerCase()
-        .includes(search.toLowerCase());
-    const matchStatus = statusFilter === "all" || r.status === statusFilter;
-    return matchSearch && matchStatus;
-  });
-
-  const statusLabel = (s: string) =>
-    s === "pending" ? "Очікує" : s === "approved" ? "Схвалено" : "Відхилено";
-  const statusVariant = (s: string): "warning" | "success" | "danger" =>
-    s === "pending" ? "warning" : s === "approved" ? "success" : "danger";
-  const typeLabel = (t: string | null) =>
-    t === "dog" ? "🐕 Собака" : t === "cat" ? "🐈 Кіт" : "🐾 Інше";
-
   return (
     <div className="max-w-5xl">
       <h1 className="text-2xl font-bold text-foreground mb-6">
@@ -83,43 +90,48 @@ export default function RequestsPage() {
       </h1>
 
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <Input
-          type="text"
-          placeholder="Пошук..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="bg-white w-72"
+        <SearchField
+          value={filters.q ?? ""}
+          onChange={(v) => setFilters({ q: v })}
+          inputClassName="bg-white w-72"
         />
         <div className="flex gap-1">
           {(["all", "pending", "approved", "rejected"] as const).map((s) => (
             <FilterChip
               key={s}
-              variant={statusFilter === s ? "active" : "outline"}
+              variant={(filters.status ?? "all") === s ? "active" : "outline"}
               size="md"
-              onClick={() => setStatusFilter(s)}
+              onClick={() =>
+                setFilters({
+                  status:
+                    s === "all"
+                      ? null
+                      : (s as "pending" | "approved" | "rejected"),
+                })
+              }
               count={
                 s === "all"
-                  ? requests.length
-                  : requests.filter((r) => r.status === s).length
+                  ? allRequests.length
+                  : allRequests.filter((r) => r.status === s).length
               }
             >
-              {s === "all" ? "Усі" : statusLabel(s)}
+              {s === "all" ? "Усі" : ADOPTION_STATUS_LABEL[s]}
             </FilterChip>
           ))}
         </div>
       </div>
 
-      {filtered.length === 0 ? (
+      {requests.length === 0 ? (
         <Card>
           <EmptyState
             title={
-              requests.length === 0 ? "Ще немає анкет" : "Нічого не знайдено"
+              allRequests.length === 0 ? "Ще немає анкет" : "Нічого не знайдено"
             }
           />
         </Card>
       ) : (
         <div className="space-y-2">
-          {filtered.map((r) => (
+          {requests.map((r) => (
             <button
               key={r.id}
               onClick={() => setSelected(r)}
@@ -134,12 +146,15 @@ export default function RequestsPage() {
                     <p className="font-medium text-foreground text-sm truncate">
                       {r.name}
                     </p>
-                    <Badge variant={statusVariant(r.status)} size="sm">
-                      {statusLabel(r.status)}
+                    <Badge
+                      variant={ADOPTION_STATUS_BADGE_VARIANT[r.status]}
+                      size="sm"
+                    >
+                      {ADOPTION_STATUS_LABEL[r.status]}
                     </Badge>
                   </div>
                   <p className="text-xs text-gray-medium mt-0.5">
-                    {typeLabel(r.animalType)}:{" "}
+                    {getRequestAnimalTypeLabel(r.animalType)}:{" "}
                     <span className="text-foreground font-medium">
                       {r.animalName}
                     </span>
@@ -171,8 +186,11 @@ export default function RequestsPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h2 className="text-lg font-bold">{selected.name}</h2>
-                      <Badge variant={statusVariant(selected.status)} size="md">
-                        {statusLabel(selected.status)}
+                      <Badge
+                        variant={ADOPTION_STATUS_BADGE_VARIANT[selected.status]}
+                        size="md"
+                      >
+                        {ADOPTION_STATUS_LABEL[selected.status]}
                       </Badge>
                     </div>
                     <p className="text-xs text-gray-medium mt-0.5">
@@ -188,7 +206,8 @@ export default function RequestsPage() {
                   <div>
                     <p className="text-xs text-gray-medium">Тварина</p>
                     <p className="text-sm font-semibold">
-                      {selected.animalName} · {typeLabel(selected.animalType)}
+                      {selected.animalName} ·{" "}
+                      {getRequestAnimalTypeLabel(selected.animalType)}
                     </p>
                   </div>
                   <Link
@@ -221,25 +240,37 @@ export default function RequestsPage() {
                   </div>
                   {selected.location && (
                     <div className="flex items-center gap-2.5 text-sm">
-                      <IconMapPinFilled size={16} className="text-gray-medium" />
+                      <IconMapPinFilled
+                        size={16}
+                        className="text-gray-medium"
+                      />
                       <span>{selected.location}</span>
                     </div>
                   )}
                   {selected.instagram && (
                     <div className="flex items-center gap-2.5 text-sm">
-                      <IconBrandInstagram size={16} className="text-gray-medium" />
+                      <IconBrandInstagram
+                        size={16}
+                        className="text-gray-medium"
+                      />
                       <span>@{selected.instagram}</span>
                     </div>
                   )}
                   {selected.telegram && (
                     <div className="flex items-center gap-2.5 text-sm">
-                      <IconBrandTelegram size={16} className="text-gray-medium" />
+                      <IconBrandTelegram
+                        size={16}
+                        className="text-gray-medium"
+                      />
                       <span>@{selected.telegram}</span>
                     </div>
                   )}
                   {selected.facebook && (
                     <div className="flex items-center gap-2.5 text-sm">
-                      <IconBrandFacebook size={16} className="text-gray-medium" />
+                      <IconBrandFacebook
+                        size={16}
+                        className="text-gray-medium"
+                      />
                       <span>{selected.facebook}</span>
                     </div>
                   )}
@@ -251,7 +282,10 @@ export default function RequestsPage() {
                       Повідомлення
                     </p>
                     <div className="bg-gray-light rounded-xl p-4 flex gap-2.5">
-                      <IconMessageFilled size={16} className="text-gray-medium" />
+                      <IconMessageFilled
+                        size={16}
+                        className="text-gray-medium"
+                      />
                       <p className="text-sm text-foreground leading-relaxed">
                         {selected.message}
                       </p>
@@ -284,11 +318,11 @@ export default function RequestsPage() {
                   </div>
                 ) : (
                   <Badge
-                    variant={statusVariant(selected.status)}
+                    variant={ADOPTION_STATUS_BADGE_VARIANT[selected.status]}
                     size="lg"
                     className="w-full justify-center py-3"
                   >
-                    {statusLabel(selected.status)}
+                    {ADOPTION_STATUS_LABEL[selected.status]}
                   </Badge>
                 )}
               </div>

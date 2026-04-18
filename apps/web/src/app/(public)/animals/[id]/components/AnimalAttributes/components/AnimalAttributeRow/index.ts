@@ -1,0 +1,1 @@
+export { AnimalAttributeRow } from "./AnimalAttributeRow";

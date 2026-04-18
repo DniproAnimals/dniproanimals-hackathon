@@ -1,5 +1,6 @@
 import type {
   CreateVolunteerBody,
+  ListVolunteersQuery,
   UpdateVolunteerBody,
 } from "@dniproanimals/contracts";
 import {
@@ -7,7 +8,12 @@ import {
   db,
   desc,
   eq,
+  ilike,
+  isNotNull,
+  isNull,
+  or,
   organizationsTable,
+  sql,
   volunteersTable,
 } from "@dniproanimals/database";
 import crypto from "node:crypto";
@@ -15,12 +21,46 @@ import crypto from "node:crypto";
 type VolunteerInsert = typeof volunteersTable.$inferInsert;
 
 export const volunteersService = {
-  async listByOrg(orgId: number) {
+  async listByOrg(orgId: number, filters: ListVolunteersQuery = {}) {
+    const conditions = [eq(volunteersTable.orgId, orgId)];
+
+    if (filters.q) {
+      const like = `%${filters.q}%`;
+      const searchClause = or(
+        ilike(volunteersTable.name, like),
+        ilike(volunteersTable.surname, like),
+        ilike(volunteersTable.email, like),
+      );
+      if (searchClause) conditions.push(searchClause);
+    }
+
+    if (filters.status === "active") {
+      conditions.push(isNotNull(volunteersTable.userId));
+    } else if (filters.status === "pending") {
+      conditions.push(isNull(volunteersTable.userId));
+    }
+
     return db
       .select()
       .from(volunteersTable)
-      .where(eq(volunteersTable.orgId, orgId))
+      .where(and(...conditions))
       .orderBy(desc(volunteersTable.createdAt));
+  },
+
+  async statsByOrg(orgId: number) {
+    const [row] = await db
+      .select({
+        total: sql<number>`count(*)::int`,
+        active: sql<number>`count(*) filter (where ${volunteersTable.userId} is not null)::int`,
+        pending: sql<number>`count(*) filter (where ${volunteersTable.userId} is null)::int`,
+      })
+      .from(volunteersTable)
+      .where(eq(volunteersTable.orgId, orgId));
+    return {
+      total: row?.total ?? 0,
+      active: row?.active ?? 0,
+      pending: row?.pending ?? 0,
+    };
   },
 
   async create(orgId: number, body: CreateVolunteerBody) {

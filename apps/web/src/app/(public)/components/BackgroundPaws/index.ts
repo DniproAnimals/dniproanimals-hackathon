@@ -1,0 +1,1 @@
+export { BackgroundPaws } from "./BackgroundPaws";

@@ -24,7 +24,7 @@ export const adoptionController = createController({
       response: { 200: listAdoptionResponseSchema },
     },
     handler: async (request, reply) => {
-      const rows = await adoptionService.list(request.query.orgId);
+      const rows = await adoptionService.list(request.query);
       return reply.send(
         rows.map((r) => ({
           ...toAdoptionResponse(r),

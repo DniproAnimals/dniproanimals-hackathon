@@ -1,0 +1,1 @@
+export { VolunteerDetailDialog } from "./VolunteerDetailDialog";

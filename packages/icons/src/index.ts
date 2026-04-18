@@ -1,2 +1,2 @@
 export * from "@tabler/icons-react";
-export * from './PawIcon'
+export * from "./PawIcon";

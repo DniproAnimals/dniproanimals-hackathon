@@ -3,7 +3,7 @@ import {
   useAdoptionQuery,
   useAnimalsQuery,
   useCreateVolunteerMutation,
-  useMeQuery,
+  useCurrentOrg,
   useVolunteersQuery,
 } from "@/shared/query-hooks";
 import { endpoints } from "@dniproanimals/endpoints";
@@ -34,12 +34,10 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
-import { useDashboard } from "./layout";
 
 export default function DashboardOverview() {
-  const qc = useQueryClient();
-  const { org, isOwner } = useDashboard();
-  const { data: user } = useMeQuery();
+  const queryClient = useQueryClient();
+  const { org, isOwner, user } = useCurrentOrg();
   const orgId = org?.id;
   const { data: animals = [], isLoading: animalsLoading } = useAnimalsQuery(
     { orgId },
@@ -49,13 +47,19 @@ export default function DashboardOverview() {
     { orgId },
     { enabled: !!orgId },
   );
-  const { data: volunteers = [], isLoading: volLoading } = useVolunteersQuery({
-    enabled: !!orgId,
-  });
+  const { data: volunteers = [], isLoading: volLoading } = useVolunteersQuery(
+    {},
+    { enabled: !!orgId },
+  );
 
   const addVolunteerMutation = useCreateVolunteerMutation({
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: [endpoints.volunteers.list()] });
+      queryClient.invalidateQueries({
+        queryKey: [endpoints.volunteers.list()],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [endpoints.volunteers.stats()],
+      });
       setVolForm({
         name: "",
         surname: "",

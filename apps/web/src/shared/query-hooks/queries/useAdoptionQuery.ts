@@ -3,7 +3,13 @@ import { apiClient } from "@/shared/api-client";
 import type { OmitQueryOptions } from "@/shared/types/react-query";
 import type { ListAdoptionQuery } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
+
+export const adoptionQueryOptions = (query: ListAdoptionQuery = {}) =>
+  queryOptions({
+    queryKey: [endpoints.adoption.list(), query],
+    queryFn: () => apiClient.adoption.list(query),
+  });
 
 export const useAdoptionQuery = (
   query: ListAdoptionQuery = {},

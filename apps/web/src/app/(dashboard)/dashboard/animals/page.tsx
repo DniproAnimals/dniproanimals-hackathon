@@ -1,7 +1,15 @@
 "use client";
 import ImageFallback from "@/shared/components/ImageFallback";
+import { SearchField } from "@/shared/components/SearchField";
+import {
+  ANIMAL_STATUS_BADGE_VARIANT,
+  ANIMAL_STATUS_LABEL,
+  getAnimalSexLabel,
+  getAnimalTypeLabel,
+} from "@/shared/constants";
 import {
   useAnimalsQuery,
+  useCurrentOrg,
   useDeleteAnimalMutation,
 } from "@/shared/query-hooks";
 import type { AnimalStatus, AnimalType } from "@dniproanimals/contracts";
@@ -11,7 +19,6 @@ import {
   Button,
   Card,
   EmptyState,
-  Input,
   Select,
   SelectContent,
   SelectItem,
@@ -26,29 +33,26 @@ import {
 } from "@dniproanimals/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { useState } from "react";
-import { useDashboard } from "../layout";
+import { useAnimalsFilterState } from "./hooks/useAnimalsFilterState";
 
 export default function AnimalsPage() {
-  const qc = useQueryClient();
-  const { org } = useDashboard();
-  const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState<AnimalType | "">("");
-  const [statusFilter, setStatusFilter] = useState<AnimalStatus | "">("");
+  const queryClient = useQueryClient();
+  const { org } = useCurrentOrg();
+  const [filters, setFilters] = useAnimalsFilterState();
 
   const { data: animals = [] } = useAnimalsQuery(
     {
       orgId: org?.id,
-      type: typeFilter || undefined,
-      status: statusFilter || undefined,
-      q: search || undefined,
+      type: filters.type ?? undefined,
+      status: filters.status ?? undefined,
+      q: filters.q ?? undefined,
     },
     { enabled: !!org?.id },
   );
 
   const deleteMut = useDeleteAnimalMutation({
     onSuccess: () =>
-      qc.invalidateQueries({ queryKey: [endpoints.animals.list()] }),
+      queryClient.invalidateQueries({ queryKey: [endpoints.animals.list()] }),
   });
 
   const handleDelete = (id: number) => {
@@ -56,40 +60,25 @@ export default function AnimalsPage() {
     deleteMut.mutate(id);
   };
 
-  const typeLabel = (t: string) =>
-    t === "dog" ? "Собака" : t === "cat" ? "Кіт" : "Інше";
-  const statusLabel = (s: string) =>
-    s === "available"
-      ? "Шукає дім"
-      : s === "adopted"
-        ? "Усиновлено"
-        : "Заброньовано";
-  const statusVariant = (s: string): "success" | "info" | "warning" =>
-    s === "available" ? "success" : s === "adopted" ? "info" : "warning";
-  const sexLabel = (s: string | null) =>
-    s === "male" ? "Хлопчик" : s === "female" ? "Дівчинка" : "";
-
   return (
     <div className="max-w-5xl">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">Тварини</h1>
         <Button asChild variant="primary">
-          <Link href="/dashboard/animals/edit">Додати тварину</Link>
+          <Link href="/dashboard/animals/add">Додати тварину</Link>
         </Button>
       </div>
 
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <Input
-          type="text"
-          placeholder="Пошук..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="bg-white w-56"
+        <SearchField
+          value={filters.q ?? ""}
+          onChange={(v) => setFilters({ q: v })}
+          inputClassName="bg-white w-56"
         />
         <Select
-          value={typeFilter || "all"}
+          value={filters.type ?? "all"}
           onValueChange={(v) =>
-            setTypeFilter(v === "all" ? "" : (v as AnimalType))
+            setFilters({ type: v === "all" ? null : (v as AnimalType) })
           }
         >
           <SelectTrigger className="bg-white w-auto">
@@ -103,9 +92,9 @@ export default function AnimalsPage() {
           </SelectContent>
         </Select>
         <Select
-          value={statusFilter || "all"}
+          value={filters.status ?? "all"}
           onValueChange={(v) =>
-            setStatusFilter(v === "all" ? "" : (v as AnimalStatus))
+            setFilters({ status: v === "all" ? null : (v as AnimalStatus) })
           }
         >
           <SelectTrigger className="bg-white w-auto">
@@ -175,14 +164,17 @@ export default function AnimalsPage() {
                       </Link>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell text-gray-medium">
-                      {typeLabel(a.type)}
+                      {getAnimalTypeLabel(a.type)}
                     </TableCell>
                     <TableCell className="hidden md:table-cell text-gray-medium">
-                      {sexLabel(a.sex)}
+                      {a.sex ? getAnimalSexLabel(a.sex) : ""}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={statusVariant(a.status)} size="sm">
-                        {statusLabel(a.status)}
+                      <Badge
+                        variant={ANIMAL_STATUS_BADGE_VARIANT[a.status]}
+                        size="sm"
+                      >
+                        {ANIMAL_STATUS_LABEL[a.status]}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -193,7 +185,7 @@ export default function AnimalsPage() {
                           size="sm"
                           className="text-xs"
                         >
-                          <Link href={`/dashboard/animals/edit?edit=${a.id}`}>
+                          <Link href={`/dashboard/animals/${a.id}/edit`}>
                             Редагувати
                           </Link>
                         </Button>

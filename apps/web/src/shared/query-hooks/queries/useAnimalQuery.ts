@@ -2,7 +2,13 @@
 import { apiClient } from "@/shared/api-client";
 import type { OmitQueryOptions } from "@/shared/types/react-query";
 import { endpoints } from "@dniproanimals/endpoints";
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
+
+export const animalQueryOptions = (id: number) =>
+  queryOptions({
+    queryKey: [endpoints.animals.get({ id })],
+    queryFn: () => apiClient.animals.get(id),
+  });
 
 export const useAnimalQuery = (
   id: number,

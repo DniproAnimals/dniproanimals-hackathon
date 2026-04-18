@@ -1,0 +1,1 @@
+export { DashboardAuthGate } from "./DashboardAuthGate";

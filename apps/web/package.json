@@ -18,12 +18,14 @@
     "@dniproanimals/env": "*",
     "@dniproanimals/icons": "*",
     "@dniproanimals/ui": "*",
+    "@hookform/resolvers": "^5.2.2",
     "@tanstack/react-query": "^5.62.0",
     "motion": "^12.38.0",
     "next": "16.2.1",
     "nuqs": "^2.8.9",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-hook-form": "^7.72.1"
   },
   "devDependencies": {
     "@dniproanimals/eslint-config": "*",

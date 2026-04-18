@@ -1,0 +1,1 @@
+export { AdoptionSuccess } from "./AdoptionSuccess";

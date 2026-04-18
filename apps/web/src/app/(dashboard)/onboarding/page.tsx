@@ -72,7 +72,9 @@ export default function OnboardingPage() {
   const createOrgMutation = useCreateOrganizationMutation({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [endpoints.auth.me()] });
-      queryClient.invalidateQueries({ queryKey: [endpoints.organizations.list()] });
+      queryClient.invalidateQueries({
+        queryKey: [endpoints.organizations.list()],
+      });
       router.push("/dashboard");
     },
   });
@@ -385,7 +387,9 @@ export default function OnboardingPage() {
           disabled={createOrgMutation.isPending}
           className="w-full"
         >
-          {createOrgMutation.isPending ? "Створення..." : "Створити організацію"}
+          {createOrgMutation.isPending
+            ? "Створення..."
+            : "Створити організацію"}
         </Button>
 
         <p className="text-xs text-gray-medium text-center">

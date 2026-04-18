@@ -54,7 +54,7 @@ function Button({
   variant,
   size,
   shape,
-  type = 'button',
+  type = "button",
   asChild = false,
   ...props
 }: ButtonProps) {

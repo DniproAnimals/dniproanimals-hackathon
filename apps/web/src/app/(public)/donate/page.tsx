@@ -190,7 +190,6 @@ export default function DonatePage() {
               {[100, 500, 1000].map((val) => (
                 <Button
                   key={val}
-                  
                   variant={amount === val ? "primary" : "outline"}
                   onClick={() => {
                     setAmount(val);

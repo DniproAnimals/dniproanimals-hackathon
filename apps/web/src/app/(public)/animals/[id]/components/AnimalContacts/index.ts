@@ -1,0 +1,1 @@
+export { AnimalContacts } from "./AnimalContacts";

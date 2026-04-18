@@ -7,18 +7,25 @@ import type {
   DeleteVolunteerResponse,
   InviteInfoQuery,
   InviteInfoResponse,
+  ListVolunteersQuery,
   ListVolunteersResponse,
   UpdateVolunteerBody,
   UpdateVolunteerResponse,
+  VolunteersStatsResponse,
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import type { HttpFn } from "../utils";
 
 export function createVolunteersApiService(http: HttpFn) {
   return {
-    list: () =>
+    list: (query: ListVolunteersQuery = {}) =>
       http<ListVolunteersResponse>({
         endpoint: endpoints.volunteers.list(),
+        query,
+      }),
+    stats: () =>
+      http<VolunteersStatsResponse>({
+        endpoint: endpoints.volunteers.stats(),
       }),
     create: (body: CreateVolunteerBody) =>
       http<CreateVolunteerResponse>({

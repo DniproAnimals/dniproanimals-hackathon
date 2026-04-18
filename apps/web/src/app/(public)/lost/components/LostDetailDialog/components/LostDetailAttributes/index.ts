@@ -1,0 +1,1 @@
+export { LostDetailAttributes } from "./LostDetailAttributes";

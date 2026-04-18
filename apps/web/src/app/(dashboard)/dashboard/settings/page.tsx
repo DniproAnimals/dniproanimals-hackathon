@@ -1,6 +1,7 @@
 "use client";
 import ImageFallback from "@/shared/components/ImageFallback";
 import {
+  useCurrentOrg,
   useUpdateOwnOrganizationMutation,
   useUploadImageMutation,
 } from "@/shared/query-hooks";
@@ -29,7 +30,6 @@ import {
   Textarea,
 } from "@dniproanimals/ui";
 import { useRef, useState } from "react";
-import { useDashboard } from "../layout";
 
 const contactTypes = [
   { key: "instagram", label: "Instagram", icon: IconBrandInstagram },
@@ -39,7 +39,7 @@ const contactTypes = [
 ];
 
 export default function SettingsPage() {
-  const { org, isOwner, refreshOrg } = useDashboard();
+  const { org, isOwner, refetch: refreshOrg } = useCurrentOrg();
   const fileRef = useRef<HTMLInputElement>(null);
   const [saved, setSaved] = useState(false);
   const [showContactPicker, setShowContactPicker] = useState(false);

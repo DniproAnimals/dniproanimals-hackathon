@@ -7,9 +7,11 @@ import {
   deleteVolunteerResponseSchema,
   inviteInfoQuerySchema,
   inviteInfoResponseSchema,
+  listVolunteersQuerySchema,
   listVolunteersResponseSchema,
   updateVolunteerBodySchema,
   updateVolunteerResponseSchema,
+  volunteersStatsResponseSchema,
 } from "@dniproanimals/contracts";
 import { db, usersTable } from "@dniproanimals/database";
 import { endpoints } from "@dniproanimals/endpoints";
@@ -45,13 +47,28 @@ export const volunteersController = createController({
     method: "GET",
     url: endpoints.volunteers.list(),
     schema: {
+      querystring: listVolunteersQuerySchema,
       response: { 200: listVolunteersResponseSchema },
     },
     handler: withAuth(async (request, reply) => {
       const user = await usersService.getById(request.session.userId);
       if (!user?.orgId) throw new UnauthorizedError();
-      const rows = await volunteersService.listByOrg(user.orgId);
+      const rows = await volunteersService.listByOrg(user.orgId, request.query);
       return reply.send(rows.map(toVolunteerResponse));
+    }),
+  }),
+
+  stats: defineRoute({
+    method: "GET",
+    url: endpoints.volunteers.stats(),
+    schema: {
+      response: { 200: volunteersStatsResponseSchema },
+    },
+    handler: withAuth(async (request, reply) => {
+      const user = await usersService.getById(request.session.userId);
+      if (!user?.orgId) throw new UnauthorizedError();
+      const stats = await volunteersService.statsByOrg(user.orgId);
+      return reply.send(stats);
     }),
   }),
 
