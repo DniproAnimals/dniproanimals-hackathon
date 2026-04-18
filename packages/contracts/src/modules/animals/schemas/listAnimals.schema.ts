@@ -1,5 +1,12 @@
 import { z } from "zod";
-import { animalModel, animalStatusSchema } from "../models";
+import { commaSeparatedArraySchema } from "../../../shared/schemas";
+import {
+  animalModel,
+  animalSexSchema,
+  animalSizeSchema,
+  animalStatusSchema,
+  animalTypeSchema,
+} from "../models";
 
 export const listAnimalsSortSchema = z.enum([
   "newest",
@@ -14,19 +21,20 @@ export const listAnimalsSortSchema = z.enum([
 export type ListAnimalsSort = z.infer<typeof listAnimalsSortSchema>;
 
 export const listAnimalsQuerySchema = z.object({
-  orgId: z.coerce.number().optional(),
-  type: z.string().optional(),
-  sex: z.string().optional(),
-  size: z.string().optional(),
-  vaccinated: z.enum(["0", "1"]).optional(),
-  sterilized: z.enum(["0", "1"]).optional(),
-  trained: z.enum(["0", "1"]).optional(),
-  status: animalStatusSchema.optional(),
-  breed: z.string().optional(),
-  color: z.string().optional(),
-  q: z.string().optional(),
-  sort: listAnimalsSortSchema.optional(),
+  orgId: z.coerce.number().nullish(),
+  type: animalTypeSchema.nullish(),
+  sex: animalSexSchema.nullish(),
+  size: animalSizeSchema.nullish(),
+  vaccinated: z.boolean().nullish(),
+  sterilized: z.boolean().nullish(),
+  trained: z.boolean().nullish(),
+  status: animalStatusSchema.nullish(),
+  breed: commaSeparatedArraySchema().nullish(),
+  color: commaSeparatedArraySchema().nullish(),
+  q: z.string().nullish(),
+  sort: listAnimalsSortSchema.nullish(),
 });
+
 export type ListAnimalsQuery = z.infer<typeof listAnimalsQuerySchema>;
 
 export const listAnimalsResponseSchema = z.array(animalModel);

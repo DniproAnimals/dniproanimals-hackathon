@@ -5,7 +5,11 @@ import { AnimalAdminActions } from "../AnimalAdminActions";
 import { AnimalStatusBadge } from "../AnimalStatusBadge";
 import { FavoriteToggle } from "../FavoriteToggle";
 
-export function AnimalDetailHeader({ animal }: { animal: Animal }) {
+interface AnimalDetailHeaderProps {
+  animal: Animal;
+}
+
+export function AnimalDetailHeader({ animal }: AnimalDetailHeaderProps) {
   return (
     <div className="flex items-center justify-between gap-3 mb-1">
       <div className="flex items-center gap-2.5">
@@ -26,7 +30,7 @@ export function AnimalDetailHeader({ animal }: { animal: Animal }) {
       </div>
       <div className="flex items-center gap-2 shrink-0">
         <AnimalAdminActions animalId={animal.id} />
-        {animal.status === "available" && <AdoptButton />}
+        {animal.status === "available" && <AdoptButton animal={animal} />}
         <AnimalStatusBadge status={animal.status} />
       </div>
     </div>

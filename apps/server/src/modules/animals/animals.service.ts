@@ -41,12 +41,6 @@ function orderBy(sort: ListAnimalsQuery["sort"]) {
   }
 }
 
-const splitCsv = (v: string | undefined) =>
-  (v ?? "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-
 export const animalsService = {
   async list(query: ListAnimalsQuery) {
     const filters = [];
@@ -65,31 +59,23 @@ export const animalsService = {
       filters.push(visible);
     }
 
-    const types = splitCsv(query.type);
-    if (types.length === 1) filters.push(eq(animalsTable.type, types[0]!));
-    else if (types.length > 1) filters.push(inArray(animalsTable.type, types));
+    if (query.type) filters.push(eq(animalsTable.type, query.type));
+    if (query.sex) filters.push(eq(animalsTable.sex, query.sex));
+    if (query.size) filters.push(eq(animalsTable.size, query.size));
 
-    const sexes = splitCsv(query.sex);
-    if (sexes.length === 1) filters.push(eq(animalsTable.sex, sexes[0]!));
-    else if (sexes.length > 1) filters.push(inArray(animalsTable.sex, sexes));
-
-    const sizes = splitCsv(query.size);
-    if (sizes.length === 1) filters.push(eq(animalsTable.size, sizes[0]!));
-    else if (sizes.length > 1) filters.push(inArray(animalsTable.size, sizes));
-
-    if (query.vaccinated === "1")
+    if (query.vaccinated === true)
       filters.push(eq(animalsTable.vaccinated, true));
-    if (query.sterilized === "1")
+    if (query.sterilized === true)
       filters.push(eq(animalsTable.sterilized, true));
-    if (query.trained === "1") filters.push(eq(animalsTable.trained, true));
+    if (query.trained === true) filters.push(eq(animalsTable.trained, true));
     if (query.status) filters.push(eq(animalsTable.status, query.status));
 
-    const breeds = splitCsv(query.breed);
+    const breeds = query.breed ?? [];
     if (breeds.length === 1) filters.push(eq(animalsTable.breed, breeds[0]!));
     else if (breeds.length > 1)
       filters.push(inArray(animalsTable.breed, breeds));
 
-    const colors = splitCsv(query.color);
+    const colors = query.color ?? [];
     if (colors.length) {
       const colorFilter = or(
         ...colors.map((c) => ilike(animalsTable.color, `%${c}%`)),

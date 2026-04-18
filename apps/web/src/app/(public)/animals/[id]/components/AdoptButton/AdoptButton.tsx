@@ -1,15 +1,27 @@
 "use client";
+import { Animal } from "@dniproanimals/contracts";
 import { Button } from "@dniproanimals/ui";
-import { parseAsBoolean, useQueryState } from "nuqs";
+import { useState } from "react";
+import { AdoptionFlow } from "../AdoptionFlow";
 
-export function AdoptButton() {
-  const [, setAdopt] = useQueryState(
-    "adopt",
-    parseAsBoolean.withDefault(false),
-  );
+interface AdoptButtonProps {
+  animal: Animal;
+}
+
+export function AdoptButton({ animal }: AdoptButtonProps) {
+  const [adoptOpen, setAdoptOpen] = useState(false);
+
   return (
-    <Button variant="primary" size="md" onClick={() => setAdopt(true)}>
-      Забрати додому
-    </Button>
+    <>
+      <AdoptionFlow
+        open={adoptOpen}
+        onOpenChange={setAdoptOpen}
+        animalId={animal.id}
+        onClose={() => setAdoptOpen(false)}
+      />
+      <Button variant="primary" size="md" onClick={() => setAdoptOpen(true)}>
+        Забрати додому
+      </Button>
+    </>
   );
 }
