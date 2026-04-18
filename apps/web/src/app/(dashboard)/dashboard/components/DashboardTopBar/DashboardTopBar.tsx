@@ -2,14 +2,11 @@
 import { useCurrentOrg } from "@/shared/query-hooks";
 import { IconMenu2 } from "@dniproanimals/icons";
 import { Button } from "@dniproanimals/ui";
-import { parseAsBoolean, useQueryState } from "nuqs";
+import { useState } from "react";
 
 export function DashboardTopBar() {
   const { org } = useCurrentOrg();
-  const [, setOpen] = useQueryState(
-    "sidebar",
-    parseAsBoolean.withDefault(false),
-  );
+  const [, setOpen] = useState(false);
 
   return (
     <div className="md:hidden bg-white border-b border-gray-border px-4 py-3 flex items-center gap-3 sticky top-0 z-30">

@@ -1,10 +1,5 @@
 "use client";
-import {
-  useLogoutMutation,
-  useLostQuery,
-  useMeQuery,
-} from "@/shared/query-hooks";
-import { endpoints } from "@dniproanimals/endpoints";
+import { useLostQuery, useMeQuery } from "@/shared/query-hooks";
 import {
   IconChevronDown,
   IconHomeFilled,
@@ -24,10 +19,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@dniproanimals/ui";
-import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useLogOut } from "../hooks";
 
 const navItems = [
   { href: "/", label: "Про нас" },
@@ -39,20 +34,10 @@ const navItems = [
 
 export default function Header() {
   const pathname = usePathname();
-  const router = useRouter();
-  const queryClient = useQueryClient();
   const { data: user } = useMeQuery();
   const { data: lostItems } = useLostQuery({ type: "lost" });
   const lostCount = lostItems?.length ?? 0;
-
-  const logoutMutation = useLogoutMutation({
-    onSuccess: () => {
-      queryClient.setQueryData([endpoints.auth.me()], null);
-      queryClient.invalidateQueries({ queryKey: [endpoints.auth.me()] });
-      router.push("/");
-    },
-  });
-  const handleLogout = () => logoutMutation.mutate(undefined);
+  const logOut = useLogOut();
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -137,7 +122,7 @@ export default function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem destructive onClick={handleLogout}>
+                <DropdownMenuItem destructive onClick={logOut}>
                   <IconLogout />
                   Вийти
                 </DropdownMenuItem>
@@ -145,7 +130,7 @@ export default function Header() {
             </DropdownMenu>
           ) : (
             <Button asChild variant="subtle" shape="pill" size="sm">
-              <Link href="/auth">Увійти</Link>
+              <Link href="/auth/signin">Увійти</Link>
             </Button>
           )}
         </div>
@@ -176,7 +161,7 @@ export default function Header() {
               </Link>
             ))}
             <Link
-              href={user ? "/profile" : "/auth"}
+              href={user ? "/profile" : "/auth/signin"}
               className={cn(
                 "flex flex-col items-center gap-0.5 py-1 px-3 text-xs font-medium transition-colors",
                 pathname === "/profile"

@@ -6,8 +6,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@dniproanimals/ui";
-import { useFormContext } from "react-hook-form";
-import type { LostFormValues } from "../../constants/schema";
+import { useLostFormContext } from "../../hooks/useLostForm";
 import { LostChipGroup, type ChipOption } from "../LostChipGroup";
 
 const OPTIONS: ChipOption<"small" | "medium" | "large">[] = [
@@ -17,7 +16,7 @@ const OPTIONS: ChipOption<"small" | "medium" | "large">[] = [
 ];
 
 export function LostSizeField() {
-  const { control } = useFormContext<LostFormValues>();
+  const { control } = useLostFormContext();
   return (
     <FormField
       control={control}

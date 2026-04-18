@@ -1,11 +1,7 @@
 import Footer from "@/shared/components/Footer";
 import Header from "@/shared/components/Header";
 
-export default function PublicLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function PublicLayout({ children }: LayoutProps<"/">) {
   return (
     <>
       <Header />

@@ -2,14 +2,11 @@
 import { useCurrentOrg } from "@/shared/query-hooks";
 import { IconPlus } from "@dniproanimals/icons";
 import { Button } from "@dniproanimals/ui";
-import { parseAsBoolean, useQueryState } from "nuqs";
+import { useState } from "react";
 
 export function AddVolunteerButton({ size = "md" }: { size?: "sm" | "md" }) {
   const { isOwner } = useCurrentOrg();
-  const [, setCreateOpen] = useQueryState(
-    "createVolunteer",
-    parseAsBoolean.withDefault(false),
-  );
+  const [, setCreateOpen] = useState(false);
 
   if (!isOwner) return null;
 

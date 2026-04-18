@@ -1,7 +1,7 @@
 "use client";
 import { useAnimalQuery } from "@/shared/query-hooks";
 import { motion } from "motion/react";
-import { parseAsBoolean, useQueryState } from "nuqs";
+import { useState } from "react";
 import { AdoptionFlow } from "./components/AdoptionFlow";
 import { AnimalAttributes } from "./components/AnimalAttributes";
 import { AnimalBackButton } from "./components/AnimalBackButton";
@@ -19,15 +19,9 @@ const TYPE_EMOJI: Record<string, string> = {
   other: "🐾",
 };
 
-export default function AnimalDetailPage({ id }: { id: string }) {
-  const animalId = Number(id);
-  const { data: animal, isLoading } = useAnimalQuery(animalId, {
-    enabled: !!animalId,
-  });
-  const [adoptOpen, setAdoptOpen] = useQueryState(
-    "adopt",
-    parseAsBoolean.withDefault(false),
-  );
+export default function AnimalDetailPage({ id }: { id: number }) {
+  const { data: animal, isLoading } = useAnimalQuery(id);
+  const [adoptOpen, setAdoptOpen] = useState(false);
 
   if (isLoading) return <AnimalDetailSkeleton />;
   if (!animal) return <AnimalNotFound />;

@@ -39,6 +39,7 @@ export const endpoints = createTypedEndpoints({
     jar: "/organizations/jar",
   },
   superadmin: {
+    listOrgs: "/superadmin/organizations",
     updateOrg: "/superadmin/organizations",
     deleteOrg: "/superadmin/organizations",
   },

@@ -9,7 +9,7 @@ import { StorySection } from "./components/StorySection";
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-[#Fcfcfc] text-foreground selection:bg-primary selection:text-foreground relative z-0 pb-24 md:pb-0 overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-foreground relative z-0 pb-24 md:pb-0 overflow-hidden">
       <BackgroundPaws />
       <HeroSection />
       <StatsCards />

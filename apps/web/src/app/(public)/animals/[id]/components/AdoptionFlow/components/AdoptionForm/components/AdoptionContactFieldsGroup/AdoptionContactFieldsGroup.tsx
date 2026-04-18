@@ -20,8 +20,7 @@ import {
   PopoverTrigger,
 } from "@dniproanimals/ui";
 import { useState } from "react";
-import { useFormContext } from "react-hook-form";
-import type { AdoptionFormValues } from "../../schema";
+import { useAdoptionFormContext } from "../../hooks/useAdoptionForm";
 
 type ContactKey = "email" | "instagram" | "telegram" | "facebook";
 
@@ -49,7 +48,7 @@ const PLACEHOLDER: Record<ContactKey, string> = {
 const ALL: ContactKey[] = ["email", "instagram", "telegram", "facebook"];
 
 export function AdoptionContactFieldsGroup() {
-  const { control } = useFormContext<AdoptionFormValues>();
+  const { control } = useAdoptionFormContext();
   const [visible, setVisible] = useState<ContactKey[]>(["email"]);
   const [addOpen, setAddOpen] = useState(false);
 

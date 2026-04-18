@@ -8,19 +8,13 @@ import {
   DialogTitle,
   Form,
 } from "@dniproanimals/ui";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { AdoptionContactFieldsGroup } from "./components/AdoptionContactFieldsGroup";
 import { AdoptionLocationField } from "./components/AdoptionLocationField";
 import { AdoptionMessageField } from "./components/AdoptionMessageField";
 import { AdoptionNameField } from "./components/AdoptionNameField";
 import { AdoptionPhoneField } from "./components/AdoptionPhoneField";
-import {
-  ADOPTION_FORM_DEFAULTS,
-  adoptionFormSchema,
-  adoptionFormValuesToBody,
-  type AdoptionFormValues,
-} from "./schema";
+import { useAdoptionForm } from "./hooks/useAdoptionForm";
+import { adoptionFormValuesToBody, type AdoptionFormValues } from "./schema";
 
 interface AdoptionFormProps {
   animalId: number;
@@ -28,10 +22,7 @@ interface AdoptionFormProps {
 }
 
 export function AdoptionForm({ animalId, onSuccess }: AdoptionFormProps) {
-  const form = useForm<AdoptionFormValues>({
-    resolver: zodResolver(adoptionFormSchema),
-    defaultValues: ADOPTION_FORM_DEFAULTS,
-  });
+  const form = useAdoptionForm();
   const mutation = useCreateAdoptionMutation({ onSuccess });
 
   const handleSubmit = (values: AdoptionFormValues) => {

@@ -13,11 +13,11 @@ import {
   PopoverTrigger,
 } from "@dniproanimals/ui";
 import { useState } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
-import type { LostFormValues } from "../../constants/schema";
+import { useWatch } from "react-hook-form";
+import { useLostFormContext } from "../../hooks/useLostForm";
 
 export function LostBreedField() {
-  const { control } = useFormContext<LostFormValues>();
+  const { control } = useLostFormContext();
   const animalType = useWatch({ control, name: "animalType" });
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");

@@ -8,11 +8,10 @@ import {
   Input,
   InputWithIcon,
 } from "@dniproanimals/ui";
-import { useFormContext } from "react-hook-form";
-import type { LostFormValues } from "../../constants/schema";
+import { useLostFormContext } from "../../hooks/useLostForm";
 
 export function LostContactsFields() {
-  const { control } = useFormContext<LostFormValues>();
+  const { control } = useLostFormContext();
   return (
     <div className="pt-1 border-t border-gray-border">
       <p className="text-xs text-gray-medium mb-1.5 mt-2">Ваші контакти *</p>

@@ -39,13 +39,8 @@ export const organizationsController = createController({
     schema: {
       response: { 200: listOrganizationsResponseSchema },
     },
-    handler: async (request, reply) => {
-      const userId = request.session.userId;
-      const user = userId ? await usersService.getById(userId) : null;
-      const rows =
-        user?.role === "superadmin"
-          ? await organizationsService.listAll()
-          : await organizationsService.listApproved();
+    handler: async (_request, reply) => {
+      const rows = await organizationsService.listApproved();
       return reply.send(rows.map(toOrganizationResponse));
     },
   }),

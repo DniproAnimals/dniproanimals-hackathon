@@ -1,9 +1,10 @@
-import type { ReactNode } from "react";
 import { DashboardAuthGate } from "./components/DashboardAuthGate";
 import { DashboardSidebar } from "./components/DashboardSidebar";
 import { DashboardTopBar } from "./components/DashboardTopBar";
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: LayoutProps<"/dashboard">) {
   return (
     <DashboardAuthGate>
       <div className="min-h-screen bg-gray-50 flex">

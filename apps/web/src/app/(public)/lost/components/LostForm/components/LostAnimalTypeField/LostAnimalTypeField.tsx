@@ -6,8 +6,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@dniproanimals/ui";
-import { useFormContext } from "react-hook-form";
-import type { LostFormValues } from "../../constants/schema";
+import { useLostFormContext } from "../../hooks/useLostForm";
 import { LostChipGroup, type ChipOption } from "../LostChipGroup";
 
 const OPTIONS: ChipOption<"Собака" | "Кіт" | "Інше">[] = [
@@ -17,7 +16,7 @@ const OPTIONS: ChipOption<"Собака" | "Кіт" | "Інше">[] = [
 ];
 
 export function LostAnimalTypeField() {
-  const { control, setValue } = useFormContext<LostFormValues>();
+  const { control, setValue } = useLostFormContext();
   return (
     <FormField
       control={control}

@@ -7,11 +7,10 @@ import {
   FormMessage,
   Input,
 } from "@dniproanimals/ui";
-import { useFormContext } from "react-hook-form";
-import type { VolunteerFormValues } from "../../schema";
+import { useVolunteerFormContext } from "../../hooks/useVolunteerForm";
 
 export function VolunteerNameField() {
-  const { control } = useFormContext<VolunteerFormValues>();
+  const { control } = useVolunteerFormContext();
   return (
     <FormField
       control={control}

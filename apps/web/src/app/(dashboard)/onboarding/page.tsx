@@ -1,5 +1,6 @@
 "use client";
 import ImageFallback from "@/shared/components/ImageFallback";
+import { RequiredAuth } from "@/shared/components/RequiredAuth";
 import {
   useCreateOrganizationMutation,
   useMeQuery,
@@ -30,7 +31,6 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  Skeleton,
   Textarea,
 } from "@dniproanimals/ui";
 import { useQueryClient } from "@tanstack/react-query";
@@ -46,9 +46,17 @@ const contactTypes = [
 ];
 
 export default function OnboardingPage() {
+  return (
+    <RequiredAuth>
+      <OnboardingContent />
+    </RequiredAuth>
+  );
+}
+
+function OnboardingContent() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { data: user, isLoading: loading } = useMeQuery();
+  const { data: user } = useMeQuery();
   const fileRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<"choose" | "org">("choose");
   const [visibleContacts, setVisibleContacts] = useState<string[]>([]);
@@ -91,18 +99,7 @@ export default function OnboardingPage() {
     createOrgMutation.mutate(form);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-[80vh] flex items-center justify-center">
-        <Skeleton className="size-10 rounded-full" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    router.replace("/auth");
-    return null;
-  }
+  if (!user) return null;
 
   if (step === "choose") {
     return (

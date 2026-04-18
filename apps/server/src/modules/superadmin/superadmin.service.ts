@@ -1,5 +1,6 @@
 import {
   db,
+  desc,
   eq,
   notificationsTable,
   organizationsTable,
@@ -8,6 +9,13 @@ import {
 } from "@dniproanimals/database";
 
 export const superadminService = {
+  async listOrgs() {
+    return db
+      .select()
+      .from(organizationsTable)
+      .orderBy(desc(organizationsTable.createdAt));
+  },
+
   async updateOrgStatus(
     id: number,
     status: "pending" | "approved" | "rejected",

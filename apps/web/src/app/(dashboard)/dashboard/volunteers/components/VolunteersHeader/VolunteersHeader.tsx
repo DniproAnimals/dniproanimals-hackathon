@@ -1,15 +1,13 @@
 "use client";
 import { useVolunteersStatsQuery } from "@/shared/query-hooks";
-import { parseAsBoolean, parseAsInteger, useQueryState } from "nuqs";
+import { parseAsInteger, useQueryState } from "nuqs";
+import { useState } from "react";
 import { AddVolunteerButton } from "../AddVolunteerButton";
 import { VolunteerFormDialog } from "../VolunteerFormDialog";
 
 export function VolunteersHeader() {
   const { data: stats } = useVolunteersStatsQuery();
-  const [createOpen, setCreateOpen] = useQueryState(
-    "createVolunteer",
-    parseAsBoolean.withDefault(false),
-  );
+  const [createOpen, setCreateOpen] = useState(false);
   const [editId, setEditId] = useQueryState("editVolunteer", parseAsInteger);
 
   const isOpen = createOpen || editId != null;

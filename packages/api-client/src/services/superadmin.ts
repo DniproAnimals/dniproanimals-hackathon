@@ -1,6 +1,7 @@
 import type {
   SuperadminDeleteOrgBody,
   SuperadminDeleteOrgResponse,
+  SuperadminListOrgsResponse,
   SuperadminUpdateOrgBody,
   SuperadminUpdateOrgResponse,
 } from "@dniproanimals/contracts";
@@ -9,6 +10,10 @@ import type { HttpFn } from "../utils";
 
 export function createSuperadminApiService(http: HttpFn) {
   return {
+    listOrgs: () =>
+      http<SuperadminListOrgsResponse>({
+        endpoint: endpoints.superadmin.listOrgs(),
+      }),
     updateOrg: (body: SuperadminUpdateOrgBody) =>
       http<SuperadminUpdateOrgResponse>({
         endpoint: endpoints.superadmin.updateOrg(),

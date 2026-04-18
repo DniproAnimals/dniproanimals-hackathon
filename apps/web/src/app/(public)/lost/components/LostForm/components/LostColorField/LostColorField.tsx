@@ -12,11 +12,10 @@ import {
   PopoverTrigger,
 } from "@dniproanimals/ui";
 import { useState } from "react";
-import { useFormContext } from "react-hook-form";
-import type { LostFormValues } from "../../constants/schema";
+import { useLostFormContext } from "../../hooks/useLostForm";
 
 export function LostColorField() {
-  const { control } = useFormContext<LostFormValues>();
+  const { control } = useLostFormContext();
   const [open, setOpen] = useState(false);
 
   return (

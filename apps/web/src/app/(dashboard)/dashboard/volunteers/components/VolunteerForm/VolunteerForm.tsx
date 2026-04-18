@@ -1,7 +1,5 @@
 "use client";
 import { Button, Form } from "@dniproanimals/ui";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { VolunteerDescriptionField } from "./components/VolunteerDescriptionField";
 import { VolunteerEmailField } from "./components/VolunteerEmailField";
 import { VolunteerInstagramField } from "./components/VolunteerInstagramField";
@@ -10,7 +8,8 @@ import { VolunteerPhoneField } from "./components/VolunteerPhoneField";
 import { VolunteerPhotoField } from "./components/VolunteerPhotoField";
 import { VolunteerSurnameField } from "./components/VolunteerSurnameField";
 import { VolunteerTelegramField } from "./components/VolunteerTelegramField";
-import { volunteerFormSchema, type VolunteerFormValues } from "./schema";
+import { useVolunteerForm } from "./hooks/useVolunteerForm";
+import { type VolunteerFormValues } from "./schema";
 
 interface VolunteerFormProps {
   defaultValues: VolunteerFormValues;
@@ -25,10 +24,7 @@ export function VolunteerForm({
   submitting,
   submitLabel,
 }: VolunteerFormProps) {
-  const form = useForm<VolunteerFormValues>({
-    resolver: zodResolver(volunteerFormSchema),
-    defaultValues,
-  });
+  const form = useVolunteerForm(defaultValues);
 
   return (
     <Form {...form}>

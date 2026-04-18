@@ -4,11 +4,10 @@ import { IconPhoto } from "@dniproanimals/icons";
 import { FormField, FormItem, FormLabel, FormMessage } from "@dniproanimals/ui";
 import Image from "next/image";
 import { useRef } from "react";
-import { useFormContext } from "react-hook-form";
-import type { LostFormValues } from "../../constants/schema";
+import { useLostFormContext } from "../../hooks/useLostForm";
 
 export function LostPhotosField() {
-  const { control } = useFormContext<LostFormValues>();
+  const { control } = useLostFormContext();
   const fileRef = useRef<HTMLInputElement>(null);
   const uploadMutation = useUploadImageMutation();
 

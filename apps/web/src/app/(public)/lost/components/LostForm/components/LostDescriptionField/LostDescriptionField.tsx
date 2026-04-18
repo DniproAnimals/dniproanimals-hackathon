@@ -7,11 +7,10 @@ import {
   FormMessage,
   Textarea,
 } from "@dniproanimals/ui";
-import { useFormContext } from "react-hook-form";
-import type { LostFormValues } from "../../constants/schema";
+import { useLostFormContext } from "../../hooks/useLostForm";
 
 export function LostDescriptionField() {
-  const { control } = useFormContext<LostFormValues>();
+  const { control } = useLostFormContext();
   return (
     <FormField
       control={control}

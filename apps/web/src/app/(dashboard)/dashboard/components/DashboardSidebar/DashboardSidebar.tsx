@@ -7,7 +7,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@dniproanimals/ui";
-import { parseAsBoolean, useQueryState } from "nuqs";
+import { useState } from "react";
 import { SidebarLogo } from "./components/SidebarLogo";
 import { SidebarNav } from "./components/SidebarNav";
 import { SidebarOrgInfo } from "./components/SidebarOrgInfo";
@@ -27,10 +27,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export function DashboardSidebar() {
-  const [isOpen, setOpen] = useQueryState(
-    "sidebar",
-    parseAsBoolean.withDefault(false),
-  );
+  const [isOpen, setOpen] = useState(false);
 
   return (
     <>

@@ -1,7 +1,8 @@
 "use client";
 import { useAnimalQuery, useUpdateAnimalMutation } from "@/shared/query-hooks";
 import type { Animal } from "@dniproanimals/contracts";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { use } from "react";
 import {
   AnimalForm,
   animalFormValuesToBody,
@@ -30,8 +31,10 @@ function animalToFormValues(animal: Animal): AnimalFormValues {
   };
 }
 
-export default function EditAnimalPage() {
-  const { id } = useParams<{ id: string }>();
+export default function EditAnimalPage(
+  props: PageProps<"/dashboard/animals/[id]/edit">,
+) {
+  const { id } = use(props.params);
   const numericId = Number(id);
   const router = useRouter();
   const { data: animal } = useAnimalQuery(numericId);

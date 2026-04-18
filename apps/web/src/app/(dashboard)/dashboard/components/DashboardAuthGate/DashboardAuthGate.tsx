@@ -1,24 +1,26 @@
 "use client";
+import { RequiredAuth } from "@/shared/components/RequiredAuth";
 import { useMeQuery } from "@/shared/query-hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 
 export function DashboardAuthGate({ children }: { children: ReactNode }) {
+  return (
+    <RequiredAuth>
+      <OrgGate>{children}</OrgGate>
+    </RequiredAuth>
+  );
+}
+
+function OrgGate({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { data: user, isLoading } = useMeQuery();
+  const { data: user } = useMeQuery();
 
   useEffect(() => {
-    if (isLoading) return;
-    if (!user) {
-      router.replace("/auth");
-      return;
-    }
-    if (!user.orgId) {
-      router.replace("/");
-    }
-  }, [user, isLoading, router]);
+    if (user && !user.orgId) router.replace("/");
+  }, [user, router]);
 
-  if (isLoading || !user) {
+  if (!user || !user.orgId) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-gray-medium">Завантаження...</p>

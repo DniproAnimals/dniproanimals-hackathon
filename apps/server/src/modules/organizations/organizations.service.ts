@@ -22,13 +22,6 @@ export const organizationsService = {
       .orderBy(desc(organizationsTable.createdAt));
   },
 
-  async listAll() {
-    return db
-      .select()
-      .from(organizationsTable)
-      .orderBy(desc(organizationsTable.createdAt));
-  },
-
   async getById(id: number) {
     const [org] = await db
       .select()

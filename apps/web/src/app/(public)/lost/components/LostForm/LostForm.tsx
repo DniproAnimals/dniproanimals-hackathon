@@ -1,7 +1,5 @@
 "use client";
 import { Button, Form } from "@dniproanimals/ui";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { LostAnimalTypeField } from "./components/LostAnimalTypeField";
 import { LostBreedField } from "./components/LostBreedField";
 import { LostColorField } from "./components/LostColorField";
@@ -13,7 +11,8 @@ import { LostPhotosField } from "./components/LostPhotosField";
 import { LostSexField } from "./components/LostSexField";
 import { LostSizeField } from "./components/LostSizeField";
 import { LostTitleField } from "./components/LostTitleField";
-import { lostFormSchema, type LostFormValues } from "./constants/schema";
+import { type LostFormValues } from "./constants/schema";
+import { useLostForm } from "./hooks/useLostForm";
 
 interface LostFormProps {
   defaultValues: LostFormValues;
@@ -28,10 +27,7 @@ export function LostForm({
   submitting,
   submitLabel,
 }: LostFormProps) {
-  const form = useForm<LostFormValues>({
-    resolver: zodResolver(lostFormSchema),
-    defaultValues,
-  });
+  const form = useLostForm(defaultValues);
 
   return (
     <Form {...form}>

@@ -6,11 +6,10 @@ import {
   FormMessage,
   Textarea,
 } from "@dniproanimals/ui";
-import { useFormContext } from "react-hook-form";
-import type { AdoptionFormValues } from "../../schema";
+import { useAdoptionFormContext } from "../../hooks/useAdoptionForm";
 
 export function AdoptionMessageField() {
-  const { control } = useFormContext<AdoptionFormValues>();
+  const { control } = useAdoptionFormContext();
   return (
     <FormField
       control={control}

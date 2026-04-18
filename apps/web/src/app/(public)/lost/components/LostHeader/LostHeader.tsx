@@ -1,16 +1,15 @@
 "use client";
-import { parseAsBoolean, parseAsInteger, useQueryState } from "nuqs";
+import { parseAsInteger, useQueryState } from "nuqs";
+import { useState } from "react";
 import { CreateLostButton } from "../CreateLostButton";
 import { LostFormDialog } from "../LostFormDialog";
 
 export function LostHeader() {
-  const [createOpen, setCreateOpen] = useQueryState(
-    "createLost",
-    parseAsBoolean.withDefault(false),
-  );
+  const [createOpen, setCreateOpen] = useState(false);
   const [editId, setEditId] = useQueryState("editLost", parseAsInteger);
 
   const isOpen = createOpen || editId != null;
+
   const close = async () => {
     await setCreateOpen(false);
     await setEditId(null);

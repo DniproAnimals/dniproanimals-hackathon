@@ -8,9 +8,7 @@ import AnimalDetail from "./AnimalDetail";
 
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
+}: PageProps<"/animals/[id]">): Promise<Metadata> {
   const { id } = await params;
   const numericId = Number(id);
   if (!Number.isFinite(numericId) || numericId <= 0) {
@@ -35,9 +33,7 @@ export async function generateMetadata({
 
 export default async function AnimalDetailPageRoute({
   params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+}: PageProps<"/animals/[id]">) {
   const { id } = await params;
   const numericId = Number(id);
   if (!Number.isFinite(numericId) || numericId <= 0) notFound();
@@ -51,7 +47,7 @@ export default async function AnimalDetailPageRoute({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <AnimalDetail id={String(numericId)} />
+      <AnimalDetail id={numericId} />
     </HydrationBoundary>
   );
 }

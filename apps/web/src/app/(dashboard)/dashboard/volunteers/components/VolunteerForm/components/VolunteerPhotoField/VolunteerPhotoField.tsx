@@ -4,11 +4,10 @@ import { useUploadImageMutation } from "@/shared/query-hooks";
 import { IconPhoto } from "@dniproanimals/icons";
 import { FormField, FormItem, FormMessage } from "@dniproanimals/ui";
 import { useRef } from "react";
-import { useFormContext } from "react-hook-form";
-import type { VolunteerFormValues } from "../../schema";
+import { useVolunteerFormContext } from "../../hooks/useVolunteerForm";
 
 export function VolunteerPhotoField() {
-  const { control } = useFormContext<VolunteerFormValues>();
+  const { control } = useVolunteerFormContext();
   const fileRef = useRef<HTMLInputElement>(null);
   const uploadMutation = useUploadImageMutation();
 

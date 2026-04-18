@@ -6,8 +6,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@dniproanimals/ui";
-import { useFormContext } from "react-hook-form";
-import type { LostFormValues } from "../../constants/schema";
+import { useLostFormContext } from "../../hooks/useLostForm";
 import { LostChipGroup, type ChipOption } from "../LostChipGroup";
 
 const OPTIONS: ChipOption<"male" | "female">[] = [
@@ -16,7 +15,7 @@ const OPTIONS: ChipOption<"male" | "female">[] = [
 ];
 
 export function LostSexField() {
-  const { control } = useFormContext<LostFormValues>();
+  const { control } = useLostFormContext();
   return (
     <FormField
       control={control}

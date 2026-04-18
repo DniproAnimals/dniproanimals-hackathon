@@ -5,15 +5,11 @@ import { Button } from "@dniproanimals/ui";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { ReactNode } from "react";
 
 export default async function EditAnimalLayout({
   children,
   params,
-}: {
-  children: ReactNode;
-  params: Promise<{ id: string }>;
-}) {
+}: LayoutProps<"/dashboard/animals/[id]/edit">) {
   const { id } = await params;
   const numericId = Number(id);
   if (!Number.isFinite(numericId) || numericId <= 0) notFound();
