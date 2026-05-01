@@ -1,4 +1,5 @@
 "use client";
+import { GoogleAuthButton } from "@/shared/components/GoogleAuthButton";
 import { type RegisterBody } from "@dniproanimals/contracts";
 import { Button, Form } from "@dniproanimals/ui";
 import Link from "next/link";
@@ -9,13 +10,17 @@ import { useSignUpForm } from "./hooks/useSignUpForm";
 
 interface SignUpFormProps {
   onSubmit: (values: RegisterBody) => void;
+  onGoogleLogin?: (idToken: string) => void;
   submitting?: boolean;
+  googleSubmitting?: boolean;
   errorMessage?: string;
 }
 
 export function SignUpForm({
   onSubmit,
+  onGoogleLogin,
   submitting,
+  googleSubmitting,
   errorMessage,
 }: SignUpFormProps) {
   const form = useSignUpForm();
@@ -38,11 +43,26 @@ export function SignUpForm({
           type="submit"
           variant="primary"
           size="lg"
-          disabled={submitting}
+          disabled={submitting || googleSubmitting}
           className="w-full"
         >
           {submitting ? "Зачекайте..." : "Зареєструватися"}
         </Button>
+
+        {onGoogleLogin && (
+          <>
+            <div className="flex items-center gap-3 py-1">
+              <div className="h-px flex-1 bg-gray-border" />
+              <span className="text-xs text-gray-medium">або</span>
+              <div className="h-px flex-1 bg-gray-border" />
+            </div>
+            <GoogleAuthButton
+              onCredential={onGoogleLogin}
+              text="signup_with"
+              disabled={submitting || googleSubmitting}
+            />
+          </>
+        )}
 
         <p className="text-xs text-center text-gray-medium">
           Вже є акаунт?{" "}

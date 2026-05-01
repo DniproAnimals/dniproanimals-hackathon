@@ -1,4 +1,5 @@
 import {
+  googleLoginBodySchema,
   loginBodySchema,
   logoutResponseSchema,
   registerBodySchema,
@@ -40,6 +41,23 @@ export const authController = createController({
     },
     handler: async (request, reply) => {
       const user = await authService.login(request.body);
+      if (!user) throw new UnauthorizedError();
+      request.session.userId = user.id;
+      return reply.send(toUserResponse(user));
+    },
+  }),
+
+  googleLogin: defineRoute({
+    method: "POST",
+    url: endpoints.auth.google(),
+    schema: {
+      body: googleLoginBodySchema,
+      response: { 200: userModel },
+    },
+    handler: async (request, reply) => {
+      const user = await authService.loginWithGoogleIdToken(
+        request.body.idToken,
+      );
       if (!user) throw new UnauthorizedError();
       request.session.userId = user.id;
       return reply.send(toUserResponse(user));
