@@ -11,7 +11,6 @@ interface SignInFormProps {
   onSubmit: (values: LoginBody) => void;
   onGoogleLogin?: (idToken: string) => void;
   submitting?: boolean;
-  googleSubmitting?: boolean;
   errorMessage?: string;
 }
 
@@ -19,7 +18,6 @@ export function SignInForm({
   onSubmit,
   onGoogleLogin,
   submitting,
-  googleSubmitting,
   errorMessage,
 }: SignInFormProps) {
   const form = useSignInForm();
@@ -41,7 +39,7 @@ export function SignInForm({
           type="submit"
           variant="primary"
           size="lg"
-          disabled={submitting || googleSubmitting}
+          disabled={submitting}
           className="w-full"
         >
           {submitting ? "Зачекайте..." : "Увійти"}
@@ -57,7 +55,7 @@ export function SignInForm({
             <GoogleAuthButton
               onCredential={onGoogleLogin}
               text="signin_with"
-              disabled={submitting || googleSubmitting}
+              disabled={submitting}
             />
           </>
         )}

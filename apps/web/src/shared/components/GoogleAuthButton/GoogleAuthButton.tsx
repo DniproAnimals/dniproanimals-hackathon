@@ -1,5 +1,6 @@
 "use client";
 import { env } from "@dniproanimals/env";
+import { cn } from "@dniproanimals/ui";
 import { useEffect, useRef } from "react";
 
 type GoogleButtonText = "signin_with" | "signup_with" | "continue_with";
@@ -83,13 +84,12 @@ export function GoogleAuthButton({
 
   return (
     <div
-      className={
-        disabled
-          ? "pointer-events-none opacity-60 transition-opacity"
-          : "transition-opacity"
-      }
+      className={cn(
+        "transition-opacity",
+        disabled && "pointer-events-none opacity-60",
+      )}
     >
-      <div ref={containerRef} className="w-full flex justify-center" />
+      <div ref={containerRef} className="w-full flex justify-center min-h-11" />
     </div>
   );
 }

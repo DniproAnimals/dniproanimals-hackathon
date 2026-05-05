@@ -48,8 +48,7 @@ export default function SignUpPage() {
           setErrorMessage("");
           googleLoginMutation.mutate({ idToken });
         }}
-        submitting={registerMutation.isPending}
-        googleSubmitting={googleLoginMutation.isPending}
+        submitting={registerMutation.isPending || googleLoginMutation.isPending}
         errorMessage={errorMessage}
       />
     </>

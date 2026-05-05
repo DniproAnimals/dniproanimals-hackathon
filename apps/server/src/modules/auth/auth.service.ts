@@ -1,10 +1,8 @@
 import { db, eq, usersTable } from "@dniproanimals/database";
-import { env } from "@dniproanimals/env";
 import bcrypt from "bcryptjs";
-import { OAuth2Client } from "google-auth-library";
+import { googleService } from "../google";
 
 const ROUNDS = 10;
-const googleClient = new OAuth2Client(env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 
 export const authService = {
   async register(input: { name: string; email: string; password: string }) {
@@ -45,23 +43,7 @@ export const authService = {
   },
 
   async loginWithGoogleIdToken(idToken: string) {
-    let payload: {
-      sub?: string | null;
-      email?: string | null;
-      name?: string | null;
-      picture?: string | null;
-    } | null = null;
-
-    try {
-      const ticket = await googleClient.verifyIdToken({
-        idToken,
-        audience: env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-      });
-      payload = ticket.getPayload() ?? null;
-    } catch {
-      return null;
-    }
-
+    const payload = await googleService.verifyIdToken(idToken);
     if (!payload?.sub || !payload.email) return null;
 
     const email = payload.email.toLowerCase();
