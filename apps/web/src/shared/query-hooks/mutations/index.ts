@@ -6,6 +6,7 @@ export * from "./useCreateOrganizationMutation";
 export * from "./useCreateVolunteerMutation";
 export * from "./useDeleteAnimalMutation";
 export * from "./useDeleteVolunteerMutation";
+export * from "./useGoogleLoginMutation";
 export * from "./useLoginMutation";
 export * from "./useLogoutMutation";
 export * from "./useRegisterMutation";

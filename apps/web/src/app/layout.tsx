@@ -43,6 +43,10 @@ export default function RootLayout({
           src="https://usd.org/js/count.js"
           strategy="afterInteractive"
         />
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+        />
       </head>
       <body className="min-h-full flex flex-col bg-white">
         <ReactQueryProvider>
