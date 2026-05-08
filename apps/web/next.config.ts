@@ -15,6 +15,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/lost-animals",
+        destination: "/animals",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

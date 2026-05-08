@@ -21,7 +21,6 @@ export const listAnimalsSortSchema = z.enum([
 export type ListAnimalsSort = z.infer<typeof listAnimalsSortSchema>;
 
 export const listAnimalsQuerySchema = z.object({
-  orgId: z.coerce.number().nullish(),
   type: animalTypeSchema.nullish(),
   sex: animalSexSchema.nullish(),
   size: animalSizeSchema.nullish(),

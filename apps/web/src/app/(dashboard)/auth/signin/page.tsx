@@ -16,8 +16,9 @@ export default function SignInPage() {
     onSuccess: (data) => {
       queryClient.setQueryData([endpoints.auth.me()], data);
       if (data.role === "superadmin") router.push("/admin");
-      else if (data.orgId) router.push("/dashboard");
-      else router.push("/onboarding");
+      else if (data.role === "admin" || data.role === "volunteer")
+        router.push("/dashboard");
+      else router.push("/profile");
     },
     onError: (err) => setErrorMessage(err.message || "Помилка"),
   });

@@ -1,6 +1,6 @@
 "use client";
 import { ADOPTION_STATUS_LABEL } from "@/shared/constants";
-import { useAdoptionStatsQuery, useCurrentOrg } from "@/shared/query-hooks";
+import { useAdoptionStatsQuery } from "@/shared/query-hooks";
 import { adoptionStatusSchema } from "@dniproanimals/contracts";
 import { FilterChip } from "@dniproanimals/ui";
 import { useRequestsFilterState } from "../../../../hooks/useRequestsFilterState";
@@ -10,8 +10,7 @@ type StatusTab = (typeof STATUS_TABS)[number];
 
 export function RequestsStatusTabs() {
   const [filters, setFilters] = useRequestsFilterState();
-  const { org } = useCurrentOrg();
-  const { data: stats } = useAdoptionStatsQuery({ enabled: !!org?.id });
+  const { data: stats } = useAdoptionStatsQuery();
 
   const countFor = (s: StatusTab) =>
     s === "all" ? (stats?.total ?? 0) : (stats?.[s] ?? 0);

@@ -15,7 +15,7 @@ export default function SignUpPage() {
   const registerMutation = useRegisterMutation({
     onSuccess: (data) => {
       queryClient.setQueryData([endpoints.auth.me()], data);
-      router.push("/onboarding");
+      router.push("/profile");
     },
     onError: (err) => setErrorMessage(err.message || "Помилка"),
   });

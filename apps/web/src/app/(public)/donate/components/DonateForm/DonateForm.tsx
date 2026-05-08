@@ -1,27 +1,20 @@
 "use client";
-import { useOrganizationsQuery } from "@/shared/query-hooks";
+
 import { Form } from "@dniproanimals/ui";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { DonateAmountField } from "./components/DonateAmountField";
-import { DonateOrgField } from "./components/DonateOrgField";
 import { DonateSubmitButton } from "./components/DonateSubmitButton";
 import { useDonateForm } from "./hooks/useDonateForm";
 
 export function DonateForm() {
   const form = useDonateForm();
-  const { data: organizations = [] } = useOrganizationsQuery();
   const [error, setError] = useState("");
 
-  const onSubmit = form.handleSubmit(({ orgId, amount }) => {
-    const jarId = organizations.find((o) => o.id === orgId)?.monobankJarId;
-    if (!jarId) {
-      setError("Ця організація ще не підключила Monobank банку");
-      return;
-    }
+  const onSubmit = form.handleSubmit(({ amount }) => {
     setError("");
     window.open(
-      `https://send.monobank.ua/jar/${jarId}?amount=${amount}`,
+      `https://send.monobank.ua/jar/4441114441727326?amount=${amount}`,
       "_blank",
     );
   });
@@ -40,7 +33,6 @@ export function DonateForm() {
           Швидка пожертва онлайн
         </h2>
 
-        <DonateOrgField />
         <DonateAmountField />
 
         {!!error && (
