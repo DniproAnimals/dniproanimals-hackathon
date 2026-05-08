@@ -108,7 +108,7 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem destructive onClick={logOut}>
+                <DropdownMenuItem destructive onSelect={logOut}>
                   <IconLogout />
                   Вийти
                 </DropdownMenuItem>
