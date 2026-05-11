@@ -1,5 +1,8 @@
 "use client";
-import { useRegisterMutation } from "@/shared/query-hooks";
+import {
+  useGoogleLoginMutation,
+  useRegisterMutation,
+} from "@/shared/query-hooks";
 import type { RegisterBody } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import { useQueryClient } from "@tanstack/react-query";
@@ -12,11 +15,20 @@ export default function SignUpPage() {
   const queryClient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState("");
 
+  const onAuthSuccess = (data: { role: string; orgId: number | null }) => {
+    queryClient.setQueryData([endpoints.auth.me()], data);
+    if (data.role === "superadmin") router.push("/admin");
+    else if (data.orgId) router.push("/dashboard");
+    else router.push("/onboarding");
+  };
+
   const registerMutation = useRegisterMutation({
-    onSuccess: (data) => {
-      queryClient.setQueryData([endpoints.auth.me()], data);
-      router.push("/onboarding");
-    },
+    onSuccess: onAuthSuccess,
+    onError: (err) => setErrorMessage(err.message || "Помилка"),
+  });
+
+  const googleLoginMutation = useGoogleLoginMutation({
+    onSuccess: onAuthSuccess,
     onError: (err) => setErrorMessage(err.message || "Помилка"),
   });
 
@@ -32,7 +44,11 @@ export default function SignUpPage() {
       </h1>
       <SignUpForm
         onSubmit={handleSubmit}
-        submitting={registerMutation.isPending}
+        onGoogleLogin={(idToken) => {
+          setErrorMessage("");
+          googleLoginMutation.mutate({ idToken });
+        }}
+        submitting={registerMutation.isPending || googleLoginMutation.isPending}
         errorMessage={errorMessage}
       />
     </>
