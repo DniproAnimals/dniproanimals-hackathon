@@ -58,6 +58,9 @@ export const endpoints = createTypedEndpoints({
   notifications: {
     list: "/notifications",
   },
+  mail: {
+    test: "/mail/test",
+  },
   upload: {
     image: "/upload",
   },

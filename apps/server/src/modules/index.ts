@@ -4,6 +4,7 @@ import { registerAnimalsRoutes } from "./animals";
 import { registerAuthRoutes } from "./auth";
 import { registerFavoritesRoutes } from "./favorites";
 import { registerLostRoutes } from "./lost";
+import { registerMailRoutes } from "./mail";
 import { registerNotificationsRoutes } from "./notifications";
 import { registerOrganizationsRoutes } from "./organizations";
 import { registerSuperadminRoutes } from "./superadmin";
@@ -17,6 +18,7 @@ export async function appRouter(fastify: FastifyZodInstance) {
   registerAdoptionRoutes(fastify);
   registerLostRoutes(fastify);
   registerFavoritesRoutes(fastify);
+  registerMailRoutes(fastify);
   registerVolunteersRoutes(fastify);
   registerNotificationsRoutes(fastify);
   registerSuperadminRoutes(fastify);
