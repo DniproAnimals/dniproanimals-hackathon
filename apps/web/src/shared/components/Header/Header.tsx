@@ -1,6 +1,6 @@
 "use client";
 import { useLogOut } from "@/shared/hooks";
-import { useLostQuery, useMeQuery } from "@/shared/query-hooks";
+import { useMeQuery } from "@/shared/query-hooks";
 import {
   IconChevronDown,
   IconHomeFilled,
@@ -11,7 +11,6 @@ import {
 import {
   Avatar,
   AvatarFallback,
-  Badge,
   Button,
   cn,
   DropdownMenu,
@@ -27,16 +26,12 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { href: "/", label: "Про нас" },
   { href: "/animals", label: "Тварини" },
-  { href: "/lost", label: "Загублені" },
-  { href: "/organizations", label: "Організації" },
   { href: "/donate", label: "Допомогти" },
 ];
 
 export function Header() {
   const pathname = usePathname();
   const { data: user } = useMeQuery();
-  const { data: lostItems } = useLostQuery({ type: "lost" });
-  const lostCount = lostItems?.length ?? 0;
   const logOut = useLogOut();
 
   const isActive = (href: string) =>
@@ -71,15 +66,6 @@ export function Header() {
               )}
             >
               {item.label}
-              {item.href === "/lost" && lostCount > 0 && (
-                <Badge
-                  variant="danger"
-                  size="xs"
-                  className="absolute -top-1 -right-1 size-5 p-0 justify-center bg-red-500 text-white"
-                >
-                  {lostCount}
-                </Badge>
-              )}
             </Link>
           ))}
         </nav>
@@ -107,11 +93,11 @@ export function Header() {
                     </Link>
                   </DropdownMenuItem>
                 )}
-                {user.orgId && (
+                {user.id && (
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard">
                       <IconHomeFilled className="text-green-secondary" />
-                      Організація
+                      Дашборд
                     </Link>
                   </DropdownMenuItem>
                 )}
@@ -122,7 +108,7 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem destructive onClick={logOut}>
+                <DropdownMenuItem destructive onSelect={logOut}>
                   <IconLogout />
                   Вийти
                 </DropdownMenuItem>
@@ -149,15 +135,6 @@ export function Header() {
                 )}
               >
                 {item.label}
-                {item.href === "/lost" && lostCount > 0 && (
-                  <Badge
-                    variant="danger"
-                    size="xs"
-                    className="absolute -top-0.5 right-0 size-4 p-0 justify-center bg-red-500 text-white text-[9px]"
-                  >
-                    {lostCount}
-                  </Badge>
-                )}
               </Link>
             ))}
             <Link

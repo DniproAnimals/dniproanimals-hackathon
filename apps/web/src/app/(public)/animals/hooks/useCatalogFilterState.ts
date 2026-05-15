@@ -7,7 +7,6 @@ import {
 } from "@dniproanimals/contracts";
 import {
   parseAsArrayOf,
-  parseAsBoolean,
   parseAsString,
   parseAsStringLiteral,
   useQueryStates,
@@ -20,9 +19,6 @@ export function useCatalogFilterState() {
     size: parseAsStringLiteral(animalSizeSchema.options),
     breed: parseAsArrayOf(parseAsString).withDefault([]),
     color: parseAsArrayOf(parseAsString).withDefault([]),
-    vaccinated: parseAsBoolean,
-    sterilized: parseAsBoolean,
-    trained: parseAsBoolean,
     q: parseAsString,
     sort: parseAsStringLiteral(listAnimalsSortSchema.options).withDefault(
       "newest",
@@ -51,8 +47,5 @@ export function useCatalogActiveFilterCount() {
   if (f.size) n++;
   n += f.breed.length;
   n += f.color.length;
-  if (f.vaccinated) n++;
-  if (f.sterilized) n++;
-  if (f.trained) n++;
   return n;
 }

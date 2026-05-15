@@ -1,15 +1,11 @@
 "use client";
-import { useAdoptionQuery, useCurrentOrg } from "@/shared/query-hooks";
+import { useAdoptionQuery } from "@/shared/query-hooks";
 import { Card } from "@dniproanimals/ui";
 import Link from "next/link";
 import { RecentRequestRow } from "./components/RecentRequestRow";
 
 export function RecentRequestsSection() {
-  const { org } = useCurrentOrg();
-  const { data: requests = [] } = useAdoptionQuery(
-    { orgId: org?.id, limit: 5 },
-    { enabled: !!org?.id },
-  );
+  const { data: requests = [] } = useAdoptionQuery({ limit: 5 });
 
   return (
     <Card>

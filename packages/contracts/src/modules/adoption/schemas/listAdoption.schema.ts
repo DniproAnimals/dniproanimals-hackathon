@@ -5,7 +5,6 @@ import {
 } from "../models";
 
 export const listAdoptionQuerySchema = z.object({
-  orgId: z.coerce.number().optional(),
   q: z.string().optional(),
   status: adoptionStatusSchema.optional(),
   limit: z.coerce.number().int().positive().max(100).optional(),
