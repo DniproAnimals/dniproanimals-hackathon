@@ -37,5 +37,8 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "google-auth-library": "^10.6.2"
+  }
 }

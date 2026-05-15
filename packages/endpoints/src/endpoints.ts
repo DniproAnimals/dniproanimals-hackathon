@@ -6,6 +6,7 @@ export const endpoints = createTypedEndpoints({
     register: "/auth/register",
     logout: "/auth/logout",
     me: "/auth/me",
+    google: "/auth/google",
   },
   animals: {
     list: "/animals",

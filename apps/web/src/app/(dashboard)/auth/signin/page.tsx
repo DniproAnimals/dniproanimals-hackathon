@@ -1,5 +1,5 @@
 "use client";
-import { useLoginMutation } from "@/shared/query-hooks";
+import { useGoogleLoginMutation, useLoginMutation } from "@/shared/query-hooks";
 import type { LoginBody } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import { useQueryClient } from "@tanstack/react-query";
@@ -12,14 +12,20 @@ export default function SignInPage() {
   const queryClient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState("");
 
+  const onAuthSuccess = (data: { role: string; orgId: number | null }) => {
+    queryClient.setQueryData([endpoints.auth.me()], data);
+    if (data.role === "superadmin") router.push("/admin");
+    else if (data.orgId) router.push("/dashboard");
+    else router.push("/onboarding");
+  };
+
   const loginMutation = useLoginMutation({
-    onSuccess: (data) => {
-      queryClient.setQueryData([endpoints.auth.me()], data);
-      if (data.role === "superadmin") router.push("/admin");
-      else if (data.role === "admin" || data.role === "volunteer")
-        router.push("/dashboard");
-      else router.push("/profile");
-    },
+    onSuccess: onAuthSuccess,
+    onError: (err) => setErrorMessage(err.message || "Помилка"),
+  });
+
+  const googleLoginMutation = useGoogleLoginMutation({
+    onSuccess: onAuthSuccess,
     onError: (err) => setErrorMessage(err.message || "Помилка"),
   });
 
@@ -35,7 +41,11 @@ export default function SignInPage() {
       </h1>
       <SignInForm
         onSubmit={handleSubmit}
-        submitting={loginMutation.isPending}
+        onGoogleLogin={(idToken) => {
+          setErrorMessage("");
+          googleLoginMutation.mutate({ idToken });
+        }}
+        submitting={loginMutation.isPending || googleLoginMutation.isPending}
         errorMessage={errorMessage}
       />
     </>

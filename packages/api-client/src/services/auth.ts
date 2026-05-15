@@ -1,4 +1,5 @@
 import type {
+  GoogleLoginBody,
   LoginBody,
   LogoutResponse,
   RegisterBody,
@@ -20,6 +21,14 @@ export function createAuthApiService(http: HttpFn) {
     login: (body: LoginBody) =>
       http<User>({
         endpoint: endpoints.auth.login(),
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json" },
+      }),
+
+    googleLogin: (body: GoogleLoginBody) =>
+      http<User>({
+        endpoint: endpoints.auth.google(),
         method: "POST",
         body: JSON.stringify(body),
         headers: { "Content-Type": "application/json" },

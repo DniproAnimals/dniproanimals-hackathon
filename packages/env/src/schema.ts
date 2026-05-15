@@ -29,6 +29,8 @@ export const envSchema = z.object({
 
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: z.string().min(1),
+
+  NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.string().min(1),
 });
 
 export type Env = z.infer<typeof envSchema>;

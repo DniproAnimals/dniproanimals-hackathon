@@ -3,7 +3,7 @@ import postcss from "@tailwindcss/postcss";
 
 const config: StorybookConfig = {
   stories: ["../../../packages/ui/src/**/*.stories.@(ts|tsx)"],
-  addons: [],
+  addons: ["@storybook/addon-docs"],
   framework: {
     name: "@storybook/nextjs-vite",
     options: {},
