@@ -21,3 +21,4 @@ export * from "./useUpdateOrgStatusMutation";
 export * from "./useUpdateOwnOrganizationMutation";
 export * from "./useUpdateVolunteerMutation";
 export * from "./useUploadImageMutation";
+export * from "./useVerifyEmailMutation";

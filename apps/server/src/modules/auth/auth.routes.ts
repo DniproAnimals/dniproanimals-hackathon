@@ -6,5 +6,6 @@ export function registerAuthRoutes(app: FastifyZodInstance) {
   app.route(authController.login);
   app.route(authController.googleLogin);
   app.route(authController.logout);
+  app.route(authController.verifyEmail);
   app.route(authController.me);
 }

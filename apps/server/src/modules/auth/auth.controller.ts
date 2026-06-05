@@ -4,9 +4,12 @@ import {
   logoutResponseSchema,
   registerBodySchema,
   userModel,
+  verifyEmailQuerySchema,
+  verifyEmailResponseSchema,
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import {
+  BadRequestError,
   ConflictError,
   NotFoundError,
   UnauthorizedError,
@@ -27,7 +30,6 @@ export const authController = createController({
     handler: async (request, reply) => {
       const user = await authService.register(request.body);
       if (!user) throw new ConflictError("User with this email already exists");
-      request.session.userId = user.id;
       return reply.send(toUserResponse(user));
     },
   }),
@@ -73,6 +75,28 @@ export const authController = createController({
     handler: async (request, reply) => {
       await request.session.destroy();
       reply.clearCookie("session");
+      return reply.send({ success: true });
+    },
+  }),
+
+  verifyEmail: defineRoute({
+    method: "GET",
+    url: endpoints.auth.verifyEmail(),
+    schema: {
+      querystring: verifyEmailQuerySchema,
+      response: { 200: verifyEmailResponseSchema },
+    },
+    handler: async (request, reply) => {
+      const result = await authService.verifyEmail(request.query.token);
+      if (!result.ok) {
+        if (result.reason === "expired") {
+          throw new BadRequestError("Verification link expired");
+        }
+        if (result.reason === "used") {
+          throw new BadRequestError("Verification link already used");
+        }
+        throw new NotFoundError("Verification token");
+      }
       return reply.send({ success: true });
     },
   }),
