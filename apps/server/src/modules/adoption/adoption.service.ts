@@ -21,7 +21,6 @@ export const adoptionService = {
         animal: {
           name: animalsTable.name,
           type: animalsTable.type,
-          orgId: animalsTable.orgId,
         },
       })
       .from(adoptionRequestsTable)
@@ -34,7 +33,6 @@ export const adoptionService = {
     const q = filters.q?.toLowerCase();
 
     const filtered = rows
-      .filter((r) => (filters.orgId ? r.animal?.orgId === filters.orgId : true))
       .filter((r) =>
         filters.status ? r.request.status === filters.status : true,
       )
@@ -53,7 +51,7 @@ export const adoptionService = {
     return filters.limit ? filtered.slice(0, filters.limit) : filtered;
   },
 
-  async statsByOrg(orgId: number) {
+  async stats() {
     const [row] = await db
       .select({
         total: sql<number>`count(*)::int`,
@@ -61,12 +59,7 @@ export const adoptionService = {
         approved: sql<number>`count(*) filter (where ${adoptionRequestsTable.status} = 'approved')::int`,
         rejected: sql<number>`count(*) filter (where ${adoptionRequestsTable.status} = 'rejected')::int`,
       })
-      .from(adoptionRequestsTable)
-      .leftJoin(
-        animalsTable,
-        eq(adoptionRequestsTable.animalId, animalsTable.id),
-      )
-      .where(eq(animalsTable.orgId, orgId));
+      .from(adoptionRequestsTable);
     return {
       total: row?.total ?? 0,
       pending: row?.pending ?? 0,

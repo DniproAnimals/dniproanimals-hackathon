@@ -35,22 +35,8 @@ export const animalModel = z.object({
   contactTelegram: z.string().nullable(),
   contactFacebook: z.string().nullable(),
   contactLocation: z.string().nullable(),
-  orgId: z.number().nullable(),
   status: animalStatusSchema,
   createdAt: z.string(),
   updatedAt: z.string(),
 });
 export type Animal = z.infer<typeof animalModel>;
-
-export const animalOrgRefModel = z.object({
-  id: z.number(),
-  name: z.string(),
-  photo: z.string().nullable(),
-  location: z.string().nullable(),
-});
-export type AnimalOrgRef = z.infer<typeof animalOrgRefModel>;
-
-export const animalWithOrgModel = animalModel.extend({
-  org: animalOrgRefModel.nullable(),
-});
-export type AnimalWithOrg = z.infer<typeof animalWithOrgModel>;

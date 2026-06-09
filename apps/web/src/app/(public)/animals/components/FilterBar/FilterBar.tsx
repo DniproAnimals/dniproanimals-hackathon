@@ -4,7 +4,6 @@ import { FilterBarHeader } from "./components/FilterBarHeader";
 import { FilterBarSearchField } from "./components/FilterBarSearchField";
 import { FilterBreedField } from "./components/FilterBreedField";
 import { FilterColorField } from "./components/FilterColorField";
-import { FilterExtraField } from "./components/FilterExtraField";
 import { FilterSexField } from "./components/FilterSexField";
 import { FilterSizeField } from "./components/FilterSizeField";
 import { FilterTypeField } from "./components/FilterTypeField";
@@ -19,7 +18,6 @@ export function FilterBar() {
       <FilterSexField />
       <FilterSizeField />
       <FilterColorField />
-      <FilterExtraField />
       <FilterActiveChips />
     </div>
   );

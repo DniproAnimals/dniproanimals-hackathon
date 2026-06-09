@@ -39,13 +39,11 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
   {
     href: "/dashboard/donations",
     label: "Пожертви",
-    ownerOnly: true,
     icon: <IconCoin size={18} />,
   },
   {
-    href: "/dashboard/settings",
+    href: "/dashboard/foundation",
     label: "Налаштування",
-    ownerOnly: true,
     icon: <IconSettingsFilled size={18} />,
   },
 ];

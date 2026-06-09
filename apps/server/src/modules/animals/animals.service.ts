@@ -12,9 +12,7 @@ import {
   eq,
   ilike,
   inArray,
-  isNull,
   or,
-  organizationsTable,
   sql,
 } from "@dniproanimals/database";
 
@@ -44,20 +42,6 @@ function orderBy(sort: ListAnimalsQuery["sort"]) {
 export const animalsService = {
   async list(query: ListAnimalsQuery) {
     const filters = [];
-
-    if (query.orgId) {
-      filters.push(eq(animalsTable.orgId, query.orgId));
-    } else {
-      const approved = await db
-        .select({ id: organizationsTable.id })
-        .from(organizationsTable)
-        .where(eq(organizationsTable.status, "approved"));
-      const ids = approved.map((o) => o.id);
-      const visible = ids.length
-        ? or(isNull(animalsTable.orgId), inArray(animalsTable.orgId, ids))!
-        : isNull(animalsTable.orgId);
-      filters.push(visible);
-    }
 
     if (query.type) filters.push(eq(animalsTable.type, query.type));
     if (query.sex) filters.push(eq(animalsTable.sex, query.sex));
@@ -101,7 +85,7 @@ export const animalsService = {
     return query.limit ? base.limit(query.limit) : base;
   },
 
-  async statsByOrg(orgId: number) {
+  async stats() {
     const [row] = await db
       .select({
         total: sql<number>`count(*)::int`,
@@ -109,8 +93,7 @@ export const animalsService = {
         reserved: sql<number>`count(*) filter (where ${animalsTable.status} = 'reserved')::int`,
         adopted: sql<number>`count(*) filter (where ${animalsTable.status} = 'adopted')::int`,
       })
-      .from(animalsTable)
-      .where(eq(animalsTable.orgId, orgId));
+      .from(animalsTable);
     return {
       total: row?.total ?? 0,
       available: row?.available ?? 0,
@@ -128,29 +111,7 @@ export const animalsService = {
     return animal ?? null;
   },
 
-  async getOrgRef(orgId: number) {
-    const [org] = await db
-      .select({
-        id: organizationsTable.id,
-        name: organizationsTable.name,
-        photo: organizationsTable.photo,
-        location: organizationsTable.location,
-      })
-      .from(organizationsTable)
-      .where(eq(organizationsTable.id, orgId))
-      .limit(1);
-    return org ?? null;
-  },
-
-  async listByOrg(orgId: number) {
-    return db
-      .select()
-      .from(animalsTable)
-      .where(eq(animalsTable.orgId, orgId))
-      .orderBy(desc(animalsTable.createdAt));
-  },
-
-  async create(body: CreateAnimalBody, orgId: number | null) {
+  async create(body: CreateAnimalBody) {
     const insert: AnimalInsert = {
       name: body.name,
       description: body.description ?? null,
@@ -161,9 +122,9 @@ export const animalsService = {
       weightKg: body.weightKg ?? null,
       size: body.size ?? null,
       color: body.color ?? null,
-      vaccinated: body.vaccinated ?? null,
-      sterilized: body.sterilized ?? null,
-      trained: body.trained ?? null,
+      vaccinated: body.vaccinated ?? undefined,
+      sterilized: body.sterilized ?? undefined,
+      trained: body.trained ?? undefined,
       commands: body.commands ?? null,
       photos: JSON.stringify(body.photos ?? []),
       status: body.status ?? "available",
@@ -174,7 +135,6 @@ export const animalsService = {
       contactTelegram: body.contactTelegram ?? null,
       contactFacebook: body.contactFacebook ?? null,
       contactLocation: body.contactLocation ?? null,
-      orgId,
     };
     const [created] = await db.insert(animalsTable).values(insert).returning();
     return created!;
@@ -195,10 +155,10 @@ export const animalsService = {
     if (body.size !== undefined) patch.size = body.size ?? null;
     if (body.color !== undefined) patch.color = body.color ?? null;
     if (body.vaccinated !== undefined)
-      patch.vaccinated = body.vaccinated ?? null;
+      patch.vaccinated = body.vaccinated ?? undefined;
     if (body.sterilized !== undefined)
-      patch.sterilized = body.sterilized ?? null;
-    if (body.trained !== undefined) patch.trained = body.trained ?? null;
+      patch.sterilized = body.sterilized ?? undefined;
+    if (body.trained !== undefined) patch.trained = body.trained ?? undefined;
     if (body.commands !== undefined) patch.commands = body.commands ?? null;
     if (body.photos !== undefined) patch.photos = JSON.stringify(body.photos);
     if (body.status !== undefined) patch.status = body.status;
