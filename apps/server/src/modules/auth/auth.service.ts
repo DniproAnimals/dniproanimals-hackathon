@@ -189,4 +189,44 @@ export const authService = {
 
     return user ?? null;
   },
+
+  async resendVerificationEmail(email: string) {
+    const [user] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.email, email))
+      .limit(1);
+
+    if (!user) return { ok: true, reason: "ignored" } as const;
+    if (user.emailVerified)
+      return { ok: true, reason: "already-verified" } as const;
+
+    const now = Date.now();
+    const coolDown = 60 * 1000;
+
+    if (user.emailVerificationTokenExpires) {
+      if (
+        now -
+          user.emailVerificationTokenExpires.getTime() -
+          EMAIL_VERIFICATION_TTL_MS <
+        coolDown
+      )
+        return { ok: true, reason: "rate-limit" } as const;
+    }
+
+    const token = createEmailVerificationToken();
+    const expiresAt = new Date(now + EMAIL_VERIFICATION_TTL_MS);
+
+    await db
+      .update(usersTable)
+      .set({
+        emailVerificationToken: token,
+        emailVerificationTokenExpires: expiresAt,
+      })
+      .where(eq(usersTable.id, user.id));
+
+    await sendVerificationEmail(user.email, token);
+
+    return { ok: true } as const;
+  },
 };

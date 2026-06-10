@@ -3,6 +3,8 @@ import type {
   LoginBody,
   LogoutResponse,
   RegisterBody,
+  ResendEmailBody,
+  ResendEmailResponse,
   User,
   VerifyEmailResponse,
 } from "@dniproanimals/contracts";
@@ -50,6 +52,14 @@ export function createAuthApiService(http: HttpFn) {
       http<VerifyEmailResponse>({
         endpoint: endpoints.auth.verifyEmail(),
         query: { token },
+      }),
+
+    resendVerification: (body: ResendEmailBody) =>
+      http<ResendEmailResponse>({
+        endpoint: endpoints.auth.resendEmail(),
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json" },
       }),
   };
 }

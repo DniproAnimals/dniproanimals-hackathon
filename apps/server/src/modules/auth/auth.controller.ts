@@ -3,6 +3,8 @@ import {
   loginBodySchema,
   logoutResponseSchema,
   registerBodySchema,
+  resendEmailResponseSchema,
+  resendEmailSchema,
   userModel,
   verifyEmailQuerySchema,
   verifyEmailResponseSchema,
@@ -12,6 +14,7 @@ import {
   BadRequestError,
   ConflictError,
   NotFoundError,
+  TooManyRequestsError,
   UnauthorizedError,
 } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
@@ -112,5 +115,22 @@ export const authController = createController({
       if (!user) throw new NotFoundError("User");
       return reply.send(toUserResponse(user));
     }),
+  }),
+
+  resend: defineRoute({
+    method: "POST",
+    url: endpoints.auth.resendEmail(),
+    schema: {
+      body: resendEmailSchema,
+      response: { 200: resendEmailResponseSchema },
+    },
+    handler: async (request, reply) => {
+      const result = await authService.resendVerificationEmail(
+        request.body.email,
+      );
+      if (!result.ok && result.reason === "rate-limit")
+        throw new TooManyRequestsError("Rate limit exceeded");
+      return reply.send({ success: true });
+    },
   }),
 });

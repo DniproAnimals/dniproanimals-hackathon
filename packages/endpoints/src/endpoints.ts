@@ -8,6 +8,7 @@ export const endpoints = createTypedEndpoints({
     me: "/auth/me",
     google: "/auth/google",
     verifyEmail: "/auth/verify-email",
+    resendEmail: "/auth/resend-email",
   },
   animals: {
     list: "/animals",
