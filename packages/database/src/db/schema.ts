@@ -26,6 +26,8 @@ export const usersTable = pgTable("users", {
   emailVerified: boolean("email_verified").notNull().default(false),
   emailVerificationToken: varchar("email_verification_token", { length: 255 }),
   emailVerificationTokenExpires: timestamp("email_verification_token_expires"),
+  resetPasswordToken: varchar("reset_password_token", { length: 255 }),
+  resetPasswordExpires: timestamp("reset_password_expires"),
   role: varchar({ length: 20 }).notNull().default("user").$type<UserRole>(),
   photo: varchar({ length: 1024 }),
   description: text(),

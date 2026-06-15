@@ -1,3 +1,4 @@
+import { ResetPasswordBody } from "@dniproanimals/contracts";
 import { db, eq, usersTable } from "@dniproanimals/database";
 import { env } from "@dniproanimals/env";
 import bcrypt from "bcryptjs";
@@ -7,6 +8,7 @@ import { googleService } from "../google";
 
 const ROUNDS = 10;
 const EMAIL_VERIFICATION_TTL_MS = 1000 * 60 * 60 * 24;
+const RESET_PASSWORD_TTL_MS = 1000 * 60 * 60;
 
 function buildVerificationLink(token: string) {
   const baseUrl = env.WEB_ORIGIN.replace(/\/$/, "");
@@ -23,6 +25,20 @@ async function sendVerificationEmail(email: string, token: string) {
       <p>Confirm your email by clicking the link below:</p>
       <p><a href="${verificationLink}">${verificationLink}</a></p>
       <p>If you did not create an account, you can ignore this email.</p>
+    </div>
+  `;
+
+  await sendMail({ to: email, subject, text, html });
+}
+
+async function sendPasswordResetEmail(email: string, token: string) {
+  const baseUrl = env.WEB_ORIGIN.replace(/\/$/, "");
+  const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(token)}`;
+  const subject = "Password Reset";
+  const text = `Password reset link: ${resetLink}\n\n`;
+  const html = `
+    <div style="font-family:Arial, sans-serif; line-height:1.6;">
+      <p><a href="${resetLink}">${resetLink}</a></p>
     </div>
   `;
 
@@ -226,6 +242,59 @@ export const authService = {
       .where(eq(usersTable.id, user.id));
 
     await sendVerificationEmail(user.email, token);
+
+    return { ok: true } as const;
+  },
+
+  async requestPasswordReset(email: string) {
+    const [user] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.email, email))
+      .limit(1);
+
+    if (!user) return { ok: true } as const;
+
+    const token = randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + RESET_PASSWORD_TTL_MS);
+
+    await db
+      .update(usersTable)
+      .set({
+        resetPasswordToken: token,
+        resetPasswordExpires: expiresAt,
+      })
+      .where(eq(usersTable.id, user.id));
+
+    await sendPasswordResetEmail(user.email, token);
+
+    return { ok: true } as const;
+  },
+
+  async resetPassword(input: ResetPasswordBody) {
+    const [user] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.resetPasswordToken, input.token))
+      .limit(1);
+
+    if (!user) return { ok: false, reason: "invalid-token" } as const;
+
+    const expiresAt = user.resetPasswordExpires;
+    if (!expiresAt || expiresAt.getTime() < Date.now()) {
+      return { ok: false, reason: "expired-token" } as const;
+    }
+
+    const passwordHash = await bcrypt.hash(input.newPassword, ROUNDS);
+
+    await db
+      .update(usersTable)
+      .set({
+        passwordHash,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+      })
+      .where(eq(usersTable.id, user.id));
 
     return { ok: true } as const;
   },

@@ -1,10 +1,13 @@
 import {
+  forgotPasswordBodySchema,
   googleLoginBodySchema,
   loginBodySchema,
   logoutResponseSchema,
   registerBodySchema,
   resendEmailResponseSchema,
   resendEmailSchema,
+  resetPasswordBodySchema,
+  successResponseSchema,
   userModel,
   verifyEmailQuerySchema,
   verifyEmailResponseSchema,
@@ -130,6 +133,39 @@ export const authController = createController({
       );
       if (!result.ok && result.reason === "rate-limit")
         throw new TooManyRequestsError("Rate limit exceeded");
+      return reply.send({ success: true });
+    },
+  }),
+  forgotPassword: defineRoute({
+    method: "POST",
+    url: endpoints.auth.forgotPassword(),
+    schema: {
+      body: forgotPasswordBodySchema,
+      response: { 200: successResponseSchema },
+    },
+    handler: async (request, reply) => {
+      await authService.requestPasswordReset(request.body.email);
+      return reply.send({ success: true });
+    },
+  }),
+
+  resetPassword: defineRoute({
+    method: "POST",
+    url: endpoints.auth.resetPassword(),
+    schema: {
+      body: resetPasswordBodySchema,
+      response: { 200: successResponseSchema },
+    },
+    handler: async (request, reply) => {
+      const result = await authService.resetPassword(request.body);
+
+      if (!result.ok) {
+        if (result.reason === "expired-token") {
+          throw new BadRequestError("Link expired");
+        }
+        throw new BadRequestError("Invalid reset link");
+      }
+
       return reply.send({ success: true });
     },
   }),
