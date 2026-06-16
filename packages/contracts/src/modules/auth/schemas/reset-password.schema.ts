@@ -10,3 +10,4 @@ export const resetPasswordBodySchema = z.object({
 export type ResetPasswordBody = z.infer<typeof resetPasswordBodySchema>;
 
 export const successResponseSchema = z.object({ success: z.boolean() });
+export type ResetPasswordResponse = z.infer<typeof successResponseSchema>;
