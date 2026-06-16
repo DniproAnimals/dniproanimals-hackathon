@@ -1,9 +1,5 @@
 "use client";
-import {
-  useAdoptionQuery,
-  useAdoptionStatsQuery,
-  useCurrentOrg,
-} from "@/shared/query-hooks";
+import { useAdoptionQuery, useAdoptionStatsQuery } from "@/shared/query-hooks";
 import type {
   AdoptionRequestWithAnimal,
   AdoptionStatus,
@@ -15,18 +11,13 @@ import { RequestDetailDialog } from "../RequestDetailDialog";
 import { RequestRow } from "./components/RequestRow";
 
 export function RequestsList() {
-  const { org } = useCurrentOrg();
   const [filters] = useRequestsFilterState();
 
-  const { data: requests = [] } = useAdoptionQuery(
-    {
-      orgId: org?.id,
-      q: filters.q ?? undefined,
-      status: filters.status ?? undefined,
-    },
-    { enabled: !!org?.id },
-  );
-  const { data: stats } = useAdoptionStatsQuery({ enabled: !!org?.id });
+  const { data: requests = [] } = useAdoptionQuery({
+    q: filters.q ?? undefined,
+    status: filters.status ?? undefined,
+  });
+  const { data: stats } = useAdoptionStatsQuery();
 
   const [selected, setSelected] = useState<AdoptionRequestWithAnimal | null>(
     null,

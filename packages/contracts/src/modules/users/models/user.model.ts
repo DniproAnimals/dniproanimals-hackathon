@@ -12,7 +12,6 @@ export const userModel = z.object({
   instagram: z.string().nullable(),
   telegram: z.string().nullable(),
   facebook: z.string().nullable(),
-  orgId: z.number().nullable(),
   createdAt: z.string(),
 });
 

@@ -1,16 +1,12 @@
 "use client";
-import { useAnimalsQuery, useCurrentOrg } from "@/shared/query-hooks";
+import { useAnimalsQuery } from "@/shared/query-hooks";
 import { IconPlus } from "@dniproanimals/icons";
 import { Button, Card } from "@dniproanimals/ui";
 import Link from "next/link";
 import { RecentAnimalRow } from "./components/RecentAnimalRow";
 
 export function RecentAnimalsSection() {
-  const { org, isOwner } = useCurrentOrg();
-  const { data: animals = [] } = useAnimalsQuery(
-    { orgId: org?.id, limit: 5 },
-    { enabled: !!org?.id },
-  );
+  const { data: animals = [] } = useAnimalsQuery({ limit: 5 });
 
   return (
     <Card>
@@ -19,19 +15,17 @@ export function RecentAnimalsSection() {
           Останні тварини
         </h2>
         <div className="flex items-center gap-2">
-          {isOwner && (
-            <Button
-              asChild
-              variant="primary"
-              size="sm"
-              className="h-7 px-2.5 text-xs"
-            >
-              <Link href="/dashboard/animals/add">
-                <IconPlus size={12} />
-                Додати
-              </Link>
-            </Button>
-          )}
+          <Button
+            asChild
+            variant="primary"
+            size="sm"
+            className="h-7 px-2.5 text-xs"
+          >
+            <Link href="/dashboard/animals/add">
+              <IconPlus size={12} />
+              Додати
+            </Link>
+          </Button>
           <Link
             href="/dashboard/animals"
             className="text-xs text-gray-medium hover:text-foreground"

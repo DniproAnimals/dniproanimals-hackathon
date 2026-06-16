@@ -8,12 +8,11 @@ import {
   updateAdoptionStatusResponseSchema,
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
-import { NotFoundError, UnauthorizedError } from "../../shared/errors";
+import { NotFoundError } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
 import { toAdoptionResponse } from "../../shared/utils/serializers";
 import { animalsService } from "../animals/animals.service";
 import { withAuth } from "../auth/auth.guard";
-import { usersService } from "../users/users.service";
 import { adoptionService } from "./adoption.service";
 
 export const adoptionController = createController({
@@ -43,9 +42,7 @@ export const adoptionController = createController({
       response: { 200: adoptionStatsResponseSchema },
     },
     handler: withAuth(async (request, reply) => {
-      const user = await usersService.getById(request.session.userId);
-      if (!user?.orgId) throw new UnauthorizedError();
-      const stats = await adoptionService.statsByOrg(user.orgId);
+      const stats = await adoptionService.stats();
       return reply.send(stats);
     }),
   }),
@@ -73,8 +70,6 @@ export const adoptionController = createController({
       response: { 200: updateAdoptionStatusResponseSchema },
     },
     handler: withAuth(async (request, reply) => {
-      const user = await usersService.getById(request.session.userId);
-      if (!user?.orgId) throw new UnauthorizedError();
       await adoptionService.updateStatus(request.body.id, request.body.status);
       if (request.body.status === "approved") {
         const animalId = await adoptionService.getAnimalId(request.body.id);

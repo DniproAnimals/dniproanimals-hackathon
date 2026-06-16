@@ -11,7 +11,6 @@ import Link from "next/link";
 
 const navLinks = [
   { href: "/animals", label: "Тварини" },
-  { href: "/lost", label: "Загублені" },
   { href: "/donate", label: "Допомогти" },
 ];
 

@@ -2,12 +2,10 @@ import { createAdoptionApiService } from "../services/adoption";
 import { createAnimalsApiService } from "../services/animals";
 import { createAuthApiService } from "../services/auth";
 import { createFavoritesApiService } from "../services/favorites";
-import { createLostApiService } from "../services/lost";
+import { createFoundationApiService } from "../services/foundation";
 import { createNotificationsApiService } from "../services/notifications";
-import { createOrganizationsApiService } from "../services/organizations";
-import { createSuperadminApiService } from "../services/superadmin";
 import { createUploadApiService } from "../services/upload";
-import { createVolunteersApiService } from "../services/volunteers";
+import { createUsersApiService } from "../services/users";
 import { createHttp, type ApiClientConfig } from "../utils";
 
 export function createApiClient(config: ApiClientConfig) {
@@ -16,14 +14,12 @@ export function createApiClient(config: ApiClientConfig) {
   return {
     auth: createAuthApiService(http),
     animals: createAnimalsApiService(http),
-    organizations: createOrganizationsApiService(http),
     adoption: createAdoptionApiService(http),
-    lost: createLostApiService(http),
     favorites: createFavoritesApiService(http),
-    volunteers: createVolunteersApiService(http),
     notifications: createNotificationsApiService(http),
-    superadmin: createSuperadminApiService(http),
     upload: createUploadApiService(http),
+    foundation: createFoundationApiService(http),
+    users: createUsersApiService(http),
   };
 }
 

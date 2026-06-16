@@ -1,52 +1,104 @@
 "use client";
-import type { Volunteer } from "@dniproanimals/contracts";
-import { useState } from "react";
-import { VolunteerDetailDialog } from "./components/VolunteerDetailDialog";
-import { VolunteerFormDialog } from "./components/VolunteerFormDialog";
-import { VolunteersFilters } from "./components/VolunteersFilters";
-import { VolunteersHeader } from "./components/VolunteersHeader";
-import { VolunteersList } from "./components/VolunteersList";
-import { VolunteersStats } from "./components/VolunteersStats";
+import { useUpdateUserRoleMutation, useUsersQuery } from "@/shared/query-hooks";
+import type { UpdateUserRoleBody } from "@dniproanimals/contracts";
+import {
+  Avatar,
+  AvatarFallback,
+  Badge,
+  Card,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@dniproanimals/ui";
 
 export default function VolunteersPage() {
-  const [viewing, setViewing] = useState<Volunteer | null>(null);
-  const [editing, setEditing] = useState<Volunteer | null>(null);
-  const [creating, setCreating] = useState(false);
+  const { data: users = [], isLoading } = useUsersQuery();
+  const updateRoleMutation = useUpdateUserRoleMutation();
 
-  const openCreate = () => setCreating(true);
-  const openView = (v: Volunteer) => setViewing(v);
-  const openEdit = (v: Volunteer) => {
-    setViewing(null);
-    setEditing(v);
-  };
-  const closeView = () => setViewing(null);
-  const closeForm = () => {
-    setCreating(false);
-    setEditing(null);
+  const handleRoleChange = (userId: number, role: string) => {
+    updateRoleMutation.mutate({
+      id: userId,
+      role: role as UpdateUserRoleBody["role"],
+    });
   };
 
-  const formOpen = creating || editing != null;
+  if (isLoading) return <div>Завантаження...</div>;
 
   return (
-    <div className="max-w-5xl space-y-6">
-      <VolunteersHeader onAdd={openCreate} />
-      <VolunteersStats />
-      <VolunteersFilters />
-      <VolunteersList onView={openView} onAdd={openCreate} />
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-foreground">
+        Волонтери та команда
+      </h1>
 
-      <VolunteerDetailDialog
-        open={viewing != null}
-        onOpenChange={(o) => !o && closeView()}
-        volunteer={viewing}
-        onEdit={openEdit}
-        onClose={closeView}
-      />
-      <VolunteerFormDialog
-        open={formOpen}
-        onOpenChange={(o) => !o && closeForm()}
-        volunteer={editing}
-        onClose={closeForm}
-      />
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Користувач</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Роль</TableHead>
+              <TableHead className="text-right">Дії</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell className="flex items-center gap-3">
+                  <Avatar className="size-8">
+                    <AvatarFallback>
+                      {user.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="font-medium">{user.name}</span>
+                </TableCell>
+                <TableCell className="text-gray-medium">{user.email}</TableCell>
+                <TableCell>
+                  <Badge
+                    variant={
+                      user.role === "superadmin"
+                        ? "danger"
+                        : user.role === "admin"
+                          ? "brand"
+                          : user.role === "volunteer"
+                            ? "success"
+                            : "soft"
+                    }
+                    size="sm"
+                    className="uppercase"
+                  >
+                    {user.role}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Select
+                    value={user.role}
+                    onValueChange={(val) => handleRoleChange(user.id, val)}
+                    disabled={updateRoleMutation.isPending}
+                  >
+                    <SelectTrigger className="w-[140px] ml-auto">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user">Користувач</SelectItem>
+                      <SelectItem value="volunteer">Волонтер</SelectItem>
+                      <SelectItem value="admin">Адмін</SelectItem>
+                      <SelectItem value="superadmin">Superadmin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   );
 }
