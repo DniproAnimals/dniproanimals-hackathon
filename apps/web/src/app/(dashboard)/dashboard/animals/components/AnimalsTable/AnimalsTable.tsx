@@ -1,5 +1,5 @@
 "use client";
-import { useAnimalsQuery, useCurrentOrg } from "@/shared/query-hooks";
+import { useAnimalsQuery } from "@/shared/query-hooks";
 import {
   Card,
   EmptyState,
@@ -13,17 +13,12 @@ import { useAnimalsFilterState } from "../../hooks/useAnimalsFilterState";
 import { AnimalsTableRow } from "./components/AnimalsTableRow";
 
 export function AnimalsTable() {
-  const { org } = useCurrentOrg();
   const [filters] = useAnimalsFilterState();
-  const { data: animals = [] } = useAnimalsQuery(
-    {
-      orgId: org?.id,
-      type: filters.type ?? undefined,
-      status: filters.status ?? undefined,
-      q: filters.q ?? undefined,
-    },
-    { enabled: !!org?.id },
-  );
+  const { data: animals = [] } = useAnimalsQuery({
+    type: filters.type ?? undefined,
+    status: filters.status ?? undefined,
+    q: filters.q ?? undefined,
+  });
 
   if (animals.length === 0) {
     return (

@@ -1,5 +1,5 @@
 "use client";
-import { useCurrentOrg } from "@/shared/query-hooks";
+import { useMeQuery } from "@/shared/query-hooks";
 import {
   Sheet,
   SheetContent,
@@ -10,17 +10,16 @@ import {
 import { useState } from "react";
 import { SidebarLogo } from "./components/SidebarLogo";
 import { SidebarNav } from "./components/SidebarNav";
-import { SidebarOrgInfo } from "./components/SidebarOrgInfo";
+
 import { SidebarUserPanel } from "./components/SidebarUserPanel";
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
-  const { user, org, isOwner } = useCurrentOrg();
+  const { data: user } = useMeQuery();
 
   return (
     <>
       <SidebarLogo />
-      {org && <SidebarOrgInfo org={org} />}
-      <SidebarNav isOwner={isOwner} onNavigate={onNavigate} />
+      <SidebarNav isOwner={false} onNavigate={onNavigate} />
       {user && <SidebarUserPanel user={user} />}
     </>
   );

@@ -5,7 +5,6 @@ import { AnimalBreedField } from "./components/AnimalBreedField";
 import { AnimalColorField } from "./components/AnimalColorField";
 import { AnimalContactsFields } from "./components/AnimalContactsFields";
 import { AnimalDescriptionField } from "./components/AnimalDescriptionField";
-import { AnimalHealthField } from "./components/AnimalHealthField";
 import { AnimalNameField } from "./components/AnimalNameField";
 import { AnimalPhotoField } from "./components/AnimalPhotoField";
 import { AnimalSexField } from "./components/AnimalSexField";
@@ -42,7 +41,6 @@ export function AnimalForm({
         <AnimalWeightField />
         <AnimalSizeField />
         <AnimalColorField />
-        <AnimalHealthField />
         <AnimalContactsFields />
         <Button
           type="submit"
