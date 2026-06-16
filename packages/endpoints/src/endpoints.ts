@@ -7,6 +7,7 @@ export const endpoints = createTypedEndpoints({
     logout: "/auth/logout",
     me: "/auth/me",
     google: "/auth/google",
+    verifyEmail: "/auth/verify-email",
   },
   animals: {
     list: "/animals",
@@ -29,6 +30,9 @@ export const endpoints = createTypedEndpoints({
 
   notifications: {
     list: "/notifications",
+  },
+  mail: {
+    test: "/mail/test",
   },
   upload: {
     image: "/upload/image",

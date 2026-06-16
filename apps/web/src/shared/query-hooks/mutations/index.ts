@@ -14,3 +14,4 @@ export * from "./useUpdateAnimalMutation";
 export * from "./useUpdateFoundationMutation";
 export * from "./useUpdateUserRoleMutation";
 export * from "./useUploadImageMutation";
+export * from "./useVerifyEmailMutation";

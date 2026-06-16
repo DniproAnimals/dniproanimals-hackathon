@@ -4,6 +4,7 @@ import type {
   LogoutResponse,
   RegisterBody,
   User,
+  VerifyEmailResponse,
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import type { HttpFn } from "../utils";
@@ -43,6 +44,12 @@ export function createAuthApiService(http: HttpFn) {
     me: () =>
       http<User>({
         endpoint: endpoints.auth.me(),
+      }),
+
+    verifyEmail: (token: string) =>
+      http<VerifyEmailResponse>({
+        endpoint: endpoints.auth.verifyEmail(),
+        query: { token },
       }),
   };
 }

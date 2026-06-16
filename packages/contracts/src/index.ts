@@ -2,6 +2,8 @@ export * from "./modules/adoption";
 export * from "./modules/animals";
 export * from "./modules/auth";
 export * from "./modules/favorites";
+export * from "./modules/lost";
+export * from "./modules/mail";
 export * from "./modules/notifications";
 
 export * from "./modules/foundation";

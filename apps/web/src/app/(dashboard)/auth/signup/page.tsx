@@ -23,7 +23,9 @@ export default function SignUpPage() {
   };
 
   const registerMutation = useRegisterMutation({
-    onSuccess: onAuthSuccess,
+    onSuccess: () => {
+      router.push("/verify-email");
+    },
     onError: (err) => setErrorMessage(err.message || "Помилка"),
   });
 
