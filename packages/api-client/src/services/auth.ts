@@ -1,8 +1,13 @@
 import type {
+  ForgotPasswordBody,
   GoogleLoginBody,
   LoginBody,
   LogoutResponse,
   RegisterBody,
+  ResendEmailBody,
+  ResendEmailResponse,
+  ResetPasswordBody,
+  ResetPasswordResponse,
   User,
   VerifyEmailResponse,
 } from "@dniproanimals/contracts";
@@ -50,6 +55,30 @@ export function createAuthApiService(http: HttpFn) {
       http<VerifyEmailResponse>({
         endpoint: endpoints.auth.verifyEmail(),
         query: { token },
+      }),
+
+    resendVerification: (body: ResendEmailBody) =>
+      http<ResendEmailResponse>({
+        endpoint: endpoints.auth.resendEmail(),
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json" },
+      }),
+
+    forgotPassword: (body: ForgotPasswordBody) =>
+      http<ResetPasswordResponse>({
+        endpoint: endpoints.auth.forgotPassword(),
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json" },
+      }),
+
+    resetPassword: (body: ResetPasswordBody) =>
+      http<ResetPasswordResponse>({
+        endpoint: endpoints.auth.resetPassword(),
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json" },
       }),
   };
 }

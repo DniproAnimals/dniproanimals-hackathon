@@ -29,7 +29,19 @@ export function SignInForm({
         className="bg-white rounded-2xl p-6 shadow-sm border border-gray-border space-y-3"
       >
         <SignInEmailField />
-        <SignInPasswordField />
+
+        <div className="space-y-1">
+          <SignInPasswordField />
+          <div className="flex justify-end">
+            <Link
+              href="/forgot-password"
+              className="text-xs text-gray-medium hover:text-foreground hover:underline transition-colors"
+              tabIndex={-1}
+            >
+              Забули пароль?
+            </Link>
+          </div>
+        </div>
 
         {errorMessage && (
           <p className="text-xs text-destructive">{errorMessage}</p>
