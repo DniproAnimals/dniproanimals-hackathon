@@ -1,7 +1,14 @@
 {
   "extends": "@dniproanimals/typescript-config/react-library.json",
   "compilerOptions": {
-    "outDir": "dist"
+    "outDir": "dist",
+    "paths": {
+      "@/*": ["../web/src/*"]
+    }
   },
-  "include": ["../../packages/ui/src/**/*.stories.tsx", ".storybook/**/*"]
+  "include": [
+    "../../packages/ui/src/**/*.stories.tsx",
+    "stories/**/*.stories.tsx",
+    ".storybook/**/*"
+  ]
 }

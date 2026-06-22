@@ -2,6 +2,7 @@ import {
   IconBrandFacebookFilled,
   IconBrandInstagram,
   IconBrandTelegram,
+  IconFileText,
   IconHeartFilled,
 } from "@dniproanimals/icons";
 import { Button, Separator } from "@dniproanimals/ui";
@@ -91,25 +92,43 @@ export function Footer() {
                 ))}
               </div>
             </div>
-            <div>
-              <p className="text-xs font-semibold text-foreground/40 uppercase tracking-wider mb-3">
-                Допомога
-              </p>
-              <Button
-                asChild
-                variant="soft"
-                size="md"
-                className="bg-foreground/10 text-foreground hover:bg-foreground/20"
-              >
-                <a
-                  href="https://send.monobank.ua/jar/dniproanimals"
-                  target="_blank"
-                  rel="noopener noreferrer"
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs font-semibold text-foreground/40 uppercase tracking-wider mb-3">
+                  Документи
+                </p>
+                <Button
+                  asChild
+                  variant="soft"
+                  size="md"
+                  className="bg-foreground/10 text-foreground hover:bg-foreground/20"
                 >
-                  <IconHeartFilled size={16} />
-                  Задонатити
-                </a>
-              </Button>
+                  <Link href="/contract">
+                    <IconFileText size={16} />
+                    Договір
+                  </Link>
+                </Button>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-foreground/40 uppercase tracking-wider mb-3">
+                  Допомога
+                </p>
+                <Button
+                  asChild
+                  variant="soft"
+                  size="md"
+                  className="bg-foreground/10 text-foreground hover:bg-foreground/20"
+                >
+                  <a
+                    href="https://send.monobank.ua/jar/dniproanimals"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <IconHeartFilled size={16} />
+                    Задонатити
+                  </a>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
