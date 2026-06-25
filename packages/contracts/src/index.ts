@@ -2,11 +2,11 @@ export * from "./modules/adoption";
 export * from "./modules/animals";
 export * from "./modules/auth";
 export * from "./modules/favorites";
-export * from "./modules/lost";
+export * from "./modules/mail";
 export * from "./modules/notifications";
-export * from "./modules/organizations";
-export * from "./modules/superadmin";
+
+export * from "./modules/foundation";
 export * from "./modules/upload";
 export * from "./modules/users";
-export * from "./modules/volunteers";
+
 export * from "./shared";

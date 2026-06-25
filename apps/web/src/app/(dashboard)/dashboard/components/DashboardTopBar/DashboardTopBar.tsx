@@ -1,11 +1,10 @@
 "use client";
-import { useCurrentOrg } from "@/shared/query-hooks";
+
 import { IconMenu2 } from "@dniproanimals/icons";
 import { Button } from "@dniproanimals/ui";
 import { useState } from "react";
 
 export function DashboardTopBar() {
-  const { org } = useCurrentOrg();
   const [, setOpen] = useState(false);
 
   return (
@@ -13,9 +12,7 @@ export function DashboardTopBar() {
       <Button variant="ghost" size="icon-sm" onClick={() => setOpen(true)}>
         <IconMenu2 size={20} />
       </Button>
-      <span className="font-semibold text-sm text-foreground">
-        {org?.name || "Організація"}
-      </span>
+      <span className="font-semibold text-sm text-foreground">Дашборд</span>
     </div>
   );
 }

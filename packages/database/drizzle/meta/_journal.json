@@ -15,6 +15,20 @@
       "when": 1777480178652,
       "tag": "0001_add_google_auth",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1778513403651,
+      "tag": "0002_add_email_verification",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1781554355468,
+      "tag": "0003_polite_landau",
+      "breakpoints": true
     }
   ]
 }

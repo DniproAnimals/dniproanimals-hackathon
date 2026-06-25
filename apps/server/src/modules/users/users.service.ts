@@ -24,4 +24,16 @@ export const usersService = {
   async update(id: number, patch: UserUpdate) {
     await db.update(usersTable).set(patch).where(eq(usersTable.id, id));
   },
+
+  async list() {
+    return db.select().from(usersTable).orderBy(usersTable.id);
+  },
+
+  async updateRole(
+    id: number,
+    role: "user" | "admin" | "volunteer" | "superadmin",
+  ) {
+    await db.update(usersTable).set({ role }).where(eq(usersTable.id, id));
+    return { success: true };
+  },
 };

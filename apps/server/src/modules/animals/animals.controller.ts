@@ -13,11 +13,10 @@ import {
   updateAnimalResponseSchema,
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
-import { NotFoundError, UnauthorizedError } from "../../shared/errors";
+import { NotFoundError } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
 import { toAnimalResponse } from "../../shared/utils/serializers";
 import { withAuth } from "../auth/auth.guard";
-import { usersService } from "../users/users.service";
 import { animalsService } from "./animals.service";
 
 export const animalsController = createController({
@@ -41,9 +40,7 @@ export const animalsController = createController({
       response: { 200: animalsStatsResponseSchema },
     },
     handler: withAuth(async (request, reply) => {
-      const user = await usersService.getById(request.session.userId);
-      if (!user?.orgId) throw new UnauthorizedError();
-      const stats = await animalsService.statsByOrg(user.orgId);
+      const stats = await animalsService.stats();
       return reply.send(stats);
     }),
   }),
@@ -58,20 +55,7 @@ export const animalsController = createController({
     handler: async (request, reply) => {
       const animal = await animalsService.getById(request.params.id);
       if (!animal) throw new NotFoundError("Animal");
-      const org = animal.orgId
-        ? await animalsService.getOrgRef(animal.orgId)
-        : null;
-      return reply.send({
-        ...toAnimalResponse(animal),
-        org: org
-          ? {
-              id: org.id,
-              name: org.name,
-              photo: org.photo ?? null,
-              location: org.location ?? null,
-            }
-          : null,
-      });
+      return reply.send(toAnimalResponse(animal));
     },
   }),
 
@@ -83,9 +67,7 @@ export const animalsController = createController({
       response: { 200: createAnimalResponseSchema },
     },
     handler: withAuth(async (request, reply) => {
-      const user = await usersService.getById(request.session.userId);
-      const orgId = user?.orgId ?? null;
-      const created = await animalsService.create(request.body, orgId);
+      const created = await animalsService.create(request.body);
       return reply.send(toAnimalResponse(created));
     }),
   }),

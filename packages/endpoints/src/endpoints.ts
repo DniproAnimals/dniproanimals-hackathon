@@ -7,6 +7,10 @@ export const endpoints = createTypedEndpoints({
     logout: "/auth/logout",
     me: "/auth/me",
     google: "/auth/google",
+    verifyEmail: "/auth/verify-email",
+    resendEmail: "/auth/resend-email",
+    forgotPassword: "/auth/forgot-password",
+    resetPassword: "/auth/reset-password",
   },
   animals: {
     list: "/animals",
@@ -26,39 +30,22 @@ export const endpoints = createTypedEndpoints({
     list: "/favorites",
     toggle: "/favorites",
   },
-  lost: {
-    list: "/lost",
-    create: "/lost",
-    update: "/lost/:id",
-  },
-  organizations: {
-    list: "/organizations",
-    create: "/organizations",
-    updateStatus: "/organizations",
-    updateOwn: "/organizations",
-    get: "/organizations/:id",
-    animals: "/organizations/:id/animals",
-    volunteers: "/organizations/:id/volunteers",
-    jar: "/organizations/jar",
-  },
-  superadmin: {
-    listOrgs: "/superadmin/organizations",
-    orgsStats: "/superadmin/organizations/stats",
-    updateOrg: "/superadmin/organizations",
-    deleteOrg: "/superadmin/organizations",
-  },
-  volunteers: {
-    list: "/volunteers",
-    stats: "/volunteers/stats",
-    create: "/volunteers",
-    update: "/volunteers",
-    delete: "/volunteers",
-    invite: "/volunteers/invite",
-  },
+
   notifications: {
     list: "/notifications",
   },
+  mail: {
+    test: "/mail/test",
+  },
   upload: {
-    image: "/upload",
+    image: "/upload/image",
+  },
+  foundation: {
+    get: "/foundation",
+    update: "/foundation",
+  },
+  users: {
+    list: "/users",
+    updateRole: "/users/role",
   },
 } as const);

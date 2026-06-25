@@ -17,11 +17,6 @@ const SIZE_LABELS: Record<string, string> = {
   medium: "Середній",
   large: "Великий",
 };
-const EXTRA_LABELS = {
-  vaccinated: "Вакциновано",
-  sterilized: "Стерилізовано",
-  trained: "Навчено",
-} as const;
 
 export function FilterActiveChips() {
   const [filters, setFilters] = useCatalogFilterState();
@@ -72,15 +67,6 @@ export function FilterActiveChips() {
             : null,
         }),
     });
-  }
-  for (const k of ["vaccinated", "sterilized", "trained"] as const) {
-    if (filters[k]) {
-      chips.push({
-        key: `extra-${k}`,
-        label: EXTRA_LABELS[k],
-        clear: () => setFilters({ [k]: null }),
-      });
-    }
   }
 
   if (chips.length === 0) return null;

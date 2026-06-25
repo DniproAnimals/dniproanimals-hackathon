@@ -1,14 +1,23 @@
 import {
+  forgotPasswordBodySchema,
   googleLoginBodySchema,
   loginBodySchema,
   logoutResponseSchema,
   registerBodySchema,
+  resendEmailResponseSchema,
+  resendEmailSchema,
+  resetPasswordBodySchema,
+  successResponseSchema,
   userModel,
+  verifyEmailQuerySchema,
+  verifyEmailResponseSchema,
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import {
+  BadRequestError,
   ConflictError,
   NotFoundError,
+  TooManyRequestsError,
   UnauthorizedError,
 } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
@@ -27,7 +36,6 @@ export const authController = createController({
     handler: async (request, reply) => {
       const user = await authService.register(request.body);
       if (!user) throw new ConflictError("User with this email already exists");
-      request.session.userId = user.id;
       return reply.send(toUserResponse(user));
     },
   }),
@@ -77,6 +85,28 @@ export const authController = createController({
     },
   }),
 
+  verifyEmail: defineRoute({
+    method: "GET",
+    url: endpoints.auth.verifyEmail(),
+    schema: {
+      querystring: verifyEmailQuerySchema,
+      response: { 200: verifyEmailResponseSchema },
+    },
+    handler: async (request, reply) => {
+      const result = await authService.verifyEmail(request.query.token);
+      if (!result.ok) {
+        if (result.reason === "expired") {
+          throw new BadRequestError("Verification link expired");
+        }
+        if (result.reason === "used") {
+          throw new BadRequestError("Verification link already used");
+        }
+        throw new NotFoundError("Verification token");
+      }
+      return reply.send({ success: true });
+    },
+  }),
+
   me: defineRoute({
     method: "GET",
     url: endpoints.auth.me(),
@@ -88,5 +118,55 @@ export const authController = createController({
       if (!user) throw new NotFoundError("User");
       return reply.send(toUserResponse(user));
     }),
+  }),
+
+  resend: defineRoute({
+    method: "POST",
+    url: endpoints.auth.resendEmail(),
+    schema: {
+      body: resendEmailSchema,
+      response: { 200: resendEmailResponseSchema },
+    },
+    handler: async (request, reply) => {
+      const result = await authService.resendVerificationEmail(
+        request.body.email,
+      );
+      if (!result.ok && result.reason === "rate-limit")
+        throw new TooManyRequestsError("Rate limit exceeded");
+      return reply.send({ success: true });
+    },
+  }),
+  forgotPassword: defineRoute({
+    method: "POST",
+    url: endpoints.auth.forgotPassword(),
+    schema: {
+      body: forgotPasswordBodySchema,
+      response: { 200: successResponseSchema },
+    },
+    handler: async (request, reply) => {
+      await authService.requestPasswordReset(request.body.email);
+      return reply.send({ success: true });
+    },
+  }),
+
+  resetPassword: defineRoute({
+    method: "POST",
+    url: endpoints.auth.resetPassword(),
+    schema: {
+      body: resetPasswordBodySchema,
+      response: { 200: successResponseSchema },
+    },
+    handler: async (request, reply) => {
+      const result = await authService.resetPassword(request.body);
+
+      if (!result.ok) {
+        if (result.reason === "expired-token") {
+          throw new BadRequestError("Link expired");
+        }
+        throw new BadRequestError("Invalid reset link");
+      }
+
+      return reply.send({ success: true });
+    },
   }),
 });

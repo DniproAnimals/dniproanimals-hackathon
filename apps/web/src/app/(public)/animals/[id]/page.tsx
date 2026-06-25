@@ -10,7 +10,6 @@ import { AnimalDetailHeader } from "./components/AnimalDetailHeader";
 import { AnimalDetailSkeleton } from "./components/AnimalDetailSkeleton";
 import { AnimalGallery } from "./components/AnimalGallery";
 import { AnimalNotFound } from "./components/AnimalNotFound";
-import { AnimalOrgCard } from "./components/AnimalOrgCard";
 
 const TYPE_EMOJI: Record<string, string> = {
   dog: "🐕",
@@ -64,7 +63,7 @@ export default function AnimalDetailPageRoute(
             {animal.breed || "Мікс порід"}
           </p>
           <AnimalAttributes animal={animal} />
-          {animal.org && <AnimalOrgCard org={animal.org} />}
+
           <AnimalContacts animal={animal} />
         </motion.div>
       </div>

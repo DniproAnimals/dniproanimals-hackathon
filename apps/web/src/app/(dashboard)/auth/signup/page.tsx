@@ -3,7 +3,7 @@ import {
   useGoogleLoginMutation,
   useRegisterMutation,
 } from "@/shared/query-hooks";
-import type { RegisterBody } from "@dniproanimals/contracts";
+import type { RegisterBody, User } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -15,15 +15,18 @@ export default function SignUpPage() {
   const queryClient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState("");
 
-  const onAuthSuccess = (data: { role: string; orgId: number | null }) => {
-    queryClient.setQueryData([endpoints.auth.me()], data);
-    if (data.role === "superadmin") router.push("/admin");
-    else if (data.orgId) router.push("/dashboard");
+  const onAuthSuccess = (user: User) => {
+    queryClient.setQueryData([endpoints.auth.me()], user);
+    if (user.role === "superadmin") router.push("/admin");
+    else if (user.role === "admin" || user.role === "volunteer")
+      router.push("/dashboard");
     else router.push("/onboarding");
   };
 
   const registerMutation = useRegisterMutation({
-    onSuccess: onAuthSuccess,
+    onSuccess: () => {
+      router.push("/verify-email");
+    },
     onError: (err) => setErrorMessage(err.message || "Помилка"),
   });
 

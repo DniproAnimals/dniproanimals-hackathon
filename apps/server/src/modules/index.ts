@@ -3,22 +3,18 @@ import { registerAdoptionRoutes } from "./adoption";
 import { registerAnimalsRoutes } from "./animals";
 import { registerAuthRoutes } from "./auth";
 import { registerFavoritesRoutes } from "./favorites";
-import { registerLostRoutes } from "./lost";
+import { registerFoundationRoutes } from "./foundation";
+import { registerMailRoutes } from "./mail";
 import { registerNotificationsRoutes } from "./notifications";
-import { registerOrganizationsRoutes } from "./organizations";
-import { registerSuperadminRoutes } from "./superadmin";
-import { registerUploadRoutes } from "./upload";
-import { registerVolunteersRoutes } from "./volunteers";
+import { registerUsersRoutes } from "./users";
 
 export async function appRouter(fastify: FastifyZodInstance) {
   registerAuthRoutes(fastify);
   registerAnimalsRoutes(fastify);
-  registerOrganizationsRoutes(fastify);
   registerAdoptionRoutes(fastify);
-  registerLostRoutes(fastify);
   registerFavoritesRoutes(fastify);
-  registerVolunteersRoutes(fastify);
+  registerMailRoutes(fastify);
   registerNotificationsRoutes(fastify);
-  registerSuperadminRoutes(fastify);
-  registerUploadRoutes(fastify);
+  registerFoundationRoutes(fastify);
+  registerUsersRoutes(fastify);
 }
