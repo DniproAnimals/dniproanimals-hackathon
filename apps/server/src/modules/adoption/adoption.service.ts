@@ -12,6 +12,10 @@ import {
   sql,
   usersTable,
 } from "@dniproanimals/database";
+import { env } from "@dniproanimals/env";
+import { render } from "@react-email/render";
+import React from "react";
+import { AdoptionAdminEmail } from "../../shared/emails/AdoptionAdminEmail";
 import { sendMail } from "../../shared/lib/mailer";
 
 type AdoptionInsert = typeof adoptionRequestsTable.$inferInsert;
@@ -23,28 +27,25 @@ async function sendAdoptionAdminEmail(
 ) {
   if (!adminEmails.length) return;
 
-  const subject = `Нова заявка на прихисток: ${animalName}`;
+  const subject = `🐾 Нова заявка на прихисток: ${animalName}`;
   const text = `Нова заявка на ${animalName}.\nІм'я: ${body.name}\nТелефон: ${body.phone}\nEmail: ${body.email}`;
-  const html = `
-    <div style="font-family:Arial, sans-serif; line-height:1.6;">
-      <h2>Нова заявка на прихисток!</h2>
-      <p><strong>Тварина:</strong> ${animalName} (ID: ${body.animalId})</p>
-      <h3>Контакти заявника:</h3>
-      <ul>
-        <li><strong>Ім'я:</strong> ${body.name}</li>
-        <li><strong>Телефон:</strong> ${body.phone}</li>
-        <li><strong>Email:</strong> <a href="mailto:${body.email}">${body.email}</a></li>
-        ${body.location ? `<li><strong>Локація:</strong> ${body.location}</li>` : ""}
-        ${body.telegram ? `<li><strong>Telegram:</strong> ${body.telegram}</li>` : ""}
-        ${body.instagram ? `<li><strong>Instagram:</strong> ${body.instagram}</li>` : ""}
-        ${body.facebook ? `<li><strong>Facebook:</strong> ${body.facebook}</li>` : ""}
-      </ul>
-      ${body.message ? `<h3>Повідомлення:</h3><p>${body.message}</p>` : ""}
-      <br/>
-    </div>
-  `;
 
-  await sendMail({ to: adminEmails.join(", "), subject, text, html });
+  const baseUrl = env.WEB_ORIGIN.replace(/\/$/, "");
+
+  const html = await render(
+    React.createElement(AdoptionAdminEmail, {
+      body: body,
+      animalName: animalName,
+      baseUrl: baseUrl,
+    }),
+  );
+
+  await sendMail({
+    to: adminEmails.join(", "),
+    subject: `🐾 Нова заявка на прихисток: ${animalName}`,
+    text: `Нова заявка на ${animalName}.`,
+    html,
+  });
 }
 
 export const adoptionService = {

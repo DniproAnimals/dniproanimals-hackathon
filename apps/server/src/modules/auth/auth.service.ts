@@ -1,14 +1,20 @@
 import { ResetPasswordBody } from "@dniproanimals/contracts";
 import { db, eq, usersTable } from "@dniproanimals/database";
 import { env } from "@dniproanimals/env";
+import { render } from "@react-email/render";
 import bcrypt from "bcryptjs";
 import { randomBytes } from "crypto";
+import React from "react";
+import { PasswordResetEmail } from "../../shared/emails/PasswordResetEmail.js";
+import { VerificationEmail } from "../../shared/emails/VerificationEmail.js";
 import { sendMail } from "../../shared/lib/mailer";
 import { googleService } from "../google";
 
 const ROUNDS = 10;
 const EMAIL_VERIFICATION_TTL_MS = 1000 * 60 * 60 * 24;
 const RESET_PASSWORD_TTL_MS = 1000 * 60 * 60;
+
+const baseUrl = env.WEB_ORIGIN.replace(/\/$/, "");
 
 function buildVerificationLink(token: string) {
   const baseUrl = env.WEB_ORIGIN.replace(/\/$/, "");
@@ -17,32 +23,38 @@ function buildVerificationLink(token: string) {
 
 async function sendVerificationEmail(email: string, token: string) {
   const verificationLink = buildVerificationLink(token);
-  const subject = "Confirm your email";
-  const text = `Welcome to DniproAnimals!\n\nConfirm your email: ${verificationLink}\n\nIf you did not create an account, ignore this email.`;
-  const html = `
-    <div style="font-family:Arial, sans-serif; line-height:1.6;">
-      <h2>Welcome to DniproAnimals</h2>
-      <p>Confirm your email by clicking the link below:</p>
-      <p><a href="${verificationLink}">${verificationLink}</a></p>
-      <p>If you did not create an account, you can ignore this email.</p>
-    </div>
-  `;
 
-  await sendMail({ to: email, subject, text, html });
+  const html = await render(
+    React.createElement(VerificationEmail, {
+      verficationLink: verificationLink,
+      baseUrl: baseUrl,
+    }),
+  );
+
+  await sendMail({
+    to: email,
+    subject: "Підтвердження Пошти | DniproAnimals",
+    text: "Дякуємо за створення облікового запису.",
+    html,
+  });
 }
 
 async function sendPasswordResetEmail(email: string, token: string) {
-  const baseUrl = env.WEB_ORIGIN.replace(/\/$/, "");
   const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(token)}`;
-  const subject = "Password Reset";
-  const text = `Password reset link: ${resetLink}\n\n`;
-  const html = `
-    <div style="font-family:Arial, sans-serif; line-height:1.6;">
-      <p><a href="${resetLink}">${resetLink}</a></p>
-    </div>
-  `;
 
-  await sendMail({ to: email, subject, text, html });
+  const html = await render(
+    React.createElement(PasswordResetEmail, {
+      resetLink: resetLink,
+      baseUrl: baseUrl,
+    }),
+  );
+
+  await sendMail({
+    to: email,
+    subject: "Скидання пароля | DniproAnimals",
+    text: `Посилання для зміни пароля: ${resetLink}`,
+    html,
+  });
 }
 
 function createEmailVerificationToken() {
