@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ContractDocument } from "./components/ContractDocument";
 import { ContractDownloadButton } from "./components/ContractDownloadButton";
+import { CONTRACT_ID } from "./constants/contract-content";
 
 export const metadata: Metadata = {
   title: "Договір усиновлення — DniproAnimals",
@@ -26,7 +27,7 @@ export default function ContractPage() {
               умови з організацією.
             </p>
           </div>
-          <ContractDownloadButton />
+          <ContractDownloadButton contractId={CONTRACT_ID} />
         </div>
 
         <ContractDocument />

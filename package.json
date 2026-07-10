@@ -23,6 +23,7 @@
     "storybook": "turbo run start --filter=@dniproanimals/storybook"
   },
   "devDependencies": {
+    "drizzle-kit": "^0.18.1",
     "husky": "^9.1.7",
     "prettier": "^3.8.3",
     "prettier-plugin-organize-imports": "^4.3.0",
@@ -39,6 +40,8 @@
     "packages/*"
   ],
   "dependencies": {
-    "google-auth-library": "^10.6.2"
+    "google-auth-library": "^10.6.2",
+    "jspdf": "4.2.1",
+    "next": "16.2.10"
   }
 }

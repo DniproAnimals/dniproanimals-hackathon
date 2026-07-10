@@ -6,14 +6,10 @@ import {
   CONTRACT_SUBTITLE,
   CONTRACT_TITLE,
 } from "../../constants/contract-content";
-import { CONTRACT_DOCUMENT_ID } from "../../utils/download-contract-pdf";
 
 export function ContractDocument() {
   return (
-    <article
-      id={CONTRACT_DOCUMENT_ID}
-      className="rounded-xl border border-border bg-card p-6 md:p-10 text-card-foreground shadow-sm"
-    >
+    <article className="rounded-xl border border-border bg-card p-6 md:p-10 text-card-foreground shadow-sm">
       <header className="mb-8 border-b border-border pb-6 text-center">
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
           Зразок документа

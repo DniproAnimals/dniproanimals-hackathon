@@ -27,8 +27,13 @@
   },
   "dependencies": {
     "@dniproanimals/env": "*",
+    "@tiptap/pm": "^3.27.3",
+    "@tiptap/react": "^3.27.3",
+    "@tiptap/starter-kit": "^3.27.3",
     "bcryptjs": "^2.4.3",
     "drizzle-orm": "^0.45.1",
+    "jspdf": "4.2.1",
+    "next": "16.2.10",
     "pg": "^8.20.0"
   }
 }
