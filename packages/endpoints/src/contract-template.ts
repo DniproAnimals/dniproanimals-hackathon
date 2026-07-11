@@ -1,4 +1,7 @@
 export const contractTemplate = {
-  get: (type: string) => `/contract-template/${type}`,
-  update: (type: string) => `/contract-template/${type}`,
+  get: ({ type }: { type: string }) => `/contract-template/${type}`,
+
+  update: ({ type }: { type: string }) => `/contract-template/${type}`,
+
+  pdf: ({ type }: { type: string }) => `/contract-template/${type}/pdf`,
 };

@@ -10,4 +10,5 @@ export * from "./modules/foundation";
 export * from "./modules/upload";
 export * from "./modules/users";
 
+export * from "./react";
 export * from "./shared";

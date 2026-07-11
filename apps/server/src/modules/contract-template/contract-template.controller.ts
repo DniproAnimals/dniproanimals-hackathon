@@ -8,6 +8,7 @@ import { z } from "zod";
 import { NotFoundError } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
 import { withAuth } from "../auth/auth.guard";
+import { contractTemplatePdfService } from "./contract-template-pdf.service";
 import { contractTemplateService } from "./contract-template.service";
 
 export const contractTemplateController = createController({
@@ -28,7 +29,29 @@ export const contractTemplateController = createController({
       });
     }),
   }),
+  pdf: defineRoute({
+    method: "GET",
+    url: endpoints.contractTemplate.pdf({ type: ":type" }),
+    schema: {
+      params: z.object({
+        type: z.string(),
+      }),
+    },
+    handler: withAuth(async (request, reply) => {
+      const pdf = await contractTemplatePdfService.generate(
+        request.params.type,
+      );
 
+      reply
+        .type("application/pdf")
+        .header(
+          "Content-Disposition",
+          `attachment; filename="${request.params.type}.pdf"`,
+        );
+
+      return reply.send(pdf);
+    }),
+  }),
   update: defineRoute({
     method: "PUT",
     url: endpoints.contractTemplate.update({ type: ":type" }),

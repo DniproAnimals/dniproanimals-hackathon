@@ -3,8 +3,6 @@ export type ContractSection = {
   paragraphs: string[];
 };
 
-export const CONTRACT_ID = "sample";
-
 export const CONTRACT_TITLE =
   "Договір про передачу тварини в нову сім'ю (зразок)";
 

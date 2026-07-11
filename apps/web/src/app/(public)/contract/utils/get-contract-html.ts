@@ -2,7 +2,6 @@ import "server-only";
 
 import {
   CONTRACT_DATE_PLACEHOLDER,
-  CONTRACT_ID,
   CONTRACT_PARTIES,
   CONTRACT_SECTIONS,
   CONTRACT_SIGNATURES,
@@ -71,7 +70,7 @@ function renderContractArticle(): string {
 export async function getContractHtml(
   contractId: string,
 ): Promise<string | null> {
-  if (contractId !== CONTRACT_ID) {
+  if (contractId !== "adoption") {
     return null;
   }
 

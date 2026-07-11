@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "strictNullChecks": true,
+    "jsx": "react-jsx",
     "noUncheckedIndexedAccess": false
   },
   "include": ["src"],

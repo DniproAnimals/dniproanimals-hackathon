@@ -12,12 +12,19 @@ export function createContractTemplateApiService(http: HttpFn) {
       http<ContractTemplateResponse>({
         endpoint: endpoints.contractTemplate.get({ type }),
       }),
+
     update: (type: string, body: UpdateContractTemplateBody) =>
       http<UpdateContractTemplateResponse>({
         endpoint: endpoints.contractTemplate.update({ type }),
         method: "PUT",
         body: JSON.stringify(body),
         headers: { "Content-Type": "application/json" },
+      }),
+
+    pdf: (type: string) =>
+      http<Blob>({
+        endpoint: endpoints.contractTemplate.pdf({ type }),
+        responseType: "blob",
       }),
   };
 }

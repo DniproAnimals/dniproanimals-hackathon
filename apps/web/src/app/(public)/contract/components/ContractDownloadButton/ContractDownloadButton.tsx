@@ -1,8 +1,8 @@
 "use client";
 
+import { useDownloadContractMutation } from "@/shared/query-hooks/mutations/useDownloadContractMutation";
 import { IconDownload } from "@dniproanimals/icons";
 import { Button } from "@dniproanimals/ui";
-import { useState } from "react";
 
 type ContractDownloadButtonProps = {
   contractId: string;
@@ -16,33 +16,30 @@ function getDownloadFilename(contractId: string): string {
 export function ContractDownloadButton({
   contractId,
 }: ContractDownloadButtonProps) {
-  const [isGenerating, setIsGenerating] = useState(false);
+  const { mutateAsync, isPending } = useDownloadContractMutation();
 
   async function handleDownload() {
-    setIsGenerating(true);
     try {
-      const response = await fetch(`/api/contracts/${contractId}/pdf`);
+      const blob = await mutateAsync(contractId);
 
-      if (!response.ok) {
-        throw new Error(`PDF request failed with status ${response.status}`);
-      }
-
-      const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-      const downloadLink = document.createElement("a");
-      downloadLink.href = url;
-      downloadLink.download = getDownloadFilename(contractId);
-      downloadLink.rel = "noopener";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      downloadLink.remove();
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = getDownloadFilename(contractId);
+      link.rel = "noopener";
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
       URL.revokeObjectURL(url);
-    } catch {
+    } catch (error) {
+      console.error(error);
+
       window.alert(
         "Не вдалося створити PDF. Спробуйте ще раз або оновіть сторінку.",
       );
-    } finally {
-      setIsGenerating(false);
     }
   }
 
@@ -52,11 +49,11 @@ export function ContractDownloadButton({
       variant="primary"
       size="lg"
       shape="pill"
-      disabled={isGenerating}
+      disabled={isPending}
       onClick={handleDownload}
     >
       <IconDownload size={18} />
-      {isGenerating ? "Готуємо PDF…" : "Завантажити PDF"}
+      {isPending ? "Готуємо PDF…" : "Завантажити PDF"}
     </Button>
   );
 }
