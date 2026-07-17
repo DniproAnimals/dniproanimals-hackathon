@@ -126,19 +126,14 @@ export const foundationTable = pgTable("foundation", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export type ContractContent = {
-  parties: { shelter: string; adopter: string };
-  sections: { title: string; paragraphs: string[] }[];
-  signatures: { role: string; line: string }[];
-  datePlaceholder: string;
-};
+export type TipTapDocument = Record<string, unknown>;
 
 export const contractTemplates = pgTable("contract_templates", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   type: varchar({ length: 50 }).notNull().default("adoption"),
   title: varchar({ length: 255 }).notNull(),
   subtitle: text(),
-  content: jsonb().notNull().$type<ContractContent>(),
+  content: jsonb().notNull().$type<TipTapDocument>(),
   version: integer().notNull().default(1),
   updatedBy: integer("updated_by").references(() => usersTable.id),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

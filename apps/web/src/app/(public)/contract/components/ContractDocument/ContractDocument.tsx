@@ -1,18 +1,12 @@
 "use client";
 
-import { useContractTemplateQuery } from "@/shared/query-hooks/queries/useContractTemplateQuery";
-import { ContractDocumentView } from "@dniproanimals/contracts";
+import dynamic from "next/dynamic";
+
+const ContractPdfViewer = dynamic(
+  () => import("./ContractPdfViewer").then((m) => m.ContractPdfViewer),
+  { ssr: false, loading: () => <div>Завантаження PDF...</div> },
+);
 
 export function ContractDocument() {
-  const { data: contract, isLoading } = useContractTemplateQuery("adoption");
-
-  if (isLoading) {
-    return <div>Завантаження...</div>;
-  }
-
-  if (!contract) {
-    return <div>Договір не знайдено.</div>;
-  }
-
-  return <ContractDocumentView contract={contract} />;
+  return <ContractPdfViewer contractId="adoption" />;
 }

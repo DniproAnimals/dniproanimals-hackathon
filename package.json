@@ -40,11 +40,17 @@
     "packages/*"
   ],
   "dependencies": {
+    "@tiptap/extension-bullet-list": "^3.27.3",
+    "@tiptap/extension-heading": "^3.27.3",
+    "@tiptap/extension-list-item": "^3.27.3",
+    "@tiptap/extension-ordered-list": "^3.27.3",
+    "@tiptap/extension-text-align": "^3.27.3",
     "google-auth-library": "^10.6.2",
     "jspdf": "4.2.1",
     "next": "16.2.10",
     "puppeteer": "^25.3.0",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "react-pdf": "^10.4.1"
   }
 }
