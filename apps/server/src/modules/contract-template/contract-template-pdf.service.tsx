@@ -48,9 +48,9 @@ ${body}
       console.log("3. Запускаем Chrome...");
 
       const browser = await puppeteer.launch({
-        executablePath:
-          "C:\\Users\\maksi\\.cache\\puppeteer\\chrome\\win64-150.0.7871.24\\chrome-win64\\chrome.exe",
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
         headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
       });
 
       console.log("4. Chrome запущен");
