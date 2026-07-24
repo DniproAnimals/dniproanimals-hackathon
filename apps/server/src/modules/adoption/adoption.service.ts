@@ -8,10 +8,45 @@ import {
   db,
   desc,
   eq,
+  or,
   sql,
+  usersTable,
 } from "@dniproanimals/database";
+import { env } from "@dniproanimals/env";
+import { render } from "@react-email/render";
+import React from "react";
+import { AdoptionAdminEmail } from "../../shared/emails/AdoptionAdminEmail";
+import { sendMail } from "../../shared/lib/mailer";
 
 type AdoptionInsert = typeof adoptionRequestsTable.$inferInsert;
+
+async function sendAdoptionAdminEmail(
+  adminEmails: string[],
+  body: CreateAdoptionBody,
+  animalName: string,
+) {
+  if (!adminEmails.length) return;
+
+  const subject = `🐾 Нова заявка на прихисток: ${animalName}`;
+  const text = `Нова заявка на ${animalName}.\nІм'я: ${body.name}\nТелефон: ${body.phone}\nEmail: ${body.email}`;
+
+  const baseUrl = env.WEB_ORIGIN.replace(/\/$/, "");
+
+  const html = await render(
+    React.createElement(AdoptionAdminEmail, {
+      body: body,
+      animalName: animalName,
+      baseUrl: baseUrl,
+    }),
+  );
+
+  await sendMail({
+    to: adminEmails.join(", "),
+    subject: `🐾 Нова заявка на прихисток: ${animalName}`,
+    text: `Нова заявка на ${animalName}.`,
+    html,
+  });
+}
 
 export const adoptionService = {
   async list(filters: ListAdoptionQuery = {}) {
@@ -84,6 +119,8 @@ export const adoptionService = {
       .insert(adoptionRequestsTable)
       .values(insert)
       .returning({ id: adoptionRequestsTable.id });
+
+    void this.notifyAdmins(body);
     return created!;
   },
 
@@ -101,5 +138,34 @@ export const adoptionService = {
       .where(eq(adoptionRequestsTable.id, id))
       .limit(1);
     return row?.animalId ?? null;
+  },
+
+  async notifyAdmins(body: CreateAdoptionBody) {
+    try {
+      const [[animal], admins] = await Promise.all([
+        db
+          .select({ name: animalsTable.name })
+          .from(animalsTable)
+          .where(eq(animalsTable.id, body.animalId))
+          .limit(1),
+
+        db
+          .select({ email: usersTable.email })
+          .from(usersTable)
+          .where(
+            or(eq(usersTable.role, "admin"), eq(usersTable.role, "superadmin")),
+          ),
+      ]);
+
+      if (!animal) return;
+
+      const adminEmails = admins.map((a) => a.email);
+
+      if (adminEmails.length === 0) return;
+
+      await sendAdoptionAdminEmail(adminEmails, body, animal.name);
+    } catch (err) {
+      console.error("failed to send adoption email:", err);
+    }
   },
 };
