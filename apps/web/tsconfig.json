@@ -15,6 +15,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "../../packages/database/src/db/seeds/contract-template.seed.ts"  ],
   "exclude": ["node_modules"]
 }

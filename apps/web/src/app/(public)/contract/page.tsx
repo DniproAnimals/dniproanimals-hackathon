@@ -26,7 +26,7 @@ export default function ContractPage() {
               умови з організацією.
             </p>
           </div>
-          <ContractDownloadButton />
+          <ContractDownloadButton contractId="adoption" />
         </div>
 
         <ContractDocument />

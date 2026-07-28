@@ -1,6 +1,7 @@
 import { createAdoptionApiService } from "../services/adoption";
 import { createAnimalsApiService } from "../services/animals";
 import { createAuthApiService } from "../services/auth";
+import { createContractTemplateApiService } from "../services/contractTemplate";
 import { createFavoritesApiService } from "../services/favorites";
 import { createFoundationApiService } from "../services/foundation";
 import { createNotificationsApiService } from "../services/notifications";
@@ -15,6 +16,7 @@ export function createApiClient(config: ApiClientConfig) {
     auth: createAuthApiService(http),
     animals: createAnimalsApiService(http),
     adoption: createAdoptionApiService(http),
+    contractTemplate: createContractTemplateApiService(http),
     favorites: createFavoritesApiService(http),
     notifications: createNotificationsApiService(http),
     upload: createUploadApiService(http),

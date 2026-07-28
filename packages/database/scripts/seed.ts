@@ -1,3 +1,4 @@
+import { contractTemplates } from "@dniproanimals/database";
 import "@dniproanimals/env/load";
 import bcrypt from "bcryptjs";
 import { eq, sql } from "drizzle-orm";
@@ -140,7 +141,6 @@ async function seed() {
         role: "superadmin",
       })
       .returning({ id: usersTable.id });
-    adminUserId = admin!.id;
 
     const [user] = await db
       .insert(usersTable)
@@ -155,7 +155,7 @@ async function seed() {
 
     console.log("Users: admin@gmail.com / admin, user@gmail.com / user");
   } else {
-    const [admin] = await db
+    const [] = await db
       .select({ id: usersTable.id })
       .from(usersTable)
       .where(eq(usersTable.email, "admin@gmail.com"));
@@ -257,7 +257,152 @@ async function seed() {
   } else {
     console.log(`Notifications: already exist (${notifCount})`);
   }
+  const contractCount = await getCount(contractTemplates);
 
+  if (contractCount === 0) {
+    await db.insert(contractTemplates).values({
+      type: "adoption",
+      title: "Договір про передачу тварини в нову сім'ю (зразок)",
+      subtitle:
+        "Цей документ є демонстраційним зразком для платформи DniproAnimals. Юридичну силу має лише підписаний оригінал між сторонами.",
+
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "heading",
+            attrs: {
+              level: 1,
+            },
+            content: [
+              {
+                type: "text",
+                text: "Договір про передачу тварини в нову сім'ю",
+              },
+            ],
+          },
+
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "Цей документ є демонстраційним зразком для платформи DniproAnimals. Юридичну силу має лише підписаний оригінал між сторонами.",
+              },
+            ],
+          },
+
+          {
+            type: "heading",
+            attrs: {
+              level: 2,
+            },
+            content: [
+              {
+                type: "text",
+                text: "1. Предмет договору",
+              },
+            ],
+          },
+
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "Притулок передає, а Нова сім'я приймає тварину (далі — «Тварина») на умовах відповідального утримання та догляду.",
+              },
+            ],
+          },
+
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "Передача Тварини здійснюється безоплатно як акт милосердя та відповідальної опіки.",
+              },
+            ],
+          },
+
+          {
+            type: "heading",
+            attrs: {
+              level: 2,
+            },
+            content: [
+              {
+                type: "text",
+                text: "2. Права та обов'язки Нової сім'ї",
+              },
+            ],
+          },
+
+          {
+            type: "bulletList",
+            content: [
+              {
+                type: "listItem",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [
+                      {
+                        type: "text",
+                        text: "Забезпечити належний догляд, ветеринарний нагляд та харчування.",
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                type: "listItem",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [
+                      {
+                        type: "text",
+                        text: "Не передавати тварину третім особам без письмової згоди притулку.",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+
+          {
+            type: "heading",
+            attrs: {
+              level: 2,
+            },
+            content: [
+              {
+                type: "text",
+                text: "3. Заключні положення",
+              },
+            ],
+          },
+
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "Договір набирає чинності після його підписання сторонами.",
+              },
+            ],
+          },
+        ],
+      },
+
+      version: 1,
+    });
+    console.log("Contract template created");
+  } else {
+    console.log(`Contract template already exists (${contractCount})`);
+  }
   console.log("\nSeed completed!");
 }
 

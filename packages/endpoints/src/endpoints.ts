@@ -26,6 +26,11 @@ export const endpoints = createTypedEndpoints({
     create: "/adoption",
     updateStatus: "/adoption",
   },
+  contractTemplate: {
+    get: "/contract-template/:type",
+    update: "/contract-template/:type",
+    pdf: "/contract-template/:type/pdf",
+  },
   favorites: {
     list: "/favorites",
     toggle: "/favorites",

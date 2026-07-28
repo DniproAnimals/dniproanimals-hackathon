@@ -1,23 +1,45 @@
 "use client";
 
+import { useDownloadContractMutation } from "@/shared/query-hooks/mutations/useDownloadContractMutation";
 import { IconDownload } from "@dniproanimals/icons";
 import { Button } from "@dniproanimals/ui";
-import { useState } from "react";
-import { downloadContractPdf } from "../../utils/download-contract-pdf";
 
-export function ContractDownloadButton() {
-  const [isGenerating, setIsGenerating] = useState(false);
+type ContractDownloadButtonProps = {
+  contractId: string;
+};
+
+function getDownloadFilename(contractId: string): string {
+  const safeId = contractId.trim().replace(/[^a-z0-9_-]+/gi, "-");
+  return `dogovir-${safeId || "contract"}.pdf`;
+}
+
+export function ContractDownloadButton({
+  contractId,
+}: ContractDownloadButtonProps) {
+  const { mutateAsync, isPending } = useDownloadContractMutation();
 
   async function handleDownload() {
-    setIsGenerating(true);
     try {
-      await downloadContractPdf();
-    } catch {
+      const blob = await mutateAsync(contractId);
+
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = getDownloadFilename(contractId);
+      link.rel = "noopener";
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+
       window.alert(
         "Не вдалося створити PDF. Спробуйте ще раз або оновіть сторінку.",
       );
-    } finally {
-      setIsGenerating(false);
     }
   }
 
@@ -27,11 +49,11 @@ export function ContractDownloadButton() {
       variant="primary"
       size="lg"
       shape="pill"
-      disabled={isGenerating}
+      disabled={isPending}
       onClick={handleDownload}
     >
       <IconDownload size={18} />
-      {isGenerating ? "Готуємо PDF…" : "Завантажити PDF"}
+      {isPending ? "Готуємо PDF…" : "Завантажити PDF"}
     </Button>
   );
 }

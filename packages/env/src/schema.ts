@@ -7,7 +7,7 @@ export const envSchema = z.object({
 
   DATABASE_URL: z.string().optional(),
   DB_HOST: z.string().default("localhost"),
-  DB_PORT: z.coerce.number().default(5432),
+  DB_PORT: z.coerce.number().default(55432),
   DB_USER: z.string().default("postgres"),
   DB_PASS: z.string().default("postgres"),
   DB_NAME: z.string().default("dniproanimals"),
