@@ -1,5 +1,6 @@
 import type { FastifyZodInstance } from "../shared/types/fastify";
 import { registerAdoptionRoutes } from "./adoption";
+import { registerAnimalDonationsRoutes } from "./animal-donations";
 import { registerAnimalsRoutes } from "./animals";
 import { registerAuthRoutes } from "./auth";
 import { registerContractTemplateRoutes } from "./contract-template";
@@ -17,6 +18,7 @@ export async function appRouter(fastify: FastifyZodInstance) {
   registerFavoritesRoutes(fastify);
   registerMailRoutes(fastify);
   registerNotificationsRoutes(fastify);
+  registerAnimalDonationsRoutes(fastify);
   registerFoundationRoutes(fastify);
   registerUsersRoutes(fastify);
 }

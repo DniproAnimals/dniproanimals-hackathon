@@ -29,6 +29,13 @@
       "when": 1781554355468,
       "tag": "0003_polite_landau",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1785715200000,
+      "tag": "0004_add_animal_donations",
+      "breakpoints": true
     }
   ]
 }

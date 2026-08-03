@@ -1,5 +1,6 @@
 export * from "./useAdoptionQuery";
 export * from "./useAdoptionStatsQuery";
+export * from "./useAnimalDonationStatusQuery";
 export * from "./useAnimalQuery";
 export * from "./useAnimalsQuery";
 export * from "./useAnimalsStatsQuery";

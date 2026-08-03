@@ -6,6 +6,7 @@ import {
   real,
   text,
   timestamp,
+  unique,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -67,6 +68,29 @@ export const animalsTable = pgTable("animals", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export const animalDonationsTable = pgTable(
+  "animal_donations",
+  {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    animalId: integer("animal_id")
+      .notNull()
+      .references(() => animalsTable.id, { onDelete: "cascade" }),
+    isActive: boolean("is_active").notNull().default(true),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    canceledAt: timestamp("canceled_at"),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    unique("animal_donations_user_id_animal_id_unique").on(
+      table.userId,
+      table.animalId,
+    ),
+  ],
+);
 
 export const adoptionRequestsTable = pgTable("adoption_requests", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),

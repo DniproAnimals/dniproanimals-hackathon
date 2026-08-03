@@ -1,4 +1,5 @@
 export * from "./modules/adoption";
+export * from "./modules/animal-donations";
 export * from "./modules/animals";
 export * from "./modules/auth";
 export * from "./modules/contract-templates";

@@ -1,4 +1,5 @@
 export * from "./adoption";
+export * from "./animalDonations";
 export * from "./animals";
 export * from "./auth";
 export * from "./contractTemplate";
