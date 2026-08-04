@@ -1,3 +1,4 @@
+export * from "./addBreeds.schema";
 export * from "./createAnimal.schema";
 export * from "./createSpecies.schema";
 export * from "./deleteAnimal.schema";

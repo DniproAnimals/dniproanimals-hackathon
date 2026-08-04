@@ -1,4 +1,6 @@
 import {
+  addBreedsBodySchema,
+  addBreedsResponseSchema,
   animalsStatsResponseSchema,
   createAnimalBodySchema,
   createAnimalResponseSchema,
@@ -135,6 +137,19 @@ export const animalsController = createController({
     handler: withAuth(async (request, reply) => {
       const created = await animalsService.createSpecies(request.body);
       return reply.send(toSpeciesResponse(created));
+    }),
+  }),
+
+  addBreeds: defineRoute({
+    method: "POST",
+    url: endpoints.animals.addBreeds(),
+    schema: {
+      body: addBreedsBodySchema,
+      response: { 200: addBreedsResponseSchema },
+    },
+    handler: withAuth(async (request, reply) => {
+      const result = await animalsService.addBreeds(request.body);
+      return reply.send(result);
     }),
   }),
 });

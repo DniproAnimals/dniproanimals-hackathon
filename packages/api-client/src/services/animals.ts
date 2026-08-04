@@ -1,4 +1,6 @@
 import type {
+  AddBreedsBody,
+  AddBreedsResponse,
   AnimalsStatsResponse,
   CreateAnimalBody,
   CreateAnimalResponse,
@@ -56,6 +58,13 @@ export function createAnimalsApiService(http: HttpFn) {
     createSpecies: (body: CreateSpeciesBody) =>
       http<CreateSpeciesResponse>({
         endpoint: endpoints.animals.createSpecies(),
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json" },
+      }),
+    addBreeds: (body: AddBreedsBody) =>
+      http<AddBreedsResponse>({
+        endpoint: endpoints.animals.addBreeds(),
         method: "POST",
         body: JSON.stringify(body),
         headers: { "Content-Type": "application/json" },

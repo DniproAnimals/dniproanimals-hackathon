@@ -13,6 +13,7 @@ export * from "./useToggleFavoriteMutation";
 export * from "./useUpdateAdoptionStatusMutation";
 export * from "./useUpdateAnimalMutation";
 
+export * from "./useAddBreedsMutation";
 export * from "./useCreateSpeciesMutation";
 export * from "./useUpdateFoundationMutation";
 export * from "./useUpdateUserRoleMutation";

@@ -1,4 +1,5 @@
 import type {
+  AddBreedsBody,
   CreateAnimalBody,
   CreateSpeciesBody,
   ListAnimalsQuery,
@@ -259,5 +260,34 @@ export const animalsService = {
       ...inserted!,
       breeds,
     };
+  },
+
+  async addBreeds(body: AddBreedsBody) {
+    const uniqueBreeds = Array.from(
+      new Set(body.breeds.map((b) => b.trim()).filter(Boolean)),
+    );
+
+    let addedCount = 0;
+    for (const bName of uniqueBreeds) {
+      const [exists] = await db
+        .select()
+        .from(breedsTable)
+        .where(
+          and(
+            eq(breedsTable.name, bName),
+            eq(breedsTable.speciesId, body.speciesId),
+          ),
+        );
+
+      if (!exists) {
+        await db.insert(breedsTable).values({
+          name: bName,
+          speciesId: body.speciesId,
+        });
+        addedCount++;
+      }
+    }
+
+    return { success: true, addedCount };
   },
 };

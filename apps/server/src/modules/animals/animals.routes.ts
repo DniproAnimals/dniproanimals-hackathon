@@ -10,4 +10,5 @@ export function registerAnimalsRoutes(app: FastifyZodInstance) {
   app.route(animalsController.delete);
   app.route(animalsController.listSpecies);
   app.route(animalsController.createSpecies);
+  app.route(animalsController.addBreeds);
 }
