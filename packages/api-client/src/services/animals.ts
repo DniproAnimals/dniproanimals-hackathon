@@ -2,10 +2,13 @@ import type {
   AnimalsStatsResponse,
   CreateAnimalBody,
   CreateAnimalResponse,
+  CreateSpeciesBody,
+  CreateSpeciesResponse,
   DeleteAnimalResponse,
   GetAnimalResponse,
   ListAnimalsQuery,
   ListAnimalsResponse,
+  ListSpeciesResponse,
   UpdateAnimalBody,
   UpdateAnimalResponse,
 } from "@dniproanimals/contracts";
@@ -45,6 +48,17 @@ export function createAnimalsApiService(http: HttpFn) {
       http<DeleteAnimalResponse>({
         endpoint: endpoints.animals.delete({ id }),
         method: "DELETE",
+      }),
+    listSpecies: () =>
+      http<ListSpeciesResponse>({
+        endpoint: endpoints.animals.listSpecies(),
+      }),
+    createSpecies: (body: CreateSpeciesBody) =>
+      http<CreateSpeciesResponse>({
+        endpoint: endpoints.animals.createSpecies(),
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json" },
       }),
   };
 }

@@ -1,11 +1,11 @@
 "use client";
-import { animalStatusSchema, animalTypeSchema } from "@dniproanimals/contracts";
+import { animalStatusSchema } from "@dniproanimals/contracts";
 import { parseAsString, parseAsStringEnum, useQueryStates } from "nuqs";
 
 export function useAnimalsFilterState() {
   return useQueryStates({
     q: parseAsString,
-    type: parseAsStringEnum([...animalTypeSchema.options]),
+    type: parseAsString,
     status: parseAsStringEnum([...animalStatusSchema.options]),
   });
 }

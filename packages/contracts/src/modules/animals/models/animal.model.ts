@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-export const animalTypeSchema = z.enum(["dog", "cat", "other"]);
-export type AnimalType = z.infer<typeof animalTypeSchema>;
+export const animalTypeSchema = z.string();
+export type AnimalType = string;
 
 export const animalSexSchema = z.enum(["male", "female"]);
 export type AnimalSex = z.infer<typeof animalSexSchema>;

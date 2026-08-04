@@ -1,5 +1,6 @@
 import type {
   CreateAnimalBody,
+  CreateSpeciesBody,
   ListAnimalsQuery,
   UpdateAnimalBody,
 } from "@dniproanimals/contracts";
@@ -7,12 +8,14 @@ import {
   and,
   animalsTable,
   asc,
+  breedsTable,
   db,
   desc,
   eq,
   ilike,
   inArray,
   or,
+  speciesTable,
   sql,
 } from "@dniproanimals/database";
 
@@ -203,5 +206,58 @@ export const animalsService = {
       .where(eq(animalsTable.id, id))
       .limit(1);
     return !!row;
+  },
+
+  async listSpecies() {
+    const species = await db
+      .select()
+      .from(speciesTable)
+      .orderBy(asc(speciesTable.name));
+    const result = [];
+    for (const s of species) {
+      const breeds = await db
+        .select()
+        .from(breedsTable)
+        .where(eq(breedsTable.speciesId, s.id))
+        .orderBy(asc(breedsTable.name));
+      result.push({
+        ...s,
+        breeds,
+      });
+    }
+    return result;
+  },
+
+  async createSpecies(body: CreateSpeciesBody) {
+    const slug = body.name;
+    const [inserted] = await db
+      .insert(speciesTable)
+      .values({
+        name: body.name,
+        value: slug,
+      })
+      .returning();
+
+    const breeds: any[] = [];
+    if (body.breeds && body.breeds.length > 0) {
+      const uniqueBreeds = Array.from(
+        new Set(body.breeds.map((b) => b.trim()).filter(Boolean)),
+      );
+      for (const bName of uniqueBreeds) {
+        const [bInserted] = await db
+          .insert(breedsTable)
+          .values({
+            name: bName,
+            speciesId: inserted!.id,
+          })
+          .returning();
+        breeds.push(bInserted!);
+      }
+    }
+
+    return {
+      ...inserted!,
+      breeds,
+    };
   },
 };

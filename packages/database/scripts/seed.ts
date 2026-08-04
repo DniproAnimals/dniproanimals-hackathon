@@ -10,8 +10,10 @@ import { db } from "../src";
 import {
   adoptionRequestsTable,
   animalsTable,
+  breedsTable,
   favoritesTable,
   notificationsTable,
+  speciesTable,
   usersTable,
 } from "../src/db/schema";
 
@@ -125,6 +127,52 @@ export async function getCount(table: AnyPgTable) {
 
 async function seed() {
   console.log("Seed started...\n");
+
+  const speciesCount = await getCount(speciesTable);
+  if (speciesCount === 0) {
+    const [dogSpecies] = await db
+      .insert(speciesTable)
+      .values({ name: "Собака", value: "dog" })
+      .returning({ id: speciesTable.id });
+    const [catSpecies] = await db
+      .insert(speciesTable)
+      .values({ name: "Кіт", value: "cat" })
+      .returning({ id: speciesTable.id });
+    await db.insert(speciesTable).values({ name: "Інше", value: "other" });
+
+    const dogBreeds = [
+      "Німецька вівчарка",
+      "Лабрадор",
+      "Стаффордширський тер'єр",
+      "Хаскі",
+      "Бульдог",
+      "Такса",
+      "Чихуахуа",
+      "Коргі",
+      "Мопс",
+      "Мікс",
+    ];
+    await db
+      .insert(breedsTable)
+      .values(dogBreeds.map((name) => ({ name, speciesId: dogSpecies!.id })));
+
+    const catBreeds = [
+      "Європейська короткошерста",
+      "Сіамська",
+      "Ангорська",
+      "Мейн-кун",
+      "Сфінкс",
+      "Бенгальська",
+      "Мікс",
+    ];
+    await db
+      .insert(breedsTable)
+      .values(catBreeds.map((name) => ({ name, speciesId: catSpecies!.id })));
+
+    console.log("Species & Breeds: seeded");
+  } else {
+    console.log(`Species: already exist (${speciesCount})`);
+  }
 
   const userCount = await getCount(usersTable);
 

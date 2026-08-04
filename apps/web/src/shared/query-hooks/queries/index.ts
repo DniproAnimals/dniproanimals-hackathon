@@ -9,4 +9,5 @@ export * from "./useFavoritesQuery";
 export * from "./useFoundationQuery";
 export * from "./useMeQuery";
 export * from "./useNotificationsQuery";
+export * from "./useSpeciesQuery";
 export * from "./useUsersQuery";
