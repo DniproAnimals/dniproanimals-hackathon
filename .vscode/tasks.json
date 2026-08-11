@@ -1,0 +1,30 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "validate-lint",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"lint"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$eslint-stylish"
+			],
+			"group": "test"
+		},
+		{
+			"label": "validate-format",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"format"
+			],
+			"isBackground": false,
+			"group": "test"
+		}
+	]
+}

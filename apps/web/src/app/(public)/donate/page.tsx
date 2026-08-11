@@ -3,6 +3,7 @@ import { DonateBankDetails } from "./components/DonateBankDetails";
 import { DonateContact } from "./components/DonateContact";
 import { DonateForm } from "./components/DonateForm";
 import { DonateHero } from "./components/DonateHero";
+import SheltersNeeds from "./components/ShelterNeedsSection/ShelterNeedsSection";
 
 export default function DonatePage() {
   return (
@@ -14,6 +15,7 @@ export default function DonatePage() {
           <DonateForm />
         </div>
         <DonateBankDetails />
+        <SheltersNeeds />
         <DonateContact />
       </div>
     </div>
