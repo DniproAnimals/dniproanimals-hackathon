@@ -4,7 +4,6 @@
     "jsx": "react-jsx",
     "outDir": "dist",
     "strictNullChecks": true,
-    "jsx": "react-jsx",
     "noUncheckedIndexedAccess": false
   },
   "include": ["src"],

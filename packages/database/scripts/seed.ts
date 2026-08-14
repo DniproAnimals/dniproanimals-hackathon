@@ -1,4 +1,8 @@
-import { contractTemplates } from "@dniproanimals/database";
+import {
+  DEFAULT_FOUNDATION_VALUES,
+  contractTemplates,
+  foundationTable,
+} from "@dniproanimals/database";
 import "@dniproanimals/env/load";
 import bcrypt from "bcryptjs";
 import { eq, sql } from "drizzle-orm";
@@ -128,19 +132,15 @@ async function seed() {
 
   const userCount = await getCount(usersTable);
 
-  let adminUserId: number | null = null;
   let regularUserId: number | null = null;
 
   if (userCount === 0) {
-    const [admin] = await db
-      .insert(usersTable)
-      .values({
-        name: "Admin",
-        email: "admin@gmail.com",
-        passwordHash: await bcrypt.hash("admin", 10),
-        role: "superadmin",
-      })
-      .returning({ id: usersTable.id });
+    await db.insert(usersTable).values({
+      name: "Admin",
+      email: "admin@gmail.com",
+      passwordHash: await bcrypt.hash("admin", 10),
+      role: "superadmin",
+    });
 
     const [user] = await db
       .insert(usersTable)
@@ -155,15 +155,10 @@ async function seed() {
 
     console.log("Users: admin@gmail.com / admin, user@gmail.com / user");
   } else {
-    const [] = await db
-      .select({ id: usersTable.id })
-      .from(usersTable)
-      .where(eq(usersTable.email, "admin@gmail.com"));
     const [user] = await db
       .select({ id: usersTable.id })
       .from(usersTable)
       .where(eq(usersTable.email, "user@gmail.com"));
-    // adminUserId = admin?.id ?? null;
     regularUserId = user?.id ?? null;
     console.log(`Users: already exist (${userCount})`);
   }
@@ -176,6 +171,15 @@ async function seed() {
     console.log(`Animals: ${animals.length} created`);
   } else {
     console.log(`Animals: already exist (${animalCount})`);
+  }
+
+  const foundationCount = await getCount(foundationTable);
+
+  if (foundationCount === 0) {
+    await db.insert(foundationTable).values(DEFAULT_FOUNDATION_VALUES);
+    console.log("Foundation: default public data created");
+  } else {
+    console.log(`Foundation: already exist (${foundationCount})`);
   }
 
   const adoptionCount = await getCount(adoptionRequestsTable);

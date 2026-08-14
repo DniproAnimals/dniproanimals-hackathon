@@ -1,4 +1,5 @@
 "use client";
+import { useFoundationQuery } from "@/shared/query-hooks";
 import {
   IconMailFilled,
   IconMapPinFilled,
@@ -12,6 +13,16 @@ import { ContactRow } from "./components/ContactRow";
 // See AGENTS.md §7.2.
 
 export function ContactsSection() {
+  const { data: foundation } = useFoundationQuery();
+
+  if (!foundation) {
+    return null;
+  }
+
+  const mapQuery = encodeURIComponent(
+    foundation.address ?? "м. Дніпро, вул. Героїв Дніпра",
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-16 md:py-24 relative z-10">
       <motion.div
@@ -31,28 +42,32 @@ export function ContactsSection() {
               label="Адреса притулку"
             >
               <p className="text-lg font-bold text-gray-800">
-                м. Дніпро, вул. Героїв Дніпра
+                {foundation.address}
               </p>
             </ContactRow>
-            <ContactRow
-              icon={<IconPhoneFilled size={20} />}
-              label="Телефон керівника"
-            >
-              <a
-                href="tel:+380966601817"
-                className="text-lg font-bold text-gray-800 hover:text-green-secondary"
+            {foundation.phone && (
+              <ContactRow
+                icon={<IconPhoneFilled size={20} />}
+                label="Телефон керівника"
               >
-                +380 96 660 18 17
-              </a>
-            </ContactRow>
-            <ContactRow icon={<IconMailFilled size={20} />} label="Email">
-              <a
-                href="mailto:dniproanimals.org@gmail.com"
-                className="text-lg font-bold text-gray-800 hover:text-green-secondary"
-              >
-                dniproanimals.org@gmail.com
-              </a>
-            </ContactRow>
+                <a
+                  href={`tel:${foundation.phone.replace(/\s+/g, "")}`}
+                  className="text-lg font-bold text-gray-800 hover:text-green-secondary"
+                >
+                  {foundation.phone}
+                </a>
+              </ContactRow>
+            )}
+            {foundation.email && (
+              <ContactRow icon={<IconMailFilled size={20} />} label="Email">
+                <a
+                  href={`mailto:${foundation.email}`}
+                  className="text-lg font-bold text-gray-800 hover:text-green-secondary"
+                >
+                  {foundation.email}
+                </a>
+              </ContactRow>
+            )}
           </div>
           <Button
             asChild
@@ -61,7 +76,7 @@ export function ContactsSection() {
             className="mt-8 w-full sm:w-auto self-start shadow-md"
           >
             <a
-              href="https://www.google.com/maps/search/?api=1&query=вул.+Героїв+Дніпра,+Дніпро"
+              href={`https://www.google.com/maps/search/?api=1&query=${mapQuery}`}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -78,7 +93,7 @@ export function ContactsSection() {
             style={{ border: 0 }}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            src="https://maps.google.com/maps?q=вул.+Героїв+Дніпра,+Дніпро,+Україна&output=embed&z=14"
+            src={`https://maps.google.com/maps?q=${mapQuery}&output=embed&z=14`}
           />
         </div>
       </motion.div>

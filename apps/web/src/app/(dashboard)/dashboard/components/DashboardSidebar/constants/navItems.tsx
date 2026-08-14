@@ -1,5 +1,4 @@
 import {
-  IconCoin,
   IconFileTextFilled,
   IconLayoutDashboardFilled,
   IconPawFilled,
@@ -37,13 +36,8 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     icon: <IconFileTextFilled size={18} />,
   },
   {
-    href: "/dashboard/donations",
-    label: "Пожертви",
-    icon: <IconCoin size={18} />,
-  },
-  {
     href: "/dashboard/foundation",
-    label: "Налаштування",
+    label: "Фонд",
     icon: <IconSettingsFilled size={18} />,
   },
 ];
