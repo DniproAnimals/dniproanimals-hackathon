@@ -12,6 +12,8 @@ import {
   getAnimalResponseSchema,
   listAnimalsQuerySchema,
   listAnimalsResponseSchema,
+  listBreedsQuerySchema,
+  listBreedsResponseSchema,
   listSpeciesResponseSchema,
   updateAnimalBodySchema,
   updateAnimalParamsSchema,
@@ -22,6 +24,7 @@ import { NotFoundError } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
 import {
   toAnimalResponse,
+  toBreedResponse,
   toSpeciesResponse,
 } from "../../shared/utils/serializers";
 import { withAuth } from "../auth/auth.guard";
@@ -124,6 +127,19 @@ export const animalsController = createController({
     handler: async (request, reply) => {
       const rows = await animalsService.listSpecies();
       return reply.send(rows.map(toSpeciesResponse));
+    },
+  }),
+
+  listBreeds: defineRoute({
+    method: "GET",
+    url: endpoints.animals.listBreeds(),
+    schema: {
+      querystring: listBreedsQuerySchema,
+      response: { 200: listBreedsResponseSchema },
+    },
+    handler: async (request, reply) => {
+      const rows = await animalsService.listBreeds(request.query);
+      return reply.send(rows.map(toBreedResponse));
     },
   }),
 

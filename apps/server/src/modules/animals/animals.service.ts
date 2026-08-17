@@ -3,6 +3,7 @@ import type {
   CreateAnimalBody,
   CreateSpeciesBody,
   ListAnimalsQuery,
+  ListBreedsQuery,
   UpdateAnimalBody,
 } from "@dniproanimals/contracts";
 import {
@@ -227,6 +228,25 @@ export const animalsService = {
       });
     }
     return result;
+  },
+
+  async listBreeds(query?: ListBreedsQuery) {
+    if (query?.type) {
+      const [species] = await db
+        .select()
+        .from(speciesTable)
+        .where(eq(speciesTable.value, query.type));
+
+      if (!species) return [];
+
+      return db
+        .select()
+        .from(breedsTable)
+        .where(eq(breedsTable.speciesId, species.id))
+        .orderBy(asc(breedsTable.name));
+    }
+
+    return db.select().from(breedsTable).orderBy(asc(breedsTable.name));
   },
 
   async createSpecies(body: CreateSpeciesBody) {

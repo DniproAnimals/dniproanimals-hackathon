@@ -10,6 +10,8 @@ import type {
   GetAnimalResponse,
   ListAnimalsQuery,
   ListAnimalsResponse,
+  ListBreedsQuery,
+  ListBreedsResponse,
   ListSpeciesResponse,
   UpdateAnimalBody,
   UpdateAnimalResponse,
@@ -54,6 +56,11 @@ export function createAnimalsApiService(http: HttpFn) {
     listSpecies: () =>
       http<ListSpeciesResponse>({
         endpoint: endpoints.animals.listSpecies(),
+      }),
+    listBreeds: (query?: ListBreedsQuery) =>
+      http<ListBreedsResponse>({
+        endpoint: endpoints.animals.listBreeds(),
+        query,
       }),
     createSpecies: (body: CreateSpeciesBody) =>
       http<CreateSpeciesResponse>({
