@@ -13,8 +13,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   Input,
-  Label,
   Select,
   SelectContent,
   SelectItem,
@@ -26,22 +31,54 @@ import {
   TabsTrigger,
   Textarea,
 } from "@dniproanimals/ui";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { z } from "zod";
+
+const addSpeciesSchema = z
+  .object({
+    tab: z.enum(["create", "update"]),
+    name: z.string(),
+    selectedSpeciesId: z.string(),
+    breedsText: z.string().min(1, "Вкажіть хоча б одну породу"),
+  })
+  .superRefine((data, ctx) => {
+    if (data.tab === "create" && !data.name.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Вкажіть назву виду",
+        path: ["name"],
+      });
+    }
+    if (data.tab === "update" && !data.selectedSpeciesId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Оберіть вид тварини",
+        path: ["selectedSpeciesId"],
+      });
+    }
+  });
+
+type AddSpeciesFormValues = z.infer<typeof addSpeciesSchema>;
 
 export function AddSpeciesDialog() {
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"create" | "update">("create");
-  const [name, setName] = useState("");
-  const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>("");
-  const [breedsText, setBreedsText] = useState("");
-
   const { data: species = [] } = useSpeciesQuery();
+
+  const form = useForm<AddSpeciesFormValues>({
+    resolver: zodResolver(addSpeciesSchema),
+    defaultValues: {
+      tab: "create",
+      name: "",
+      selectedSpeciesId: "",
+      breedsText: "",
+    },
+  });
 
   const handleSuccess = () => {
     setOpen(false);
-    setName("");
-    setBreedsText("");
-    setSelectedSpeciesId("");
+    form.reset();
     window.location.reload();
   };
 
@@ -53,34 +90,38 @@ export function AddSpeciesDialog() {
     onSuccess: handleSuccess,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!breedsText.trim()) return;
-
-    const breeds = breedsText
+  const onSubmit = (values: AddSpeciesFormValues) => {
+    const breeds = values.breedsText
       .split(",")
       .map((b) => b.trim())
       .filter(Boolean);
 
-    if (activeTab === "create") {
-      if (!name.trim()) return;
+    if (values.tab === "create") {
       createMutation.mutate({
-        name: name.trim(),
+        name: values.name.trim(),
         breeds,
       });
     } else {
-      if (!selectedSpeciesId) return;
       addBreedsMutation.mutate({
-        speciesId: Number(selectedSpeciesId),
+        speciesId: Number(values.selectedSpeciesId),
         breeds,
       });
     }
   };
 
   const isPending = createMutation.isPending || addBreedsMutation.isPending;
+  const activeTab = useWatch({ control: form.control, name: "tab" });
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        if (!nextOpen) {
+          form.reset();
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button
           variant="outline"
@@ -99,93 +140,108 @@ export function AddSpeciesDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs
-          value={activeTab}
-          onValueChange={(v) => setActiveTab(v as "create" | "update")}
-          className="w-full"
-        >
-          <TabsList className="grid grid-cols-2 mb-4">
-            <TabsTrigger value="create">Новий вид</TabsTrigger>
-            <TabsTrigger value="update">Існуючий вид</TabsTrigger>
-          </TabsList>
+        <Form {...form}>
+          <Tabs
+            value={activeTab}
+            onValueChange={(v) => {
+              form.setValue("tab", v as "create" | "update");
+              form.clearErrors();
+            }}
+            className="w-full"
+          >
+            <TabsList className="grid grid-cols-2 mb-4">
+              <TabsTrigger value="create">Новий вид</TabsTrigger>
+              <TabsTrigger value="update">Існуючий вид</TabsTrigger>
+            </TabsList>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <TabsContent value="create" className="mt-0 space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="species-name">Назва виду *</Label>
-                <Input
-                  id="species-name"
-                  placeholder="Наприклад: Лисиця"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required={activeTab === "create"}
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <TabsContent value="create" className="mt-0 space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Назва виду *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Наприклад: Лисиця" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-            </TabsContent>
+              </TabsContent>
 
-            <TabsContent value="update" className="mt-0 space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="existing-species">Оберіть вид *</Label>
-                <Select
-                  value={selectedSpeciesId}
-                  onValueChange={setSelectedSpeciesId}
-                  required={activeTab === "update"}
-                >
-                  <SelectTrigger id="existing-species">
-                    <SelectValue placeholder="Оберіть вид тварини" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {species.map((s) => (
-                      <SelectItem key={s.id} value={String(s.id)}>
-                        {s.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </TabsContent>
+              <TabsContent value="update" className="mt-0 space-y-4">
+                <FormField
+                  control={form.control}
+                  name="selectedSpeciesId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Оберіть вид *</FormLabel>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <FormControl>
+                          <SelectTrigger id="existing-species">
+                            <SelectValue placeholder="Оберіть вид тварини" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {species.map((s) => (
+                            <SelectItem key={s.id} value={String(s.id)}>
+                              {s.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="species-breeds">Породи (через кому) *</Label>
-              <Textarea
-                id="species-breeds"
-                placeholder="Наприклад: Руда, Сіра, Полярна"
-                value={breedsText}
-                onChange={(e) => setBreedsText(e.target.value)}
-                rows={3}
-                required
+              <FormField
+                control={form.control}
+                name="breedsText"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Породи (через кому) *</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Наприклад: Руда, Сіра, Полярна"
+                        rows={3}
+                        {...field}
+                      />
+                    </FormControl>
+                    <p className="text-xs text-gray-500 font-light font-sans">
+                      Вкажіть породи, розділяючи їх комами. Вони будуть доступні
+                      при додаванні тварини цього виду.
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <p className="text-xs text-gray-500 font-light font-sans">
-                Вкажіть породи, розділяючи їх комами. Вони будуть доступні при
-                додаванні тварини цього виду.
-              </p>
-            </div>
 
-            <div className="flex justify-end gap-3 pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-                disabled={isPending}
-              >
-                Скасувати
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                disabled={
-                  isPending ||
-                  (activeTab === "create"
-                    ? !name.trim()
-                    : !selectedSpeciesId) ||
-                  !breedsText.trim()
-                }
-              >
-                {isPending ? "Збереження..." : "Додати"}
-              </Button>
-            </div>
-          </form>
-        </Tabs>
+              <div className="flex justify-end gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setOpen(false);
+                    form.reset();
+                  }}
+                  disabled={isPending}
+                >
+                  Скасувати
+                </Button>
+                <Button type="submit" variant="primary" disabled={isPending}>
+                  {isPending ? "Збереження..." : "Додати"}
+                </Button>
+              </div>
+            </form>
+          </Tabs>
+        </Form>
       </DialogContent>
     </Dialog>
   );
