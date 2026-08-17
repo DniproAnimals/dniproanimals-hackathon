@@ -8,6 +8,7 @@ export * from "./useLoginMutation";
 export * from "./useLogoutMutation";
 export * from "./useRegisterMutation";
 export * from "./useResetPasswordMutation";
+export * from "./useSendAnimalSupportUpdateMutation";
 export * from "./useStartAnimalDonationMutation";
 export * from "./useUpdateContractTemplateMutation";
 

@@ -93,6 +93,21 @@ export const animalDonationsTable = pgTable(
   ],
 );
 
+export const animalSupportUpdatesTable = pgTable("animal_support_updates", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  animalId: integer("animal_id")
+    .notNull()
+    .references(() => animalsTable.id, { onDelete: "cascade" }),
+  authorId: integer("author_id").references(() => usersTable.id, {
+    onDelete: "set null",
+  }),
+  photos: text().notNull(),
+  recipientCount: integer("recipient_count").notNull(),
+  sentCount: integer("sent_count").notNull(),
+  failedCount: integer("failed_count").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const adoptionRequestsTable = pgTable("adoption_requests", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   animalId: integer("animal_id")

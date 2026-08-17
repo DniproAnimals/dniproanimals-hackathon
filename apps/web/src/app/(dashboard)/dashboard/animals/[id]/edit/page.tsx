@@ -10,6 +10,7 @@ import {
   animalFormValuesToBody,
   type AnimalFormValues,
 } from "../../components/AnimalForm";
+import { AnimalSupportManager } from "./components/AnimalSupportManager";
 
 function animalToFormValues(animal: Animal): AnimalFormValues {
   return {
@@ -58,16 +59,19 @@ export default function EditAnimalPage(
   if (!animal) return null;
 
   return (
-    <AnimalForm
-      defaultValues={animalToFormValues(animal)}
-      onSubmit={(values) =>
-        updateMutation.mutate({
-          id: numericId,
-          body: animalFormValuesToBody(values),
-        })
-      }
-      submitting={updateMutation.isPending}
-      submitLabel="Зберегти зміни"
-    />
+    <>
+      <AnimalForm
+        defaultValues={animalToFormValues(animal)}
+        onSubmit={(values) =>
+          updateMutation.mutate({
+            id: numericId,
+            body: animalFormValuesToBody(values),
+          })
+        }
+        submitting={updateMutation.isPending}
+        submitLabel="Зберегти зміни"
+      />
+      <AnimalSupportManager animal={animal} />
+    </>
   );
 }

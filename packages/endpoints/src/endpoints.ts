@@ -39,6 +39,8 @@ export const endpoints = createTypedEndpoints({
     status: "/animal-donations/:animalId",
     start: "/animal-donations/:animalId",
     cancel: "/animal-donations/:animalId",
+    supporters: "/animal-donations/:animalId/supporters",
+    sendUpdate: "/animal-donations/:animalId/updates",
   },
 
   notifications: {
