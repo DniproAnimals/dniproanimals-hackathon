@@ -64,7 +64,12 @@ export default function AnimalDetailPageRoute(
             {animal.breed || "Мікс порід"}
           </p>
           <AnimalAttributes animal={animal} />
-          <AnimalDonationButton animalId={animal.id} animalName={animal.name} />
+          {animal.donationsEnabled && (
+            <AnimalDonationButton
+              animalId={animal.id}
+              animalName={animal.name}
+            />
+          )}
           <AnimalContacts animal={animal} />
         </motion.div>
       </div>

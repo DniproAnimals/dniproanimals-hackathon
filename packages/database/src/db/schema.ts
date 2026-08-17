@@ -52,6 +52,7 @@ export const animalsTable = pgTable("animals", {
   vaccinated: boolean().notNull().default(true),
   sterilized: boolean().notNull().default(true),
   trained: boolean().notNull().default(true),
+  donationsEnabled: boolean("donations_enabled").notNull().default(false),
   commands: text(),
   photos: text().notNull().default("[]"),
   contactName: varchar("contact_name", { length: 255 }),

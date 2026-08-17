@@ -1,6 +1,8 @@
 "use client";
 import { useAnimalQuery, useUpdateAnimalMutation } from "@/shared/query-hooks";
 import type { Animal } from "@dniproanimals/contracts";
+import { endpoints } from "@dniproanimals/endpoints";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { use } from "react";
 import {
@@ -23,6 +25,7 @@ function animalToFormValues(animal: Animal): AnimalFormValues {
     vaccinated: !!animal.vaccinated,
     sterilized: !!animal.sterilized,
     trained: !!animal.trained,
+    donationsEnabled: animal.donationsEnabled,
     photos: animal.photos,
     contactName: animal.contactName ?? "",
     contactPhone: animal.contactPhone ?? "",
@@ -37,9 +40,19 @@ export default function EditAnimalPage(
   const { id } = use(props.params);
   const numericId = Number(id);
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data: animal } = useAnimalQuery(numericId);
   const updateMutation = useUpdateAnimalMutation({
-    onSuccess: (updated) => router.push(`/animals/${updated.id}`),
+    onSuccess: (updated) => {
+      queryClient.setQueryData(
+        [endpoints.animals.get({ id: updated.id })],
+        updated,
+      );
+      void queryClient.invalidateQueries({
+        queryKey: [endpoints.animals.list()],
+      });
+      router.push(`/animals/${updated.id}`);
+    },
   });
 
   if (!animal) return null;

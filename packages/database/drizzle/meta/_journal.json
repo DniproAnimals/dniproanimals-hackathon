@@ -36,6 +36,13 @@
       "when": 1785715200000,
       "tag": "0004_add_animal_donations",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786924800000,
+      "tag": "0005_enable_animal_donations",
+      "breakpoints": true
     }
   ]
 }

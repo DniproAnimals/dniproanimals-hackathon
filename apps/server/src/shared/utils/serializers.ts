@@ -51,6 +51,7 @@ export function toAnimalResponse(a: AnimalRow) {
     vaccinated: a.vaccinated ?? null,
     sterilized: a.sterilized ?? null,
     trained: a.trained ?? null,
+    donationsEnabled: a.donationsEnabled,
     commands: a.commands ?? null,
     photos: parsePhotos(a.photos),
     contactName: a.contactName ?? null,

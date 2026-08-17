@@ -3,7 +3,7 @@ import {
   animalDonationResponseSchema,
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
-import { NotFoundError } from "../../shared/errors";
+import { BadRequestError, NotFoundError } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
 import { animalsService } from "../animals/animals.service";
 import { withAuth } from "../auth/auth.guard";
@@ -36,6 +36,9 @@ export const animalDonationsController = createController({
     handler: withAuth(async (request, reply) => {
       const animal = await animalsService.getById(request.params.animalId);
       if (!animal) throw new NotFoundError("Animal");
+      if (!animal.donationsEnabled) {
+        throw new BadRequestError("Donations are disabled for this animal");
+      }
 
       const active = await animalDonationsService.start(
         request.session.userId,
