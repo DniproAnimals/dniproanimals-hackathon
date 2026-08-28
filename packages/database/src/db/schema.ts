@@ -6,6 +6,7 @@ import {
   real,
   text,
   timestamp,
+  unique,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -51,6 +52,7 @@ export const animalsTable = pgTable("animals", {
   vaccinated: boolean().notNull().default(true),
   sterilized: boolean().notNull().default(true),
   trained: boolean().notNull().default(true),
+  donationsEnabled: boolean("donations_enabled").notNull().default(false),
   commands: text(),
   photos: text().notNull().default("[]"),
   contactName: varchar("contact_name", { length: 255 }),
@@ -66,6 +68,44 @@ export const animalsTable = pgTable("animals", {
     .$type<AnimalStatus>(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const animalDonationsTable = pgTable(
+  "animal_donations",
+  {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    animalId: integer("animal_id")
+      .notNull()
+      .references(() => animalsTable.id, { onDelete: "cascade" }),
+    isActive: boolean("is_active").notNull().default(true),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    canceledAt: timestamp("canceled_at"),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    unique("animal_donations_user_id_animal_id_unique").on(
+      table.userId,
+      table.animalId,
+    ),
+  ],
+);
+
+export const animalSupportUpdatesTable = pgTable("animal_support_updates", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  animalId: integer("animal_id")
+    .notNull()
+    .references(() => animalsTable.id, { onDelete: "cascade" }),
+  authorId: integer("author_id").references(() => usersTable.id, {
+    onDelete: "set null",
+  }),
+  photos: text().notNull(),
+  recipientCount: integer("recipient_count").notNull(),
+  sentCount: integer("sent_count").notNull(),
+  failedCount: integer("failed_count").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const adoptionRequestsTable = pgTable("adoption_requests", {
