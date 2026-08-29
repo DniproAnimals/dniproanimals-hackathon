@@ -11,7 +11,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 export type UserRole = "user" | "admin" | "volunteer" | "superadmin";
-export type AnimalType = "dog" | "cat" | "other";
+export type AnimalType = string;
 export type AnimalSize = "small" | "medium" | "large";
 export type AnimalSex = "male" | "female";
 export type AnimalStatus = "available" | "reserved" | "adopted";
@@ -42,7 +42,7 @@ export const animalsTable = pgTable("animals", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 255 }).notNull(),
   description: text(),
-  type: varchar({ length: 20 }).notNull().$type<AnimalType>(),
+  type: varchar({ length: 50 }).notNull(),
   breed: varchar({ length: 255 }),
   sex: varchar({ length: 10 }).$type<AnimalSex>(),
   ageMonths: integer("age_months"),
@@ -179,3 +179,23 @@ export const contractTemplates = pgTable("contract_templates", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+
+export const speciesTable = pgTable("species", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  name: varchar({ length: 255 }).notNull().unique(),
+  value: varchar({ length: 50 }).notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const breedsTable = pgTable(
+  "breeds",
+  {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    name: varchar({ length: 255 }).notNull(),
+    speciesId: integer("species_id")
+      .notNull()
+      .references(() => speciesTable.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [unique("breed_name_species_id_unique").on(t.name, t.speciesId)],
+);

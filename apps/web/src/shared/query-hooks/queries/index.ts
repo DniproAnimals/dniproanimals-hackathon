@@ -5,10 +5,12 @@ export * from "./useAnimalDonationSupportersQuery";
 export * from "./useAnimalQuery";
 export * from "./useAnimalsQuery";
 export * from "./useAnimalsStatsQuery";
+export * from "./useBreedsQuery";
 export * from "./useContractTemplateQuery";
 export * from "./useFavoritesQuery";
 
 export * from "./useFoundationQuery";
 export * from "./useMeQuery";
 export * from "./useNotificationsQuery";
+export * from "./useSpeciesQuery";
 export * from "./useUsersQuery";
