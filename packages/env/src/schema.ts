@@ -27,8 +27,11 @@ export const envSchema = z.object({
   SMTP_PASS: z.string().default(""),
   SMTP_FROM: z.string().default("noreply@dniproanimals.local"),
 
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: z.string().min(1),
+  R2_ENDPOINT: z.string().url().optional(),
+  R2_ACCESS_KEY_ID: z.string().min(1).optional(),
+  R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+  R2_BUCKET_NAME: z.string().min(1).optional(),
+  R2_PUBLIC_URL: z.string().url().optional(),
 
   NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.string().min(1),
 });

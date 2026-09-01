@@ -12,6 +12,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1112.0",
     "@dniproanimals/contracts": "*",
     "@dniproanimals/database": "*",
     "@dniproanimals/endpoints": "*",
