@@ -1,19 +1,23 @@
 import "@dniproanimals/env/load";
 import type { NextConfig } from "next";
 
+const remotePatterns: NonNullable<
+  NonNullable<NextConfig["images"]>["remotePatterns"]
+> = [
+  {
+    protocol: "https",
+    hostname: "images.unsplash.com",
+  },
+];
+
+if (process.env.R2_PUBLIC_URL) {
+  const publicUrl = process.env.R2_PUBLIC_URL.replace(/\/$/, "");
+  remotePatterns.push(new URL(`${publicUrl}/**`));
+}
+
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "bmxcvlhiiushaegvkunx.supabase.co",
-        pathname: "/storage/v1/object/public/**",
-      },
-    ],
+    remotePatterns,
   },
   async redirects() {
     return [

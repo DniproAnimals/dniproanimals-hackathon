@@ -35,6 +35,13 @@ export const endpoints = createTypedEndpoints({
     list: "/favorites",
     toggle: "/favorites",
   },
+  animalDonations: {
+    status: "/animal-donations/:animalId",
+    start: "/animal-donations/:animalId",
+    cancel: "/animal-donations/:animalId",
+    supporters: "/animal-donations/:animalId/supporters",
+    sendUpdate: "/animal-donations/:animalId/updates",
+  },
 
   notifications: {
     list: "/notifications",
