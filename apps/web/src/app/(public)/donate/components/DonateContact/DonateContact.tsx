@@ -1,64 +1,26 @@
-import {
-  IconBrandFacebook,
-  IconBrandInstagram,
-  IconBrandTelegram,
-  IconPhoneFilled,
-} from "@dniproanimals/icons";
+"use client";
+
+import { SocialLinksButtons } from "@/shared/components/Contacts/SocialLinks";
+import { useFoundationQuery } from "@/shared/query-hooks";
+import { IconPhoneFilled } from "@dniproanimals/icons";
 import { Button } from "@dniproanimals/ui";
-import type { ComponentType } from "react";
-
-interface ContactLink {
-  href: string;
-  label: string;
-  icon: ComponentType<{ size: number }>;
-  external?: boolean;
-}
-
-const CONTACT_LINKS: ContactLink[] = [
-  {
-    href: "https://instagram.com/dniproanimals",
-    label: "Instagram",
-    icon: IconBrandInstagram,
-    external: true,
-  },
-  {
-    href: "https://facebook.com/dniproanimals",
-    label: "Facebook",
-    icon: IconBrandFacebook,
-    external: true,
-  },
-  {
-    href: "https://t.me/itsmotherofcats",
-    label: "Telegram",
-    icon: IconBrandTelegram,
-    external: true,
-  },
-  {
-    href: "tel:+380966601817",
-    label: "+380 96 660 18 17",
-    icon: IconPhoneFilled,
-  },
-];
 
 export function DonateContact() {
+  const { data: foundation } = useFoundationQuery();
+
   return (
     <div className="text-center">
       <p className="font-semibold text-sm mb-3">Зв&apos;язатися з нами</p>
-      <div className="flex justify-center gap-3 flex-wrap">
-        {CONTACT_LINKS.map(({ href, label, icon: Icon, external }) => (
-          <Button key={href} variant="subtle" size="lg" asChild>
-            <a
-              href={href}
-              {...(external && {
-                target: "_blank",
-                rel: "noopener noreferrer",
-              })}
-            >
-              <Icon size={16} />
-              {label}
+      <div className="flex gap-2 justify-center">
+        <SocialLinksButtons className="mb-3" variant="subtle" size="lg" />
+        {foundation?.phone && (
+          <Button variant="subtle" size="lg" asChild>
+            <a href={`tel:${foundation.phone.replace(/\s+/g, "")}`}>
+              <IconPhoneFilled size={16} />
+              {foundation.phone}
             </a>
           </Button>
-        ))}
+        )}
       </div>
     </div>
   );

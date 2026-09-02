@@ -13,12 +13,11 @@ export default function ContractsChangePage() {
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
           Зміна договору
         </h1>
-        <Link
-          href="/admin/contracts"
-          className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
-        >
-          <Button>Зміна шаблона</Button>
-        </Link>
+        <div className="mt-4 flex flex-wrap justify-center gap-3">
+          <Button asChild>
+            <Link href="/admin/contracts">Зміна шаблона</Link>
+          </Button>
+        </div>
         <p className="mt-2 text-muted-foreground text-sm md:text-base max-w-xl">
           Тут можна змінити текст договору усиновлення. Після внесення змін
           натисніть кнопку «Зберегти», щоб оновити шаблон.
