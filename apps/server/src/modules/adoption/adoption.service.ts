@@ -12,12 +12,13 @@ import {
   sql,
   usersTable,
 } from "@dniproanimals/database";
-import { env } from "@dniproanimals/env";
 import { render } from "@react-email/render";
 import React from "react";
 import { AdoptionAdminEmail } from "../../shared/emails/AdoptionAdminEmail";
 import { AdoptionApplicantEmail } from "../../shared/emails/AdoptionApplicantEmail";
+import { resolveEmailTemplate } from "../../shared/emails/template";
 import { sendMail } from "../../shared/lib/mailer";
+import { emailTemplateService } from "../email-templates/email-template.service";
 
 type AdoptionInsert = typeof adoptionRequestsTable.$inferInsert;
 
@@ -28,23 +29,30 @@ async function sendAdoptionAdminEmail(
 ) {
   if (!adminEmails.length) return;
 
-  const subject = `🐾 Нова заявка на прихисток: ${animalName}`;
-  const text = `Нова заявка на ${animalName}.\nІм'я: ${body.name}\nТелефон: ${body.phone}\nEmail: ${body.email}`;
-
-  const baseUrl = env.WEB_ORIGIN.replace(/\/$/, "");
+  const template = await emailTemplateService.get("adoption-admin");
+  const content = resolveEmailTemplate(template, { animalName });
+  const subject = content.subject;
+  const text = [
+    content.message,
+    `Ім'я тварини: ${animalName}`,
+    `ПІБ заявника: ${body.name}`,
+    `Телефон: ${body.phone}`,
+    `Email: ${body.email}`,
+    content.footer,
+  ].join("\n");
 
   const html = await render(
     React.createElement(AdoptionAdminEmail, {
-      body: body,
-      animalName: animalName,
-      baseUrl: baseUrl,
+      body,
+      animalName,
+      template,
     }),
   );
 
   await sendMail({
     to: adminEmails.join(", "),
-    subject: `🐾 Нова заявка на прихисток: ${animalName}`,
-    text: `Нова заявка на ${animalName}.`,
+    subject,
+    text,
     html,
   });
 }
@@ -53,24 +61,27 @@ async function sendAdoptionApplicantEmail(
   body: CreateAdoptionBody,
   animalName: string,
 ) {
-  const subject = `Ми отримали вашу заявку на прихисток ${animalName}`;
-  const text = [
-    `Вітаємо, ${body.name}!`,
-    `Ми отримали вашу заявку на прихисток ${animalName}.`,
-    `Після опрацювання заявки наші волонтери зателефонують вам за номером ${body.phone}, щоб уточнити деталі та домовитися про наступні кроки.`,
-  ].join("\n\n");
+  const template = await emailTemplateService.get("adoption-applicant");
+  const content = resolveEmailTemplate(template, {
+    applicantName: body.name,
+    animalName,
+    phone: body.phone,
+  });
   const html = await render(
     React.createElement(AdoptionApplicantEmail, {
       applicantName: body.name,
       animalName,
       phone: body.phone,
+      template,
     }),
   );
 
   await sendMail({
     to: body.email,
-    subject,
-    text,
+    subject: content.subject,
+    text: [content.message, content.secondaryMessage, content.footer]
+      .filter(Boolean)
+      .join("\n\n"),
     html,
   });
 }

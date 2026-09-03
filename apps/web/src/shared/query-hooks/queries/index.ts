@@ -6,6 +6,7 @@ export * from "./useAnimalQuery";
 export * from "./useAnimalsQuery";
 export * from "./useAnimalsStatsQuery";
 export * from "./useContractTemplateQuery";
+export * from "./useEmailTemplatesQuery";
 export * from "./useFavoritesQuery";
 
 export * from "./useFoundationQuery";

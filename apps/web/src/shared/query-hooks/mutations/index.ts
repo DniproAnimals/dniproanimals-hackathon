@@ -11,6 +11,7 @@ export * from "./useResetPasswordMutation";
 export * from "./useSendAnimalSupportUpdateMutation";
 export * from "./useStartAnimalDonationMutation";
 export * from "./useUpdateContractTemplateMutation";
+export * from "./useUpdateEmailTemplateMutation";
 
 export * from "./useToggleFavoriteMutation";
 export * from "./useUpdateAdoptionStatusMutation";
