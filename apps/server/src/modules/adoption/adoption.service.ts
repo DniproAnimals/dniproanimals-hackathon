@@ -16,6 +16,7 @@ import { env } from "@dniproanimals/env";
 import { render } from "@react-email/render";
 import React from "react";
 import { AdoptionAdminEmail } from "../../shared/emails/AdoptionAdminEmail";
+import { AdoptionApplicantEmail } from "../../shared/emails/AdoptionApplicantEmail";
 import { sendMail } from "../../shared/lib/mailer";
 
 type AdoptionInsert = typeof adoptionRequestsTable.$inferInsert;
@@ -44,6 +45,32 @@ async function sendAdoptionAdminEmail(
     to: adminEmails.join(", "),
     subject: `🐾 Нова заявка на прихисток: ${animalName}`,
     text: `Нова заявка на ${animalName}.`,
+    html,
+  });
+}
+
+async function sendAdoptionApplicantEmail(
+  body: CreateAdoptionBody,
+  animalName: string,
+) {
+  const subject = `Ми отримали вашу заявку на прихисток ${animalName}`;
+  const text = [
+    `Вітаємо, ${body.name}!`,
+    `Ми отримали вашу заявку на прихисток ${animalName}.`,
+    `Після опрацювання заявки наші волонтери зателефонують вам за номером ${body.phone}, щоб уточнити деталі та домовитися про наступні кроки.`,
+  ].join("\n\n");
+  const html = await render(
+    React.createElement(AdoptionApplicantEmail, {
+      applicantName: body.name,
+      animalName,
+      phone: body.phone,
+    }),
+  );
+
+  await sendMail({
+    to: body.email,
+    subject,
+    text,
     html,
   });
 }
@@ -121,6 +148,7 @@ export const adoptionService = {
       .returning({ id: adoptionRequestsTable.id });
 
     void this.notifyAdmins(body);
+    void this.notifyApplicant(body);
     return created!;
   },
 
@@ -166,6 +194,22 @@ export const adoptionService = {
       await sendAdoptionAdminEmail(adminEmails, body, animal.name);
     } catch (err) {
       console.error("failed to send adoption email:", err);
+    }
+  },
+
+  async notifyApplicant(body: CreateAdoptionBody) {
+    try {
+      const [animal] = await db
+        .select({ name: animalsTable.name })
+        .from(animalsTable)
+        .where(eq(animalsTable.id, body.animalId))
+        .limit(1);
+
+      if (!animal) return;
+
+      await sendAdoptionApplicantEmail(body, animal.name);
+    } catch (err) {
+      console.error("failed to send adoption applicant email:", err);
     }
   },
 };
