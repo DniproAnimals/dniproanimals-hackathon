@@ -1,6 +1,7 @@
 import {
   IconFileTextFilled,
   IconLayoutDashboardFilled,
+  IconMail,
   IconPawFilled,
   IconSettingsFilled,
   IconUsersGroup,
@@ -39,5 +40,11 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     href: "/dashboard/foundation",
     label: "Фонд",
     icon: <IconSettingsFilled size={18} />,
+  },
+  {
+    href: "/dashboard/email-templates",
+    label: "Шаблони листів",
+    icon: <IconMail size={18} />,
+    ownerOnly: true,
   },
 ];

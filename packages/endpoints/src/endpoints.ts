@@ -31,6 +31,10 @@ export const endpoints = createTypedEndpoints({
     update: "/contract-template/:type",
     pdf: "/contract-template/:type/pdf",
   },
+  emailTemplates: {
+    list: "/email-templates",
+    update: "/email-templates/:key",
+  },
   favorites: {
     list: "/favorites",
     toggle: "/favorites",

@@ -4,6 +4,7 @@ import { registerAnimalDonationsRoutes } from "./animal-donations";
 import { registerAnimalsRoutes } from "./animals";
 import { registerAuthRoutes } from "./auth";
 import { registerContractTemplateRoutes } from "./contract-template";
+import { registerEmailTemplateRoutes } from "./email-templates";
 import { registerFavoritesRoutes } from "./favorites";
 import { registerFoundationRoutes } from "./foundation";
 import { registerMailRoutes } from "./mail";
@@ -16,6 +17,7 @@ export async function appRouter(fastify: FastifyZodInstance) {
   registerAnimalsRoutes(fastify);
   registerAdoptionRoutes(fastify);
   registerContractTemplateRoutes(fastify);
+  registerEmailTemplateRoutes(fastify);
   registerFavoritesRoutes(fastify);
   registerMailRoutes(fastify);
   registerNotificationsRoutes(fastify);
