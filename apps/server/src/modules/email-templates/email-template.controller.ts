@@ -17,11 +17,7 @@ function toEmailTemplateResponse(template: {
   key: EmailTemplateKey;
   subject: string;
   preview: string;
-  heading: string;
-  message: string;
-  actionLabel: string | null;
-  secondaryMessage: string | null;
-  footer: string;
+  content: string;
   updatedAt: Date;
 }) {
   return { ...template, updatedAt: template.updatedAt.toISOString() };

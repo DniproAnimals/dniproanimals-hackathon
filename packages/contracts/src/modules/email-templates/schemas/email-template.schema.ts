@@ -16,11 +16,7 @@ const emailTemplateTextSchema = z.string().trim().min(1).max(5_000);
 export const emailTemplateContentSchema = z.object({
   subject: z.string().trim().min(1).max(255),
   preview: z.string().trim().min(1).max(255),
-  heading: z.string().trim().min(1).max(255),
-  message: emailTemplateTextSchema,
-  actionLabel: z.string().trim().min(1).max(255).nullable(),
-  secondaryMessage: emailTemplateTextSchema.nullable(),
-  footer: emailTemplateTextSchema,
+  content: emailTemplateTextSchema,
 });
 
 export type UpdateEmailTemplateBody = z.infer<

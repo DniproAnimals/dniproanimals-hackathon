@@ -14,7 +14,10 @@ import { env } from "@dniproanimals/env";
 import { render } from "@react-email/render";
 import React from "react";
 import { AnimalSupportUpdateEmail } from "../../shared/emails/AnimalSupportUpdateEmail";
-import { resolveEmailTemplate } from "../../shared/emails/template";
+import {
+  getEmailTemplateText,
+  resolveEmailTemplate,
+} from "../../shared/emails/template";
 import { BadRequestError, NotFoundError } from "../../shared/errors";
 import { sendMail } from "../../shared/lib/mailer";
 import { emailTemplateService } from "../email-templates/email-template.service";
@@ -129,10 +132,9 @@ export const animalDonationsService = {
     const content = resolveEmailTemplate(template, { animalName: animal.name });
     const subject = content.subject;
     const text = [
-      content.message,
+      getEmailTemplateText(content.content),
       ...body.photos,
-      content.actionLabel ? `${content.actionLabel}: ${animalUrl}` : animalUrl,
-      content.footer,
+      animalUrl,
     ].join("\n");
     const html = await render(
       React.createElement(AnimalSupportUpdateEmail, {

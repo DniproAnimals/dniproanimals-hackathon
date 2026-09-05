@@ -185,6 +185,7 @@ export const emailTemplatesTable = pgTable("email_templates", {
   actionLabel: varchar("action_label", { length: 255 }),
   secondaryMessage: text("secondary_message"),
   footer: text().notNull(),
+  content: text(),
   updatedBy: integer("updated_by").references(() => usersTable.id, {
     onDelete: "set null",
   }),

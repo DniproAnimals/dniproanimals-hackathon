@@ -2,25 +2,25 @@ import type { ReactNode } from "react";
 import {
   Body,
   Container,
-  Heading,
   Html,
   Preview,
   Section,
   Tailwind,
   Text,
 } from "react-email";
+import { EmailRichText } from "./EmailRichText";
 
 interface EmailLayoutProps {
   preview: string;
-  heading: string;
-  footer: string;
-  children: ReactNode;
+  content: string;
+  actionUrl?: string;
+  children?: ReactNode;
 }
 
 export function EmailLayout({
   preview,
-  heading,
-  footer,
+  content,
+  actionUrl,
   children,
 }: EmailLayoutProps) {
   return (
@@ -33,14 +33,13 @@ export function EmailLayout({
               <Text className="m-0 mb-2 text-center text-sm font-bold text-[#5b7765]">
                 DniproAnimals
               </Text>
-              <Heading className="m-0 mb-4 text-center text-3xl font-bold text-[#0c1014]">
-                {heading}
-              </Heading>
+              <EmailRichText
+                content={content}
+                actionUrl={actionUrl}
+                className="m-0 mb-4 text-base leading-6 text-[#0c1014]"
+              />
               {children}
             </Section>
-            <Text className="m-0 whitespace-pre-line pt-6 text-center text-sm leading-5 text-[#5b7765]">
-              {footer}
-            </Text>
           </Container>
         </Body>
       </Tailwind>

@@ -6,7 +6,10 @@ import bcrypt from "bcryptjs";
 import { randomBytes } from "crypto";
 import React from "react";
 import { PasswordResetEmail } from "../../shared/emails/PasswordResetEmail.js";
-import { resolveEmailTemplate } from "../../shared/emails/template";
+import {
+  getEmailTemplateText,
+  resolveEmailTemplate,
+} from "../../shared/emails/template";
 import { VerificationEmail } from "../../shared/emails/VerificationEmail.js";
 import { sendMail } from "../../shared/lib/mailer";
 import { emailTemplateService } from "../email-templates/email-template.service";
@@ -38,14 +41,9 @@ async function sendVerificationEmail(email: string, token: string) {
   await sendMail({
     to: email,
     subject: content.subject,
-    text: [
-      content.message,
-      verificationLink,
-      content.secondaryMessage,
-      content.footer,
-    ]
-      .filter(Boolean)
-      .join("\n\n"),
+    text: [getEmailTemplateText(content.content), verificationLink].join(
+      "\n\n",
+    ),
     html,
   });
 }
@@ -65,9 +63,7 @@ async function sendPasswordResetEmail(email: string, token: string) {
   await sendMail({
     to: email,
     subject: content.subject,
-    text: [content.message, resetLink, content.secondaryMessage, content.footer]
-      .filter(Boolean)
-      .join("\n\n"),
+    text: [getEmailTemplateText(content.content), resetLink].join("\n\n"),
     html,
   });
 }

@@ -34,19 +34,7 @@ export function AdoptionAdminEmail({
     body.location || body.telegram || body.instagram || body.facebook;
 
   return (
-    <EmailLayout
-      preview={content.preview}
-      heading={content.heading}
-      footer={content.footer}
-    >
-      <Text className="m-0 mb-6 whitespace-pre-line text-base leading-6 text-[#0c1014]">
-        {content.message}
-      </Text>
-      {content.secondaryMessage ? (
-        <Text className="m-0 mb-6 whitespace-pre-line text-base leading-6 text-[#0c1014]">
-          {content.secondaryMessage}
-        </Text>
-      ) : null}
+    <EmailLayout preview={content.preview} content={content.content}>
       <Section className="mb-6 rounded-xl bg-[#eef0d3] px-4 py-4">
         <Text className="m-0 text-base leading-7 text-[#0c1014]">
           <strong>Ім&apos;я тварини:</strong> {animalName}

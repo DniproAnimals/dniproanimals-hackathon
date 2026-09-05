@@ -16,7 +16,10 @@ import { render } from "@react-email/render";
 import React from "react";
 import { AdoptionAdminEmail } from "../../shared/emails/AdoptionAdminEmail";
 import { AdoptionApplicantEmail } from "../../shared/emails/AdoptionApplicantEmail";
-import { resolveEmailTemplate } from "../../shared/emails/template";
+import {
+  getEmailTemplateText,
+  resolveEmailTemplate,
+} from "../../shared/emails/template";
 import { sendMail } from "../../shared/lib/mailer";
 import { emailTemplateService } from "../email-templates/email-template.service";
 
@@ -33,12 +36,11 @@ async function sendAdoptionAdminEmail(
   const content = resolveEmailTemplate(template, { animalName });
   const subject = content.subject;
   const text = [
-    content.message,
+    getEmailTemplateText(content.content),
     `Ім'я тварини: ${animalName}`,
     `ПІБ заявника: ${body.name}`,
     `Телефон: ${body.phone}`,
     `Email: ${body.email}`,
-    content.footer,
   ].join("\n");
 
   const html = await render(
@@ -79,9 +81,7 @@ async function sendAdoptionApplicantEmail(
   await sendMail({
     to: body.email,
     subject: content.subject,
-    text: [content.message, content.secondaryMessage, content.footer]
-      .filter(Boolean)
-      .join("\n\n"),
+    text: getEmailTemplateText(content.content),
     html,
   });
 }

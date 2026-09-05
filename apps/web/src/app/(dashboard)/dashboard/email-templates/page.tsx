@@ -23,16 +23,16 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-  Textarea,
 } from "@dniproanimals/ui";
 import { useState } from "react";
+import { EmailTextEditor } from "./EmailTextEditor";
 
 const TEMPLATE_META: Record<
   EmailTemplateKey,
   {
     label: string;
     description: string;
-    placeholders: string[];
+    placeholders: Array<{ token: string; description: string }>;
     hasAction: boolean;
   }
 > = {
@@ -51,19 +51,23 @@ const TEMPLATE_META: Record<
   "adoption-applicant": {
     label: "Заявнику на усиновлення",
     description: "Підтверджує отримання заявки та повідомляє про дзвінок.",
-    placeholders: ["{{applicantName}}", "{{animalName}}", "{{phone}}"],
+    placeholders: [
+      { token: "{{applicantName}}", description: "Ім'я заявника" },
+      { token: "{{animalName}}", description: "Ім'я тварини" },
+      { token: "{{phone}}", description: "Телефон заявника" },
+    ],
     hasAction: false,
   },
   "adoption-admin": {
     label: "Команді про заявку",
     description: "Надсилається адміністраторам після нової заявки.",
-    placeholders: ["{{animalName}}"],
+    placeholders: [{ token: "{{animalName}}", description: "Ім'я тварини" }],
     hasAction: false,
   },
   "animal-support-update": {
     label: "Новини для підтримувачів",
     description: "Надсилається разом з новими фото тварини.",
-    placeholders: ["{{animalName}}"],
+    placeholders: [{ token: "{{animalName}}", description: "Ім'я тварини" }],
     hasAction: true,
   },
 };
@@ -79,6 +83,8 @@ export default function EmailTemplatesPage() {
   const [drafts, setDrafts] = useState<
     Partial<Record<EmailTemplateKey, UpdateEmailTemplateBody>>
   >({});
+  const [savedTemplateKey, setSavedTemplateKey] =
+    useState<EmailTemplateKey | null>(null);
   const { data: templates, isLoading, error } = useEmailTemplatesQuery();
   const updateTemplate = useUpdateEmailTemplateMutation();
   const template = templates?.find((item) => item.key === selectedKey);
@@ -94,6 +100,7 @@ export default function EmailTemplatesPage() {
     field: K,
     value: UpdateEmailTemplateBody[K],
   ) => {
+    setSavedTemplateKey(null);
     setDrafts((current) => ({
       ...current,
       [selectedKey]: {
@@ -109,8 +116,8 @@ export default function EmailTemplatesPage() {
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground">Шаблони листів</h1>
           <p className="mt-1 text-sm text-gray-medium">
-            Змінюйте текст листів. Дизайн, кнопки та дані заявок залишаються
-            незмінними.
+            Відредагуйте весь текст листа в одному composer. Дані заявок та
+            посилання кнопок залишаються незмінними.
           </p>
         </div>
 
@@ -132,9 +139,17 @@ export default function EmailTemplatesPage() {
                 <CardTitle>{meta.label}</CardTitle>
                 <CardDescription>{meta.description}</CardDescription>
                 {meta.placeholders.length > 0 ? (
-                  <CardDescription>
-                    Доступні змінні: {meta.placeholders.join(", ")}
-                  </CardDescription>
+                  <div className="flex flex-col gap-1 text-sm text-gray-medium">
+                    <p>Доступні змінні:</p>
+                    {meta.placeholders.map((placeholder) => (
+                      <p key={placeholder.token}>
+                        <code className="font-medium text-foreground">
+                          {placeholder.token}
+                        </code>{" "}
+                        - {placeholder.description}
+                      </p>
+                    ))}
+                  </div>
                 ) : null}
               </CardHeader>
               <CardContent className="flex flex-col gap-5">
@@ -156,59 +171,22 @@ export default function EmailTemplatesPage() {
                     }
                   />
                 </label>
-                <label className="flex flex-col gap-2 text-sm font-medium text-foreground">
-                  Заголовок
-                  <Input
-                    value={draft.heading}
-                    onChange={(event) =>
-                      updateDraft("heading", event.target.value)
-                    }
+                <div className="flex flex-col gap-2 text-sm font-medium text-foreground">
+                  Текст листа
+                  <EmailTextEditor
+                    key={selectedKey}
+                    value={draft.content}
+                    hasAction={meta.hasAction}
+                    onChange={(value) => updateDraft("content", value)}
                   />
-                </label>
-                <label className="flex flex-col gap-2 text-sm font-medium text-foreground">
-                  Основний текст
-                  <Textarea
-                    value={draft.message}
-                    onChange={(event) =>
-                      updateDraft("message", event.target.value)
-                    }
-                  />
-                </label>
-                <label className="flex flex-col gap-2 text-sm font-medium text-foreground">
-                  Додатковий текст
-                  <Textarea
-                    value={draft.secondaryMessage ?? ""}
-                    placeholder="Необов'язковий текст"
-                    onChange={(event) =>
-                      updateDraft(
-                        "secondaryMessage",
-                        event.target.value || null,
-                      )
-                    }
-                  />
-                </label>
-                {meta.hasAction ? (
-                  <label className="flex flex-col gap-2 text-sm font-medium text-foreground">
-                    Текст кнопки
-                    <Input
-                      value={draft.actionLabel ?? ""}
-                      onChange={(event) =>
-                        updateDraft("actionLabel", event.target.value || null)
-                      }
-                    />
-                  </label>
-                ) : null}
-                <label className="flex flex-col gap-2 text-sm font-medium text-foreground">
-                  Текст у підвалі
-                  <Textarea
-                    value={draft.footer}
-                    onChange={(event) =>
-                      updateDraft("footer", event.target.value)
-                    }
-                  />
-                </label>
+                </div>
               </CardContent>
               <CardFooter className="justify-end">
+                {savedTemplateKey === selectedKey ? (
+                  <p role="status" className="mr-auto text-sm text-success">
+                    Зміни збережено
+                  </p>
+                ) : null}
                 <Button
                   disabled={updateTemplate.isPending}
                   onClick={() => {
@@ -216,6 +194,7 @@ export default function EmailTemplatesPage() {
                       { key: selectedKey, body: draft },
                       {
                         onSuccess: () => {
+                          setSavedTemplateKey(selectedKey);
                           setDrafts((current) => {
                             const remainingDrafts = { ...current };
                             delete remainingDrafts[selectedKey];
