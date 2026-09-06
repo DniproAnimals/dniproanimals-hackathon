@@ -3,6 +3,7 @@ import { registerAdoptionRoutes } from "./adoption";
 import { registerAnimalDonationsRoutes } from "./animal-donations";
 import { registerAnimalsRoutes } from "./animals";
 import { registerAuthRoutes } from "./auth";
+import { registerBankDetailsRoutes } from "./bank-details";
 import { registerContractTemplateRoutes } from "./contract-template";
 import { registerFavoritesRoutes } from "./favorites";
 import { registerFoundationRoutes } from "./foundation";
@@ -13,6 +14,7 @@ import { registerUsersRoutes } from "./users";
 
 export async function appRouter(fastify: FastifyZodInstance) {
   registerAuthRoutes(fastify);
+  registerBankDetailsRoutes(fastify);
   registerAnimalsRoutes(fastify);
   registerAdoptionRoutes(fastify);
   registerContractTemplateRoutes(fastify);

@@ -2,6 +2,7 @@ export * from "./modules/adoption";
 export * from "./modules/animal-donations";
 export * from "./modules/animals";
 export * from "./modules/auth";
+export * from "./modules/bank-details";
 export * from "./modules/contract-templates";
 export * from "./modules/favorites";
 export * from "./modules/mail";

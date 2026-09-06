@@ -56,6 +56,9 @@ export const endpoints = createTypedEndpoints({
     get: "/foundation",
     update: "/foundation",
   },
+  bankDetails: {
+    get: "/bank-details",
+  },
   users: {
     list: "/users",
     updateRole: "/users/role",
