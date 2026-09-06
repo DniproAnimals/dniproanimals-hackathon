@@ -1,5 +1,9 @@
+import { apiClient } from "@/shared/api-client";
 import { ReactQueryProvider } from "@/shared/providers/ReactQueryProvider";
+import { getServerQueryClient } from "@/shared/providers/getServerQueryClient";
+import { endpoints } from "@dniproanimals/endpoints";
 import { cn } from "@dniproanimals/ui";
+import { dehydrate } from "@tanstack/react-query";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
@@ -22,11 +26,19 @@ export const metadata: Metadata = {
     "Благодійний фонд DniproAnimals. Допомога безхатнім тваринам, усиновлення, волонтерство.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const queryClient = getServerQueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: [endpoints.foundation.get()],
+    queryFn: () => apiClient.foundation.get(),
+  });
+
+  const dehydratedState = dehydrate(queryClient);
+
   return (
     <html
       lang="uk"
@@ -49,7 +61,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-white">
-        <ReactQueryProvider>
+        <ReactQueryProvider dehydratedState={dehydratedState}>
           <NuqsAdapter>{children}</NuqsAdapter>
         </ReactQueryProvider>
       </body>

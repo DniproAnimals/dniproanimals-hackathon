@@ -1,10 +1,7 @@
-import {
-  IconBrandFacebookFilled,
-  IconBrandInstagram,
-  IconBrandTelegram,
-  IconFileText,
-  IconHeartFilled,
-} from "@dniproanimals/icons";
+"use client";
+
+import { useFoundationQuery } from "@/shared/query-hooks";
+import { IconFileText, IconHeartFilled } from "@dniproanimals/icons";
 import { Button, Separator } from "@dniproanimals/ui";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,25 +11,11 @@ const navLinks = [
   { href: "/donate", label: "Допомогти" },
 ];
 
-const socials = [
-  {
-    href: "https://instagram.com/dniproanimals",
-    label: "Instagram",
-    icon: IconBrandInstagram,
-  },
-  {
-    href: "https://facebook.com/dniproanimals",
-    label: "Facebook",
-    icon: IconBrandFacebookFilled,
-  },
-  {
-    href: "https://t.me/itsmotherofcats",
-    label: "Telegram",
-    icon: IconBrandTelegram,
-  },
-];
+import { SocialLinksList } from "@/shared/components/Contacts/SocialLinks";
 
 export function Footer() {
+  const { data: foundation } = useFoundationQuery();
+
   return (
     <footer className="bg-primary mt-16 pb-16 md:pb-0">
       <div className="max-w-6xl mx-auto px-6 py-10">
@@ -77,20 +60,7 @@ export function Footer() {
               <p className="text-xs font-semibold text-foreground/40 uppercase tracking-wider mb-3">
                 Контакти
               </p>
-              <div className="space-y-2">
-                {socials.map(({ href, label, icon: Icon }) => (
-                  <a
-                    key={href}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-foreground/70 hover:text-foreground transition-colors"
-                  >
-                    <Icon size={14} />
-                    {label}
-                  </a>
-                ))}
-              </div>
+              <SocialLinksList />
             </div>
             <div className="space-y-4">
               <div>
@@ -120,7 +90,7 @@ export function Footer() {
                   className="bg-foreground/10 text-foreground hover:bg-foreground/20"
                 >
                   <a
-                    href="https://send.monobank.ua/jar/dniproanimals"
+                    href={foundation?.monobankJarUrl ?? "#"}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

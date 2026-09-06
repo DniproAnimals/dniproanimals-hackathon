@@ -122,6 +122,9 @@ export default function DonationsPage() {
       instagram: foundation.instagram,
       telegram: foundation.telegram,
       facebook: foundation.facebook,
+      tiktokUrl: foundation.tiktokUrl,
+      monobankCardNumber: foundation.monobankCardNumber,
+      privatBankCardNumber: foundation.privatBankCardNumber,
       ...links,
     };
     updateFoundationMutation.mutate(foundationValues);
