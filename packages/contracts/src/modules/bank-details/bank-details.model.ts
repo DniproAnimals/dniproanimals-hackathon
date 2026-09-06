@@ -4,12 +4,14 @@ const correspondentBankSchema = z.object({
   account: z.string(),
   swiftCode: z.string(),
   bankName: z.string(),
+  color: z.string().optional(),
 });
 
 export const bankDetailsSchema = z.object({
   id: z.number(),
   directBankDetails: z.object({
     title: z.string(),
+    color: z.string().optional(),
     recipientName: z.string(),
     recipientCode: z.string(),
     recipientAccount: z.string(),
@@ -18,6 +20,7 @@ export const bankDetailsSchema = z.object({
   }),
   foreignCurrencyAccount: z.object({
     title: z.string(),
+    color: z.string().optional(),
     companyName: z.string(),
     iban: z.string(),
     bankName: z.string(),
@@ -29,3 +32,18 @@ export const bankDetailsSchema = z.object({
 });
 
 export type BankDetails = z.infer<typeof bankDetailsSchema>;
+
+export const updateBankDetailsBodySchema = bankDetailsSchema.omit({
+  id: true,
+  updatedAt: true,
+});
+
+export type UpdateBankDetailsBody = z.infer<typeof updateBankDetailsBodySchema>;
+
+export const updateBankDetailsResponseSchema = z.object({
+  success: z.boolean(),
+});
+
+export type UpdateBankDetailsResponse = z.infer<
+  typeof updateBankDetailsResponseSchema
+>;

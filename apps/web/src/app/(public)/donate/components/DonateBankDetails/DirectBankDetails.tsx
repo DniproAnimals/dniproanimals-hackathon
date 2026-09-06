@@ -22,7 +22,10 @@ export function DirectBankDetails() {
   ];
 
   return (
-    <Card className="p-8 rounded-3xl border-gray-100 shadow-sm mb-8">
+    <Card
+      className="p-8 rounded-3xl border-gray-100 shadow-sm mb-8"
+      style={{ borderTop: `6px solid ${details.color || "#5b7765"}` }}
+    >
       <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
         <IconCreditCard size={24} />
         {details.title}

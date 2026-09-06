@@ -3,4 +3,5 @@ import { bankDetailsController } from "./bank-details.controller";
 
 export function registerBankDetailsRoutes(app: FastifyZodInstance) {
   app.route(bankDetailsController.get);
+  app.route(bankDetailsController.update);
 }

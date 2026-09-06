@@ -1,7 +1,12 @@
-import { bankDetailsSchema } from "@dniproanimals/contracts";
+import {
+  bankDetailsSchema,
+  updateBankDetailsBodySchema,
+  updateBankDetailsResponseSchema,
+} from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import { z } from "zod";
 import { createController, defineRoute } from "../../shared/types/controller";
+import { withAuth } from "../auth/auth.guard";
 import { bankDetailsService } from "./bank-details.service";
 
 export const bankDetailsController = createController({
@@ -21,5 +26,17 @@ export const bankDetailsController = createController({
       }
       return reply.send(data);
     },
+  }),
+  update: defineRoute({
+    method: "PATCH",
+    url: endpoints.bankDetails.update(),
+    schema: {
+      body: updateBankDetailsBodySchema,
+      response: { 200: updateBankDetailsResponseSchema },
+    },
+    handler: withAuth(async (request, reply) => {
+      const result = await bankDetailsService.update(request.body);
+      return reply.send(result);
+    }),
   }),
 });
