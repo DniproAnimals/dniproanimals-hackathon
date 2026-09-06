@@ -8,6 +8,8 @@ import {
   IconBrandFacebook,
   IconBrandInstagram,
   IconBrandTelegram,
+  IconBrandTiktok,
+  IconCreditCard,
   IconMail,
   IconMapPin,
   IconPhone,
@@ -22,7 +24,6 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  Textarea,
 } from "@dniproanimals/ui";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -41,6 +42,13 @@ export default function FoundationPage() {
       instagram: "",
       telegram: "",
       facebook: "",
+      tiktokUrl: "",
+      monobankJarUrl: "",
+      monobankCardNumber: "",
+      privatBankCardNumber: "",
+      paypalEmail: "",
+      patreonUrl: "",
+      buyMeACoffeeUrl: "",
     },
   });
 
@@ -55,6 +63,13 @@ export default function FoundationPage() {
         instagram: foundation.instagram || "",
         telegram: foundation.telegram || "",
         facebook: foundation.facebook || "",
+        tiktokUrl: foundation.tiktokUrl || "",
+        monobankJarUrl: foundation.monobankJarUrl || "",
+        monobankCardNumber: foundation.monobankCardNumber || "",
+        privatBankCardNumber: foundation.privatBankCardNumber || "",
+        paypalEmail: foundation.paypalEmail || "",
+        patreonUrl: foundation.patreonUrl || "",
+        buyMeACoffeeUrl: foundation.buyMeACoffeeUrl || "",
       });
     }
   }, [foundation, form]);
@@ -85,25 +100,6 @@ export default function FoundationPage() {
                       placeholder="Притулок ДніпроAnimals"
                       {...field}
                       value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Опис</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Розкажіть про ваш притулок..."
-                      className="min-h-[120px]"
-                      {...field}
-                      value={field.value || ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -232,6 +228,100 @@ export default function FoundationPage() {
                     <FormControl>
                       <Input
                         placeholder="URL або Username"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="tiktokUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <IconBrandTiktok size={16} />
+                      TikTok
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="https://www.tiktok.com/@..."
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </Card>
+
+          <Card className="p-6 space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-full bg-green-light flex items-center justify-center text-green-secondary">
+                <IconCreditCard size={20} />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold">Платіжні дані</h2>
+                <p className="text-sm text-gray-medium">
+                  Посилання та реквізити, які бачать відвідувачі на сайті
+                </p>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="monobankJarUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <IconCreditCard size={16} />
+                      Monobank банка
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="https://send.monobank.ua/jar/..."
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="monobankCardNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Monobank карта</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="4441 1144 4172 7326"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="privatBankCardNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>ПриватБанк карта</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="5168 7456 0790 6259"
                         {...field}
                         value={field.value ?? ""}
                       />

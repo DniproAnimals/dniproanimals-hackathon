@@ -1,4 +1,8 @@
-import { contractTemplates } from "@dniproanimals/database";
+import {
+  DEFAULT_FOUNDATION_VALUES,
+  contractTemplates,
+  foundationTable,
+} from "@dniproanimals/database";
 import "@dniproanimals/env/load";
 import bcrypt from "bcryptjs";
 import { eq, sql } from "drizzle-orm";
@@ -207,6 +211,15 @@ async function seed() {
     console.log(`Animals: ${animals.length} created`);
   } else {
     console.log(`Animals: already exist (${animalCount})`);
+  }
+
+  const foundationCount = await getCount(foundationTable);
+
+  if (foundationCount === 0) {
+    await db.insert(foundationTable).values(DEFAULT_FOUNDATION_VALUES);
+    console.log("Foundation: default public data created");
+  } else {
+    console.log(`Foundation: already exist (${foundationCount})`);
   }
 
   const adoptionCount = await getCount(adoptionRequestsTable);

@@ -1,5 +1,6 @@
 "use client";
 
+import { useFoundationQuery } from "@/shared/query-hooks";
 import { Form } from "@dniproanimals/ui";
 import { motion } from "motion/react";
 import { useState } from "react";
@@ -8,15 +9,21 @@ import { DonateSubmitButton } from "./components/DonateSubmitButton";
 import { useDonateForm } from "./hooks/useDonateForm";
 
 export function DonateForm() {
+  const { data: foundation } = useFoundationQuery();
   const form = useDonateForm();
   const [error, setError] = useState("");
 
   const onSubmit = form.handleSubmit(({ amount }) => {
     setError("");
-    window.open(
-      `https://send.monobank.ua/jar/4441114441727326?amount=${amount}`,
-      "_blank",
-    );
+    const jarUrl = foundation?.monobankJarUrl;
+
+    if (!jarUrl) {
+      setError("Посилання на Monobank-банку не налаштоване");
+      return;
+    }
+
+    const paymentUrl = `${jarUrl}${jarUrl.includes("?") ? "&" : "?"}amount=${amount}`;
+    window.open(paymentUrl, "_blank");
   });
 
   return (
@@ -27,7 +34,7 @@ export function DonateForm() {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="w-full lg:w-[480px] bg-white rounded-[2.5rem] p-8 md:p-10 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] border border-gray-100 relative shrink-0"
+        className="w-full lg:w-120 bg-white rounded-[2.5rem] p-8 md:p-10 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] border border-gray-100 relative shrink-0"
       >
         <h2 className="text-2xl md:text-3xl font-extrabold mb-6 text-center text-foreground">
           Швидка пожертва онлайн
