@@ -189,6 +189,43 @@ export const emailTemplatesTable = pgTable("email_templates", {
   updatedBy: integer("updated_by").references(() => usersTable.id, {
     onDelete: "set null",
   }),
+// --- Bank details (вынесено из foundationTable в отдельную таблицу) ---
+
+export type BankAccountDetails = {
+  title: string;
+  recipientName: string;
+  recipientCode: string;
+  recipientAccount: string;
+  bankName: string;
+  paymentPurpose: string;
+};
+
+export type ForeignCurrencyAccount = {
+  title: string;
+  companyName: string;
+  iban: string;
+  bankName: string;
+  bankSwiftCode: string;
+  companyAddress: string;
+};
+
+export type CorrespondentBank = {
+  account: string;
+  swiftCode: string;
+  bankName: string;
+};
+
+export const bankDetailsTable = pgTable("bank_details", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  directBankDetails: jsonb("direct_bank_details")
+    .notNull()
+    .$type<BankAccountDetails>(),
+  foreignCurrencyAccount: jsonb("foreign_currency_account")
+    .notNull()
+    .$type<ForeignCurrencyAccount>(),
+  correspondentBanks: jsonb("correspondent_banks")
+    .notNull()
+    .$type<CorrespondentBank[]>(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 

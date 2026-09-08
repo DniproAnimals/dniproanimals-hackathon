@@ -14,6 +14,7 @@ import { db } from "../src";
 import {
   adoptionRequestsTable,
   animalsTable,
+  bankDetailsTable,
   favoritesTable,
   notificationsTable,
   usersTable,
@@ -21,6 +22,45 @@ import {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+export const donationBankDetails = {
+  directBankDetails: {
+    title: "Прямі банківські реквізити",
+    recipientName: "БО БФ ДНІПРО ЕНІМАЛС",
+    recipientCode: "43794131",
+    recipientAccount: "UA373052990000026004050531067",
+    bankName: 'АТ КБ "ПРИВАТБАНК"',
+    paymentPurpose: "безповоротня фінансова допомога",
+  },
+
+  foreignCurrencyAccount: {
+    title: "Валютний рахунок",
+    companyName: "БО БФ ДНІПРО ЕНІМАЛС",
+    iban: "UA463052990000026009050554306",
+    bankName: 'JSC CB "PRIVATBANK", 1D HRUSHEVSKOHO STR., KYIV, 01001, UKRAINE',
+    bankSwiftCode: "PBANUA2X",
+    companyAddress:
+      "49114, УКРАЇНА, ОБЛ. ДНІПРОПЕТРОВСЬКА, М. ДНІПРО, ВУЛ. ГЕРОЇВ ДНІПРА, Б. 59",
+  },
+
+  correspondentBanks: [
+    {
+      account: "001-1-000080",
+      swiftCode: "CHASUS33",
+      bankName: "JP Morgan Chase Bank, New York, USA",
+    },
+    {
+      account: "890-0085-754",
+      swiftCode: "IRVT US 3N",
+      bankName: "The Bank of New York Mellon, New York, USA",
+    },
+    {
+      account: "36445343",
+      swiftCode: "CITI US 33",
+      bankName: "Citibank N.A., NEW YORK, USA",
+    },
+  ],
+} as const;
 
 interface RawAnimal {
   Вид: string;
@@ -218,6 +258,20 @@ async function seed() {
     console.log(`Adoption requests: already exist (${adoptionCount})`);
   }
 
+  // Bank details — отдельная таблица, не зависит от юзеров
+  const bankDetailsCount = await getCount(bankDetailsTable);
+
+  if (bankDetailsCount === 0) {
+    await db.insert(bankDetailsTable).values({
+      directBankDetails: donationBankDetails.directBankDetails,
+      foreignCurrencyAccount: donationBankDetails.foreignCurrencyAccount,
+      correspondentBanks: [...donationBankDetails.correspondentBanks],
+    });
+    console.log("Bank details: default donation details created");
+  } else {
+    console.log(`Bank details: already exist (${bankDetailsCount})`);
+  }
+
   if (regularUserId) {
     const favCount = await getCount(favoritesTable);
 
@@ -261,6 +315,7 @@ async function seed() {
   } else {
     console.log(`Notifications: already exist (${notifCount})`);
   }
+
   const contractCount = await getCount(contractTemplates);
 
   if (contractCount === 0) {
@@ -269,15 +324,12 @@ async function seed() {
       title: "Договір про передачу тварини в нову сім'ю (зразок)",
       subtitle:
         "Цей документ є демонстраційним зразком для платформи DniproAnimals. Юридичну силу має лише підписаний оригінал між сторонами.",
-
       content: {
         type: "doc",
         content: [
           {
             type: "heading",
-            attrs: {
-              level: 1,
-            },
+            attrs: { level: 1 },
             content: [
               {
                 type: "text",
@@ -285,7 +337,6 @@ async function seed() {
               },
             ],
           },
-
           {
             type: "paragraph",
             content: [
@@ -295,20 +346,11 @@ async function seed() {
               },
             ],
           },
-
           {
             type: "heading",
-            attrs: {
-              level: 2,
-            },
-            content: [
-              {
-                type: "text",
-                text: "1. Предмет договору",
-              },
-            ],
+            attrs: { level: 2 },
+            content: [{ type: "text", text: "1. Предмет договору" }],
           },
-
           {
             type: "paragraph",
             content: [
@@ -318,7 +360,6 @@ async function seed() {
               },
             ],
           },
-
           {
             type: "paragraph",
             content: [
@@ -328,20 +369,13 @@ async function seed() {
               },
             ],
           },
-
           {
             type: "heading",
-            attrs: {
-              level: 2,
-            },
+            attrs: { level: 2 },
             content: [
-              {
-                type: "text",
-                text: "2. Права та обов'язки Нової сім'ї",
-              },
+              { type: "text", text: "2. Права та обов'язки Нової сім'ї" },
             ],
           },
-
           {
             type: "bulletList",
             content: [
@@ -375,20 +409,11 @@ async function seed() {
               },
             ],
           },
-
           {
             type: "heading",
-            attrs: {
-              level: 2,
-            },
-            content: [
-              {
-                type: "text",
-                text: "3. Заключні положення",
-              },
-            ],
+            attrs: { level: 2 },
+            content: [{ type: "text", text: "3. Заключні положення" }],
           },
-
           {
             type: "paragraph",
             content: [
@@ -400,13 +425,13 @@ async function seed() {
           },
         ],
       },
-
       version: 1,
     });
     console.log("Contract template created");
   } else {
     console.log(`Contract template already exists (${contractCount})`);
   }
+
   console.log("\nSeed completed!");
 }
 
