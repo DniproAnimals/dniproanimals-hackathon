@@ -64,6 +64,10 @@ export const endpoints = createTypedEndpoints({
     get: "/bank-details",
     update: "/bank-details",
   },
+  shelterNeeds: {
+    get: "/shelter-needs",
+    update: "/shelter-needs",
+  },
   users: {
     list: "/users",
     updateRole: "/users/role",

@@ -8,6 +8,7 @@ import { createEmailTemplatesApiService } from "../services/emailTemplates";
 import { createFavoritesApiService } from "../services/favorites";
 import { createFoundationApiService } from "../services/foundation";
 import { createNotificationsApiService } from "../services/notifications";
+import { createShelterNeedsApiService } from "../services/shelterNeeds";
 import { createUploadApiService } from "../services/upload";
 import { createUsersApiService } from "../services/users";
 import { createHttp, type ApiClientConfig } from "../utils";
@@ -24,6 +25,7 @@ export function createApiClient(config: ApiClientConfig) {
     emailTemplates: createEmailTemplatesApiService(http),
     favorites: createFavoritesApiService(http),
     notifications: createNotificationsApiService(http),
+    shelterNeeds: createShelterNeedsApiService(http),
     animalDonations: createAnimalDonationsApiService(http),
     upload: createUploadApiService(http),
     foundation: createFoundationApiService(http),

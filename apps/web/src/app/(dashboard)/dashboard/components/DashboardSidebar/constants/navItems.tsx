@@ -5,6 +5,7 @@ import {
   IconMail,
   IconPawFilled,
   IconSettingsFilled,
+  IconShoppingBag,
   IconUsersGroup,
 } from "@dniproanimals/icons";
 import type { ReactNode } from "react";
@@ -58,5 +59,10 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     href: "/dashboard/donations",
     label: "Донати",
     icon: <IconCashBanknote size={18} />,
+  },
+  {
+    href: "/dashboard/material-help",
+    label: "Матеріальна допомога",
+    icon: <IconShoppingBag size={18} />,
   },
 ];

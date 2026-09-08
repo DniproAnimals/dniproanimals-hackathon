@@ -10,12 +10,14 @@ import { registerFavoritesRoutes } from "./favorites";
 import { registerFoundationRoutes } from "./foundation";
 import { registerMailRoutes } from "./mail";
 import { registerNotificationsRoutes } from "./notifications";
+import { registerShelterNeedsRoutes } from "./shelter-needs";
 import { registerUploadRoutes } from "./upload";
 import { registerUsersRoutes } from "./users";
 
 export async function appRouter(fastify: FastifyZodInstance) {
   registerAuthRoutes(fastify);
   registerBankDetailsRoutes(fastify);
+  registerShelterNeedsRoutes(fastify);
   registerAnimalsRoutes(fastify);
   registerAdoptionRoutes(fastify);
   registerContractTemplateRoutes(fastify);
