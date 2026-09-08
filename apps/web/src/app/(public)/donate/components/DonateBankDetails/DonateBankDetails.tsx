@@ -10,7 +10,6 @@ export function DonateBankDetails() {
         <IconCreditCard size={24} />
         Прямі банківські реквізити
       </h2>
-      <div className="grid md:grid-cols-2 gap-4"></div>
     </Card>
   );
 }
