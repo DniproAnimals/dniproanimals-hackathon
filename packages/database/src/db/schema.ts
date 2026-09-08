@@ -16,6 +16,12 @@ export type AnimalSize = "small" | "medium" | "large";
 export type AnimalSex = "male" | "female";
 export type AnimalStatus = "available" | "reserved" | "adopted";
 export type AdoptionStatus = "pending" | "approved" | "rejected";
+export type EmailTemplateKey =
+  | "verification"
+  | "password-reset"
+  | "adoption-applicant"
+  | "adoption-admin"
+  | "animal-support-update";
 
 export const usersTable = pgTable("users", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -169,6 +175,20 @@ export const foundationTable = pgTable("foundation", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const emailTemplatesTable = pgTable("email_templates", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  key: varchar({ length: 64 }).notNull().unique().$type<EmailTemplateKey>(),
+  subject: varchar({ length: 255 }).notNull(),
+  preview: varchar({ length: 255 }).notNull(),
+  heading: varchar({ length: 255 }).notNull(),
+  message: text().notNull(),
+  actionLabel: varchar("action_label", { length: 255 }),
+  secondaryMessage: text("secondary_message"),
+  footer: text().notNull(),
+  content: text(),
+  updatedBy: integer("updated_by").references(() => usersTable.id, {
+    onDelete: "set null",
+  }),
 // --- Bank details (вынесено из foundationTable в отдельную таблицу) ---
 
 export type BankAccountDetails = {

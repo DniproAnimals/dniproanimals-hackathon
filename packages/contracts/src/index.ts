@@ -4,6 +4,7 @@ export * from "./modules/animals";
 export * from "./modules/auth";
 export * from "./modules/bank-details";
 export * from "./modules/contract-templates";
+export * from "./modules/email-templates";
 export * from "./modules/favorites";
 export * from "./modules/mail";
 export * from "./modules/notifications";

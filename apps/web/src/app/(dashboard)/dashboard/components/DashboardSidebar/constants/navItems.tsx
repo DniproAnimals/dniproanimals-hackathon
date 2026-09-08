@@ -2,6 +2,7 @@ import {
   IconCashBanknote,
   IconFileTextFilled,
   IconLayoutDashboardFilled,
+  IconMail,
   IconPawFilled,
   IconSettingsFilled,
   IconUsersGroup,
@@ -42,6 +43,10 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     icon: <IconSettingsFilled size={18} />,
   },
   {
+    href: "/dashboard/email-templates",
+    label: "Шаблони листів",
+    icon: <IconMail size={18} />,
+    ownerOnly: true,
     href: "/dashboard/donations",
     label: "Донати",
     icon: <IconCashBanknote size={18} />,

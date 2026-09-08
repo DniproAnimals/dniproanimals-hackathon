@@ -4,6 +4,7 @@ import { createAnimalsApiService } from "../services/animals";
 import { createAuthApiService } from "../services/auth";
 import { createBankDetailsApiService } from "../services/bankDetails";
 import { createContractTemplateApiService } from "../services/contractTemplate";
+import { createEmailTemplatesApiService } from "../services/emailTemplates";
 import { createFavoritesApiService } from "../services/favorites";
 import { createFoundationApiService } from "../services/foundation";
 import { createNotificationsApiService } from "../services/notifications";
@@ -20,6 +21,7 @@ export function createApiClient(config: ApiClientConfig) {
     animals: createAnimalsApiService(http),
     adoption: createAdoptionApiService(http),
     contractTemplate: createContractTemplateApiService(http),
+    emailTemplates: createEmailTemplatesApiService(http),
     favorites: createFavoritesApiService(http),
     notifications: createNotificationsApiService(http),
     animalDonations: createAnimalDonationsApiService(http),

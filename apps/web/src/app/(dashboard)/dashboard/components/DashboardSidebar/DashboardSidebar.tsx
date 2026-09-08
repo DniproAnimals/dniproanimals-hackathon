@@ -19,7 +19,10 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       <SidebarLogo />
-      <SidebarNav isOwner={false} onNavigate={onNavigate} />
+      <SidebarNav
+        isOwner={user?.role === "superadmin"}
+        onNavigate={onNavigate}
+      />
       {user && <SidebarUserPanel user={user} />}
     </>
   );

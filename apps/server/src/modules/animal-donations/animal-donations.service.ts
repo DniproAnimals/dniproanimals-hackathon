@@ -14,8 +14,13 @@ import { env } from "@dniproanimals/env";
 import { render } from "@react-email/render";
 import React from "react";
 import { AnimalSupportUpdateEmail } from "../../shared/emails/AnimalSupportUpdateEmail";
+import {
+  getEmailTemplateText,
+  resolveEmailTemplate,
+} from "../../shared/emails/template";
 import { BadRequestError, NotFoundError } from "../../shared/errors";
 import { sendMail } from "../../shared/lib/mailer";
+import { emailTemplateService } from "../email-templates/email-template.service";
 
 async function getActiveSupporters(animalId: number) {
   const supporters = await db
@@ -123,18 +128,20 @@ export const animalDonationsService = {
 
     const baseUrl = env.WEB_ORIGIN.replace(/\/$/, "");
     const animalUrl = `${baseUrl}/animals/${animalId}`;
-    const subject = `Нові фото від ${animal.name} — DniproAnimals`;
+    const template = await emailTemplateService.get("animal-support-update");
+    const content = resolveEmailTemplate(template, { animalName: animal.name });
+    const subject = content.subject;
     const text = [
-      `Дякуємо, що підтримуєте ${animal.name}.`,
-      "Ділимося новими фотографіями:",
+      getEmailTemplateText(content.content),
       ...body.photos,
-      `Сторінка тварини: ${animalUrl}`,
+      animalUrl,
     ].join("\n");
     const html = await render(
       React.createElement(AnimalSupportUpdateEmail, {
         animalName: animal.name,
         animalUrl,
         photos: body.photos,
+        template,
       }),
     );
 

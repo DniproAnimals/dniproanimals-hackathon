@@ -4,6 +4,7 @@ export * from "./animals";
 export * from "./auth";
 export * from "./bankDetails";
 export * from "./contractTemplate";
+export * from "./emailTemplates";
 export * from "./favorites";
 export * from "./notifications";
 export * from "./upload";
