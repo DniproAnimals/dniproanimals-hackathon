@@ -38,9 +38,9 @@ export function ForeignCurrencyAccount() {
     before:top-0
     before:h-full
     before:w-1.5
-    before:bg-green-secondary
     before:content-['']
   "
+      style={{ borderTop: `6px solid ${details.color || "#5b7765"}` }}
     >
       <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
         <IconCreditCard size={24} />

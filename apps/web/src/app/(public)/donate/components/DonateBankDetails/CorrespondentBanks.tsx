@@ -32,9 +32,12 @@ export function CorrespondentBanks() {
         before:left-0
         before:top-0
         before:h-full
-        before:w-1.5        before:bg-[#7C4B22]
+        before:w-1.5
         before:content-['']
       "
+      style={{
+        borderTop: `6px solid ${banks[selectedBankIndex]?.color || "#7c4b22"}`,
+      }}
     >
       <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
         <IconCreditCard size={24} />
@@ -50,6 +53,7 @@ export function CorrespondentBanks() {
               className={`w-fit max-w-full truncate border-brown text-brown hover:border-brown hover:bg-brown hover:text-white ${
                 index === selectedBankIndex ? "bg-brown text-white" : ""
               }`}
+              style={{ borderColor: bank.color || "#7c4b22" }}
               title={bank.bankName}
               onClick={() => setSelectedBankIndex(index)}
             >
