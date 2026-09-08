@@ -232,6 +232,35 @@ export const bankDetailsTable = pgTable("bank_details", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export type ShelterNeedItem = {
+  id: string;
+  name: string;
+  price?: string;
+};
+
+export type ShelterNeedSubgroup = {
+  id: string;
+  title: string;
+  items: ShelterNeedItem[];
+};
+
+export type ShelterNeedCard = {
+  id: string;
+  title: string;
+  icon: string;
+  gradient: string;
+  color?: string;
+  variant?: "default";
+  items: ShelterNeedItem[];
+  subgroups?: ShelterNeedSubgroup[];
+};
+
+export const shelterNeedsTable = pgTable("shelter_needs", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  cards: jsonb().notNull().$type<ShelterNeedCard[]>(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export type TipTapDocument = Record<string, unknown>;
 
 export const contractTemplates = pgTable("contract_templates", {

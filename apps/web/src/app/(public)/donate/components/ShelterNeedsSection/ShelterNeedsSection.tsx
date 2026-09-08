@@ -1,7 +1,12 @@
+"use client";
+
+import { useShelterNeedsQuery } from "@/shared/query-hooks";
 import ShelterNeedCard from "./ShelterNeedsCard";
-import { shelterNeedsMock } from "./shelterNeeds.mock";
 
 const SheltersNeeds = () => {
+  const { data, isLoading } = useShelterNeedsQuery();
+  const cards = data?.cards ?? [];
+
   return (
     <section className="w-full bg-white">
       <div className="mx-auto w-full max-w-360 px-4 py-6 sm:px-6 lg:px-8">
@@ -16,10 +21,16 @@ const SheltersNeeds = () => {
           </header>
 
           {/* Needs */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {shelterNeedsMock.map((card) => (
-              <ShelterNeedCard key={card.id} card={card} />
-            ))}
+          <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {isLoading ? (
+              <p className="text-sm text-gray-medium">Завантаження...</p>
+            ) : cards.length > 0 ? (
+              cards.map((card) => <ShelterNeedCard key={card.id} card={card} />)
+            ) : (
+              <p className="text-sm text-gray-medium">
+                Дані про потреби наразі відсутні.
+              </p>
+            )}
           </div>
         </div>
       </div>

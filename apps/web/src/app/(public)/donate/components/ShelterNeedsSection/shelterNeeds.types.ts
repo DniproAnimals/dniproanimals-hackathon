@@ -9,6 +9,7 @@ export type ShelterNeedCard = {
   title: string;
   icon: string;
   gradient: string;
+  color?: string;
   variant?: "default";
   items: ShelterNeedItem[];
   subgroups?: {

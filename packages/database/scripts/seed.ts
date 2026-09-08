@@ -1,5 +1,7 @@
+import type { ShelterNeedCard } from "@dniproanimals/database";
 import {
   DEFAULT_FOUNDATION_VALUES,
+  DEFAULT_SHELTER_NEEDS,
   contractTemplates,
   foundationTable,
 } from "@dniproanimals/database";
@@ -17,6 +19,7 @@ import {
   bankDetailsTable,
   favoritesTable,
   notificationsTable,
+  shelterNeedsTable,
   usersTable,
 } from "../src/db/schema";
 
@@ -220,6 +223,22 @@ async function seed() {
     console.log("Foundation: default public data created");
   } else {
     console.log(`Foundation: already exist (${foundationCount})`);
+  }
+
+  await db.execute(sql`CREATE TABLE IF NOT EXISTS "shelter_needs" (
+    "id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    "cards" jsonb NOT NULL,
+    "updated_at" timestamp DEFAULT now() NOT NULL
+  )`);
+
+  const shelterNeedsCount = await getCount(shelterNeedsTable);
+  if (shelterNeedsCount === 0) {
+    await db
+      .insert(shelterNeedsTable)
+      .values({ cards: DEFAULT_SHELTER_NEEDS as unknown as ShelterNeedCard[] });
+    console.log("Shelter needs: default public data created");
+  } else {
+    console.log(`Shelter needs: already exist (${shelterNeedsCount})`);
   }
 
   const adoptionCount = await getCount(adoptionRequestsTable);

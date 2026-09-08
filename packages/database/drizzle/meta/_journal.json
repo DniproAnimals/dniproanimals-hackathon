@@ -78,6 +78,13 @@
       "when": 1789000000000,
       "tag": "0009_add_contract_templates",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1788867000000,
+      "tag": "0010_add_shelter_needs",
+      "breakpoints": true
     }
   ]
 }

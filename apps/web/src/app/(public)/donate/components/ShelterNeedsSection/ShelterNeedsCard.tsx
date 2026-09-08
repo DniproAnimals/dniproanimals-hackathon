@@ -14,7 +14,6 @@ const ShelterNeedCard = ({ card }: Props) => {
         "min-w-0 overflow-hidden rounded-3xl",
         "border border-solid border-neutral-100",
         "bg-white pt-px",
-        card.id === "other" ? "md:col-span-1 xl:col-span-2" : "",
       ].join(" ")}
       style={{
         boxShadow: "0px 1px 2px #0000001A",
@@ -24,7 +23,7 @@ const ShelterNeedCard = ({ card }: Props) => {
       <div
         className="mx-px mb-5 h-1"
         style={{
-          background: card.gradient,
+          background: card.color || card.gradient,
         }}
       />
 

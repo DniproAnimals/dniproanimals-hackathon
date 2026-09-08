@@ -7,4 +7,5 @@ export * from "./contractTemplate";
 export * from "./emailTemplates";
 export * from "./favorites";
 export * from "./notifications";
+export * from "./shelterNeeds";
 export * from "./upload";
