@@ -18,9 +18,9 @@ CREATE TABLE IF NOT EXISTS "foundation" (
   "updated_at" timestamp NOT NULL DEFAULT now()
 );
 
-ALTER TABLE "foundation" ADD COLUMN "tiktok_url" varchar(512);
-ALTER TABLE "foundation" ADD COLUMN "monobank_card_number" varchar(64);
-ALTER TABLE "foundation" ADD COLUMN "privat_bank_card_number" varchar(64);
+ALTER TABLE "foundation" ADD COLUMN IF NOT EXISTS "tiktok_url" varchar(512);
+ALTER TABLE "foundation" ADD COLUMN IF NOT EXISTS "monobank_card_number" varchar(64);
+ALTER TABLE "foundation" ADD COLUMN IF NOT EXISTS "privat_bank_card_number" varchar(64);
 
 INSERT INTO "foundation" (
   "name",
