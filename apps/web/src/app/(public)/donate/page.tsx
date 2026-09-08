@@ -1,7 +1,8 @@
 import { DonateBackground } from "./components/DonateBackground";
-import { DonateBankDetails } from "./components/DonateBankDetails";
+import { ForeignCurrencyAccount } from "./components/DonateBankDetails";
+import { CorrespondentBanks } from "./components/DonateBankDetails/CorrespondentBanks";
+import { DirectBankDetails } from "./components/DonateBankDetails/DirectBankDetails";
 import { DonateContact } from "./components/DonateContact";
-import { DonateForm } from "./components/DonateForm";
 import { DonateHero } from "./components/DonateHero";
 import SheltersNeeds from "./components/ShelterNeedsSection/ShelterNeedsSection";
 
@@ -12,9 +13,12 @@ export default function DonatePage() {
       <div className="max-w-7xl mx-auto px-6 py-6 lg:py-12 relative z-10">
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center justify-between mb-16">
           <DonateHero />
-          <DonateForm />
+          <DirectBankDetails />
         </div>
-        <DonateBankDetails />
+        <section className="flex gap-10 items-start justify-between">
+          <ForeignCurrencyAccount />
+          <CorrespondentBanks />
+        </section>
         <SheltersNeeds />
         <DonateContact />
       </div>
