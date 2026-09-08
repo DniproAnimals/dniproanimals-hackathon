@@ -189,6 +189,9 @@ export const emailTemplatesTable = pgTable("email_templates", {
   updatedBy: integer("updated_by").references(() => usersTable.id, {
     onDelete: "set null",
   }),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // --- Bank details (вынесено из foundationTable в отдельную таблицу) ---
 
 export type BankAccountDetails = {

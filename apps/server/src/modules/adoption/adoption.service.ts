@@ -86,32 +86,6 @@ async function sendAdoptionApplicantEmail(
   });
 }
 
-async function sendAdoptionApplicantEmail(
-  body: CreateAdoptionBody,
-  animalName: string,
-) {
-  const subject = `Ми отримали вашу заявку на прихисток ${animalName}`;
-  const text = [
-    `Вітаємо, ${body.name}!`,
-    `Ми отримали вашу заявку на прихисток ${animalName}.`,
-    `Після опрацювання заявки наші волонтери зателефонують вам за номером ${body.phone}, щоб уточнити деталі та домовитися про наступні кроки.`,
-  ].join("\n\n");
-  const html = await render(
-    React.createElement(AdoptionApplicantEmail, {
-      applicantName: body.name,
-      animalName,
-      phone: body.phone,
-    }),
-  );
-
-  await sendMail({
-    to: body.email,
-    subject,
-    text,
-    html,
-  });
-}
-
 export const adoptionService = {
   async list(filters: ListAdoptionQuery = {}) {
     const rows = await db
