@@ -71,6 +71,13 @@
       "when": 1788537600000,
       "tag": "0008_add_email_template_content",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1789000000000,
+      "tag": "0009_add_contract_templates",
+      "breakpoints": true
     }
   ]
 }
