@@ -5,7 +5,6 @@ import {
   IconChevronDown,
   IconHomeFilled,
   IconLogout,
-  IconShieldFilled,
   IconUserFilled,
 } from "@dniproanimals/icons";
 import {
@@ -85,15 +84,9 @@ export function Header() {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
-                {user.role === "superadmin" && (
-                  <DropdownMenuItem asChild>
-                    <Link href="/admin">
-                      <IconShieldFilled className="text-red-500" />
-                      Адмін панель
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                {user.id && (
+                {(user.role === "admin" ||
+                  user.role === "superadmin" ||
+                  user.role === "volunteer") && (
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard">
                       <IconHomeFilled className="text-green-secondary" />

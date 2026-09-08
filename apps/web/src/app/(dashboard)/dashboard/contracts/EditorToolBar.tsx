@@ -1,20 +1,13 @@
 "use client";
 
+import { Button } from "@dniproanimals/ui";
 import type { Editor } from "@tiptap/react";
 
-import { Button } from "@dniproanimals/ui";
-
-type Props = {
-  editor: Editor;
-};
-
-export function EditorToolbar({ editor }: Props) {
+export function EditorToolbar({ editor }: { editor: Editor }) {
   if (!editor) return null;
 
   return (
     <div className="sticky top-0 z-30 flex items-center gap-1 rounded-t-xl border-b bg-white px-3 py-2 shadow-sm">
-      {/* text */}
-
       <Button
         size="sm"
         variant={editor.isActive("bold") ? "primary" : "ghost"}
@@ -22,7 +15,6 @@ export function EditorToolbar({ editor }: Props) {
       >
         B
       </Button>
-
       <Button
         size="sm"
         variant={editor.isActive("italic") ? "primary" : "ghost"}
@@ -30,7 +22,6 @@ export function EditorToolbar({ editor }: Props) {
       >
         I
       </Button>
-
       <Button
         size="sm"
         variant={editor.isActive("underline") ? "primary" : "ghost"}
@@ -38,11 +29,7 @@ export function EditorToolbar({ editor }: Props) {
       >
         U
       </Button>
-
       <div className="mx-2 h-6 w-px bg-border" />
-
-      {/* headings */}
-
       <Button
         size="sm"
         variant={editor.isActive("heading", { level: 1 }) ? "primary" : "ghost"}
@@ -50,7 +37,6 @@ export function EditorToolbar({ editor }: Props) {
       >
         H1
       </Button>
-
       <Button
         size="sm"
         variant={editor.isActive("heading", { level: 2 }) ? "primary" : "ghost"}
@@ -58,7 +44,6 @@ export function EditorToolbar({ editor }: Props) {
       >
         H2
       </Button>
-
       <Button
         size="sm"
         variant={editor.isActive("heading", { level: 3 }) ? "primary" : "ghost"}
@@ -66,11 +51,7 @@ export function EditorToolbar({ editor }: Props) {
       >
         H3
       </Button>
-
       <div className="mx-2 h-6 w-px bg-border" />
-
-      {/* lists */}
-
       <Button
         size="sm"
         variant={editor.isActive("bulletList") ? "primary" : "ghost"}
@@ -78,7 +59,6 @@ export function EditorToolbar({ editor }: Props) {
       >
         •
       </Button>
-
       <Button
         size="sm"
         variant={editor.isActive("orderedList") ? "primary" : "ghost"}
@@ -86,11 +66,7 @@ export function EditorToolbar({ editor }: Props) {
       >
         1.
       </Button>
-
       <div className="mx-2 h-6 w-px bg-border" />
-
-      {/* align */}
-
       <Button
         size="sm"
         variant={editor.isActive({ textAlign: "left" }) ? "primary" : "ghost"}
@@ -98,7 +74,6 @@ export function EditorToolbar({ editor }: Props) {
       >
         L
       </Button>
-
       <Button
         size="sm"
         variant={editor.isActive({ textAlign: "center" }) ? "primary" : "ghost"}
@@ -106,7 +81,6 @@ export function EditorToolbar({ editor }: Props) {
       >
         C
       </Button>
-
       <Button
         size="sm"
         variant={editor.isActive({ textAlign: "right" }) ? "primary" : "ghost"}
@@ -114,11 +88,7 @@ export function EditorToolbar({ editor }: Props) {
       >
         R
       </Button>
-
       <div className="mx-2 h-6 w-px bg-border" />
-
-      {/* undo */}
-
       <Button
         size="sm"
         variant="ghost"
@@ -126,7 +96,6 @@ export function EditorToolbar({ editor }: Props) {
       >
         Undo
       </Button>
-
       <Button
         size="sm"
         variant="ghost"

@@ -49,6 +49,12 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     ownerOnly: true,
   },
   {
+    href: "/dashboard/contracts",
+    label: "Шаблон договору",
+    icon: <IconFileTextFilled size={18} />,
+    ownerOnly: true,
+  },
+  {
     href: "/dashboard/donations",
     label: "Донати",
     icon: <IconCashBanknote size={18} />,
