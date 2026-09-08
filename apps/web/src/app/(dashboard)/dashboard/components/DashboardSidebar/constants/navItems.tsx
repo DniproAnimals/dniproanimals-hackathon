@@ -1,4 +1,5 @@
 import {
+  IconCashBanknote,
   IconFileTextFilled,
   IconLayoutDashboardFilled,
   IconPawFilled,
@@ -39,5 +40,10 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     href: "/dashboard/foundation",
     label: "Фонд",
     icon: <IconSettingsFilled size={18} />,
+  },
+  {
+    href: "/dashboard/donations",
+    label: "Донати",
+    icon: <IconCashBanknote size={18} />,
   },
 ];

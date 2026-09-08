@@ -9,7 +9,6 @@ import {
   IconBrandInstagram,
   IconBrandTelegram,
   IconBrandTiktok,
-  IconCreditCard,
   IconMail,
   IconMapPin,
   IconPhone,
@@ -249,79 +248,6 @@ export default function FoundationPage() {
                     <FormControl>
                       <Input
                         placeholder="https://www.tiktok.com/@..."
-                        {...field}
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </Card>
-
-          <Card className="p-6 space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="size-10 rounded-full bg-green-light flex items-center justify-center text-green-secondary">
-                <IconCreditCard size={20} />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold">Платіжні дані</h2>
-                <p className="text-sm text-gray-medium">
-                  Посилання та реквізити, які бачать відвідувачі на сайті
-                </p>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="monobankJarUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <IconCreditCard size={16} />
-                      Monobank банка
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="https://send.monobank.ua/jar/..."
-                        {...field}
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="monobankCardNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Monobank карта</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="4441 1144 4172 7326"
-                        {...field}
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="privatBankCardNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ПриватБанк карта</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="5168 7456 0790 6259"
                         {...field}
                         value={field.value ?? ""}
                       />

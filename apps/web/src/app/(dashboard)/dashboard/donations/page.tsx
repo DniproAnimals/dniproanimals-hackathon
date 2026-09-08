@@ -12,9 +12,6 @@ import type {
   UpdateFoundationBody,
 } from "@dniproanimals/contracts";
 import {
-  IconBrandPatreon,
-  IconBrandPaypal,
-  IconCoffee,
   IconCreditCard,
   IconPencil,
   IconPlus,
@@ -373,35 +370,6 @@ export default function DonationsPage() {
               )}
             </Card>
           ))}
-        </div>
-      </Card>
-
-      <Card className="p-6">
-        <h2 className="mb-6 text-lg font-bold">Інші способи допомоги</h2>
-        <div className="grid gap-6 md:grid-cols-3">
-          <LinkField
-            label="Monobank Банка"
-            value={links.monobankJarUrl || ""}
-            onChange={(value) => updateLink("monobankJarUrl", value)}
-          />
-          <LinkField
-            label="PayPal Email"
-            value={links.paypalEmail || ""}
-            icon={<IconBrandPaypal size={16} className="text-blue-500" />}
-            onChange={(value) => updateLink("paypalEmail", value)}
-          />
-          <LinkField
-            label="Patreon URL"
-            value={links.patreonUrl || ""}
-            icon={<IconBrandPatreon size={16} className="text-orange-500" />}
-            onChange={(value) => updateLink("patreonUrl", value)}
-          />
-          <LinkField
-            label="Buy Me a Coffee URL"
-            value={links.buyMeACoffeeUrl || ""}
-            icon={<IconCoffee size={16} className="text-yellow-600" />}
-            onChange={(value) => updateLink("buyMeACoffeeUrl", value)}
-          />
         </div>
       </Card>
 
