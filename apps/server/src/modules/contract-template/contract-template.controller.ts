@@ -5,7 +5,6 @@ import {
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import { z } from "zod";
-import { NotFoundError } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
 import { withAuth } from "../auth/auth.guard";
 import { contractTemplatePdfService } from "./contract-template-pdf.service";
@@ -21,7 +20,18 @@ export const contractTemplateController = createController({
     },
     handler: withAuth(async (request, reply) => {
       const row = await contractTemplateService.getActive(request.params.type);
-      if (!row) throw new NotFoundError("Contract template");
+
+      if (!row) {
+        return reply.send({
+          id: 0,
+          type: request.params.type,
+          title: "Договір усиновлення",
+          subtitle: null,
+          content: { type: "doc", content: [] },
+          version: 1,
+          updatedAt: new Date().toISOString(),
+        });
+      }
 
       return reply.send({
         ...row,
