@@ -17,12 +17,20 @@ export const startServer = async () => {
   await registerZod(server);
   await server.register(fastifyCookie);
   await registerSession(server);
+
   await server.register(fastifyMultipart, {
     attachFieldsToBody: true,
     limits: { fileSize: 50 * 1024 * 1024 },
   });
+
   await server.register(appRouter);
 
-  await server.listen({ port: env.SERVER_PORT });
-  console.log(`Fastify server running on http://localhost:${env.SERVER_PORT}`);
+  const port = Number(process.env.PORT ?? env.SERVER_PORT);
+
+  await server.listen({
+    port,
+    host: "0.0.0.0",
+  });
+
+  console.log(`Fastify server running on port ${port}`);
 };
