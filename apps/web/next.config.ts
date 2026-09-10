@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import "@dniproanimals/env/load";
 
 const remotePatterns: NonNullable<
   NonNullable<NextConfig["images"]>["remotePatterns"]
