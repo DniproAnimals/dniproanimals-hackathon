@@ -12,7 +12,7 @@ const parsed = envSchema.safeParse({
 
   SESSION_SECRET: process.env.SESSION_SECRET,
 
-  SERVER_PORT: process.env.SERVER_PORT,
+  SERVER_PORT: process.env.SERVER_PORT ?? process.env.PORT,
   WEB_ORIGIN: process.env.WEB_ORIGIN,
   NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
 
