@@ -1,9 +1,10 @@
 import "@dniproanimals/env/load";
 import pg from "pg";
-import { getDatabaseUrl } from "../src/utils/get-database-url";
+
+const databaseUrl = process.env.DATABASE_URL_UNPOOLED;
 
 async function drop() {
-  const sql = new pg.Client(getDatabaseUrl());
+  const sql = new pg.Client(databaseUrl);
   await sql.connect();
 
   try {

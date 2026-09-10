@@ -1,10 +1,11 @@
 import "@dniproanimals/env/load";
 import { execSync } from "node:child_process";
 import pg from "pg";
-import { getDatabaseUrl } from "../src/utils/get-database-url";
+
+const databaseUrl = process.env.DATABASE_URL_UNPOOLED;
 
 async function resetDatabase() {
-  const sql = new pg.Client(getDatabaseUrl());
+  const sql = new pg.Client(databaseUrl);
   await sql.connect();
 
   try {
