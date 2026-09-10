@@ -1,4 +1,3 @@
-import "@dniproanimals/env/load";
 import type { NextConfig } from "next";
 
 const remotePatterns: NonNullable<
