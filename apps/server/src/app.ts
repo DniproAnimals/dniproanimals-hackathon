@@ -25,7 +25,7 @@ export const startServer = async () => {
 
   await server.register(appRouter);
 
-  const port = Number(process.env.PORT ?? env.SERVER_PORT);
+  const port = env.SERVER_PORT;
 
   await server.listen({
     port,
