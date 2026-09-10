@@ -5,12 +5,14 @@ export const envSchema = z.object({
     .enum(["development", "production", "test"])
     .default("development"),
 
-  DATABASE_URL: z.string().optional(),
-  DB_HOST: z.string().default("localhost"),
-  DB_PORT: z.coerce.number().default(55432),
-  DB_USER: z.string().default("postgres"),
-  DB_PASS: z.string().default("postgres"),
-  DB_NAME: z.string().default("dniproanimals"),
+  DATABASE_URL: z.string().min(1).optional(),
+  DATABASE_URL_UNPOOLED: z.string().min(1).optional(),
+  NEON_BRANCH: z.string().optional(),
+  // DB_HOST: z.string().default("localhost"),
+  // DB_PORT: z.coerce.number().default(5432),
+  // DB_USER: z.string().default("postgres"),
+  // DB_PASS: z.string().default("postgres"),
+  // DB_NAME: z.string().default("dniproanimals"),
 
   REDIS_HOST: z.string().default("localhost"),
   REDIS_PORT: z.coerce.number().default(6379),
