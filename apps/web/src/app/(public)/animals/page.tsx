@@ -1,14 +1,14 @@
 "use client";
 import { useAnimalsQuery } from "@/shared/query-hooks";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { AnimalsCatalogHeader } from "./components/AnimalsCatalogHeader";
 import { AnimalsList } from "./components/AnimalsList";
 import { AnimalsListHeader } from "./components/AnimalsListHeader";
 import { FilterBar } from "./components/FilterBar";
 import { useCatalogFilterState } from "./hooks/useCatalogFilterState";
 
-export default function AnimalsPage() {
+function AnimalsPageContent() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [params] = useCatalogFilterState();
   const { data: animals = [], isLoading } = useAnimalsQuery(params);
@@ -45,5 +45,13 @@ export default function AnimalsPage() {
         </div>
       </div>
     </motion.div>
+  );
+}
+
+export default function AnimalsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[50vh]" />}>
+      <AnimalsPageContent />
+    </Suspense>
   );
 }
