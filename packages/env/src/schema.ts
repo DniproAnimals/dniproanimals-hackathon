@@ -5,9 +5,9 @@ export const envSchema = z.object({
     .enum(["development", "production", "test"])
     .default("development"),
 
-  DATABASE_URL: z.string().min(1).optional(),
-  DATABASE_URL_UNPOOLED: z.string().min(1).optional(),
-  NEON_BRANCH: z.string().optional(),
+  DATABASE_URL: z.string().url(),
+  DATABASE_URL_UNPOOLED: z.string().url(),
+  NEON_BRANCH: z.string().default("main"),
 
   REDIS_HOST: z.string().default("localhost"),
   REDIS_PORT: z.coerce.number().default(6379),
