@@ -22,6 +22,7 @@ import {
 } from "@dniproanimals/database";
 
 type AnimalInsert = typeof animalsTable.$inferInsert;
+type BreedRow = typeof breedsTable.$inferSelect;
 
 function orderBy(sort: ListAnimalsQuery["sort"]) {
   switch (sort) {
@@ -215,19 +216,32 @@ export const animalsService = {
       .select()
       .from(speciesTable)
       .orderBy(asc(speciesTable.name));
-    const result = [];
-    for (const s of species) {
-      const breeds = await db
-        .select()
-        .from(breedsTable)
-        .where(eq(breedsTable.speciesId, s.id))
-        .orderBy(asc(breedsTable.name));
-      result.push({
-        ...s,
-        breeds,
-      });
+
+    if (species.length === 0) {
+      return [];
     }
-    return result;
+
+    const speciesIds = species.map((s) => s.id);
+    const breeds = await db
+      .select()
+      .from(breedsTable)
+      .where(inArray(breedsTable.speciesId, speciesIds))
+      .orderBy(asc(breedsTable.name));
+
+    const breedsBySpeciesId = new Map<number, BreedRow[]>();
+    for (const breed of breeds) {
+      const list = breedsBySpeciesId.get(breed.speciesId);
+      if (list) {
+        list.push(breed);
+      } else {
+        breedsBySpeciesId.set(breed.speciesId, [breed]);
+      }
+    }
+
+    return species.map((s) => ({
+      ...s,
+      breeds: breedsBySpeciesId.get(s.id) ?? [],
+    }));
   },
 
   async listBreeds(query?: ListBreedsQuery) {
@@ -259,22 +273,22 @@ export const animalsService = {
       })
       .returning();
 
-    const breeds: any[] = [];
-    if (body.breeds && body.breeds.length > 0) {
-      const uniqueBreeds = Array.from(
-        new Set(body.breeds.map((b) => b.trim()).filter(Boolean)),
-      );
-      for (const bName of uniqueBreeds) {
-        const [bInserted] = await db
-          .insert(breedsTable)
-          .values({
-            name: bName,
-            speciesId: inserted!.id,
-          })
-          .returning();
-        breeds.push(bInserted!);
-      }
-    }
+    const uniqueBreeds = Array.from(
+      new Set(body.breeds?.map((b) => b.trim()).filter(Boolean) ?? []),
+    );
+
+    const breeds: BreedRow[] =
+      uniqueBreeds.length > 0
+        ? await db
+            .insert(breedsTable)
+            .values(
+              uniqueBreeds.map((name) => ({
+                name,
+                speciesId: inserted!.id,
+              })),
+            )
+            .returning()
+        : [];
 
     return {
       ...inserted!,
@@ -287,27 +301,21 @@ export const animalsService = {
       new Set(body.breeds.map((b) => b.trim()).filter(Boolean)),
     );
 
-    let addedCount = 0;
-    for (const bName of uniqueBreeds) {
-      const [exists] = await db
-        .select()
-        .from(breedsTable)
-        .where(
-          and(
-            eq(breedsTable.name, bName),
-            eq(breedsTable.speciesId, body.speciesId),
-          ),
-        );
-
-      if (!exists) {
-        await db.insert(breedsTable).values({
-          name: bName,
-          speciesId: body.speciesId,
-        });
-        addedCount++;
-      }
+    if (uniqueBreeds.length === 0) {
+      return { success: true, addedCount: 0 };
     }
 
-    return { success: true, addedCount };
+    const inserted = await db
+      .insert(breedsTable)
+      .values(
+        uniqueBreeds.map((bName) => ({
+          name: bName,
+          speciesId: body.speciesId,
+        })),
+      )
+      .onConflictDoNothing()
+      .returning();
+
+    return { success: true, addedCount: inserted.length };
   },
 };

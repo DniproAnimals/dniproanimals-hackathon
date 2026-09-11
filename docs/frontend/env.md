@@ -26,6 +26,7 @@ All variables are declared in `packages/env/src/schema.ts`. `NEXT_PUBLIC_*` cros
 | `NEXT_PUBLIC_API_URL`                          | Base URL of the backend, used by `apiClient` |
 | `NEXT_PUBLIC_SUPABASE_URL`                     | Supabase project URL (storage / public API)  |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` | Supabase publishable (anon) key              |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID`                 | Google OAuth Client ID                       |
 
 ### Server-only
 
