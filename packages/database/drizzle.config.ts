@@ -2,7 +2,9 @@ import { env } from "@dniproanimals/env";
 import "@dniproanimals/env/load";
 import { defineConfig } from "drizzle-kit";
 
-if (!env.DATABASE_URL_UNPOOLED) {
+const databaseUrl = env.DATABASE_URL_UNPOOLED;
+
+if (!databaseUrl) {
   throw new Error("DATABASE_URL_UNPOOLED is required for database migrations");
 }
 
@@ -11,6 +13,6 @@ export default defineConfig({
   schema: "./src/db/schema.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: env.DATABASE_URL_UNPOOLED,
+    url: databaseUrl,
   },
 });
