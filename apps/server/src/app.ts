@@ -11,6 +11,7 @@ import { registerZod } from "./shared/plugins/zod";
 export const startServer = async () => {
   const server = fastify({
     logger: env.NODE_ENV === "development",
+    trustProxy: env.NODE_ENV === "production",
   }).withTypeProvider<ZodTypeProvider>();
 
   await registerCors(server);
