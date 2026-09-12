@@ -4,18 +4,21 @@ import { RedisStore } from "connect-redis";
 import { redis } from "../lib/redis";
 import type { FastifyZodInstance } from "../types/fastify";
 
-export async function registerSession(app: FastifyZodInstance) {
-  const isProduction = env.NODE_ENV === "production";
+export const sessionCookieOptions = {
+  secure: env.NODE_ENV === "production",
+  httpOnly: true,
+  sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+  path: "/",
+} as const;
 
+export async function registerSession(app: FastifyZodInstance) {
   await app.register(fastifySession, {
     secret: env.SESSION_SECRET,
     store: new RedisStore({ client: redis }),
     cookieName: "session",
     cookie: {
-      secure: isProduction,
-      httpOnly: true,
+      ...sessionCookieOptions,
       maxAge: 1000 * 60 * 60 * 24 * 7,
-      sameSite: isProduction ? "none" : "lax",
     },
     saveUninitialized: false,
   });
