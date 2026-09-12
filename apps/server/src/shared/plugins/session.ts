@@ -4,10 +4,13 @@ import { RedisStore } from "connect-redis";
 import { redis } from "../lib/redis";
 import type { FastifyZodInstance } from "../types/fastify";
 
+const isProduction = env.NODE_ENV === "production";
+
 export const sessionCookieOptions = {
-  secure: env.NODE_ENV === "production",
+  secure: isProduction,
   httpOnly: true,
-  sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+  sameSite: isProduction ? "none" : "lax",
+  partitioned: isProduction,
   path: "/",
 } as const;
 
