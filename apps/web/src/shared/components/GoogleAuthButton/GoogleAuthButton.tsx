@@ -11,6 +11,10 @@ interface GoogleAuthButtonProps {
   disabled?: boolean;
 }
 
+let activeCredentialHandler: GoogleAuthButtonProps["onCredential"] | null =
+  null;
+let googleIdentityInitialized = false;
+
 type GoogleAccountsId = {
   initialize: (options: {
     client_id: string;
@@ -49,18 +53,33 @@ export function GoogleAuthButton({
   const initializedRef = useRef(false);
 
   useEffect(() => {
+    activeCredentialHandler = onCredential;
+
+    return () => {
+      if (activeCredentialHandler === onCredential) {
+        activeCredentialHandler = null;
+      }
+    };
+  }, [onCredential]);
+
+  useEffect(() => {
     const container = containerRef.current;
     if (!container || initializedRef.current) return;
 
     const init = () => {
       if (!window.google?.accounts?.id) return false;
-      window.google.accounts.id.initialize({
-        client_id: env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-        callback: (response) => {
-          const token = response.credential;
-          if (token) onCredential(token);
-        },
-      });
+
+      if (!googleIdentityInitialized) {
+        window.google.accounts.id.initialize({
+          client_id: env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+          callback: (response) => {
+            const token = response.credential;
+            if (token) activeCredentialHandler?.(token);
+          },
+        });
+        googleIdentityInitialized = true;
+      }
+
       container.innerHTML = "";
       window.google.accounts.id.renderButton(container, {
         theme: "outline",
@@ -80,7 +99,7 @@ export function GoogleAuthButton({
     }, 200);
 
     return () => window.clearInterval(interval);
-  }, [onCredential, text]);
+  }, [text]);
 
   return (
     <div

@@ -50,12 +50,6 @@ export default async function RootLayout({
     >
       <head>
         <Script
-          defer
-          data-id="3158505"
-          src="https://usd.org/js/count.js"
-          strategy="afterInteractive"
-        />
-        <Script
           src="https://accounts.google.com/gsi/client"
           strategy="afterInteractive"
         />

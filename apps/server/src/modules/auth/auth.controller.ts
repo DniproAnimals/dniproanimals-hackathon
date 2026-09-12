@@ -20,6 +20,7 @@ import {
   TooManyRequestsError,
   UnauthorizedError,
 } from "../../shared/errors";
+import { sessionCookieOptions } from "../../shared/plugins/session";
 import { createController, defineRoute } from "../../shared/types/controller";
 import { toUserResponse } from "../../shared/utils/serializers";
 import { withAuth } from "./auth.guard";
@@ -80,7 +81,7 @@ export const authController = createController({
     },
     handler: async (request, reply) => {
       await request.session.destroy();
-      reply.clearCookie("session");
+      reply.clearCookie("session", sessionCookieOptions);
       return reply.send({ success: true });
     },
   }),
