@@ -23,6 +23,7 @@ export const envSchema = z.object({
   SMTP_USER: z.string().default(""),
   SMTP_PASS: z.string().default(""),
   SMTP_FROM: z.string().default("noreply@dniproanimals.local"),
+  RESEND_API_KEY: z.string().min(1).optional(),
 
   R2_ENDPOINT: z.string().url().optional(),
   R2_ACCESS_KEY_ID: z.string().min(1).optional(),
