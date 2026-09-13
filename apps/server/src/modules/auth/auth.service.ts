@@ -68,6 +68,16 @@ async function sendPasswordResetEmail(email: string, token: string) {
   });
 }
 
+// Данные (юзер/токен) к этому моменту уже сохранены в БД — сбой SMTP не должен
+// ронять запрос 500-кой, это операционная проблема, а не ошибка пользователя.
+async function trySendMail(action: () => Promise<void>, context: string) {
+  try {
+    await action();
+  } catch (err) {
+    console.error(`[auth] failed to send email (${context}):`, err);
+  }
+}
+
 function createEmailVerificationToken() {
   return randomBytes(32).toString("hex");
 }
@@ -99,7 +109,10 @@ export const authService = {
       .returning();
 
     if (user) {
-      await sendVerificationEmail(user.email, token);
+      await trySendMail(
+        () => sendVerificationEmail(user.email, token),
+        "register",
+      );
     }
 
     return user ?? null;
@@ -263,7 +276,10 @@ export const authService = {
       })
       .where(eq(usersTable.id, user.id));
 
-    await sendVerificationEmail(user.email, token);
+    await trySendMail(
+      () => sendVerificationEmail(user.email, token),
+      "resendVerificationEmail",
+    );
 
     return { ok: true } as const;
   },
@@ -288,7 +304,10 @@ export const authService = {
       })
       .where(eq(usersTable.id, user.id));
 
-    await sendPasswordResetEmail(user.email, token);
+    await trySendMail(
+      () => sendPasswordResetEmail(user.email, token),
+      "requestPasswordReset",
+    );
 
     return { ok: true } as const;
   },

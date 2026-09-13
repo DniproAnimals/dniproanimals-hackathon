@@ -11,6 +11,8 @@ COPY . .
 # Устанавливаем зависимости всех npm workspaces
 RUN npm ci
 
+RUN npx turbo run build --filter=@dniproanimals/server...
+
 # Render будет передавать PORT через environment
 ENV PORT=10000
 EXPOSE 10000
