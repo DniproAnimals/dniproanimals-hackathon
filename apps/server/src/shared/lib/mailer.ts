@@ -2,7 +2,7 @@ import { env } from "@dniproanimals/env";
 import nodemailer from "nodemailer";
 
 type MailPayload = {
-  to: string;
+  to: string | string[];
   subject: string;
   text?: string;
   html?: string;
