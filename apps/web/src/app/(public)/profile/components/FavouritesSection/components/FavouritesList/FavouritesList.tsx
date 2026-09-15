@@ -1,4 +1,5 @@
 "use client";
+
 import { AnimalCard } from "@/shared/components/AnimalCard";
 import { Animal } from "@dniproanimals/contracts";
 import { FavouritesEmpty } from "./components/FavouritesEmpty";
@@ -19,9 +20,9 @@ export function FavouritesList({ isLoading, animals }: FavouritesListProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
-      {animals.map((animal, i) => (
-        <AnimalCard key={animal.id} animal={animal} index={i} />
+    <div className="grid grid-cols-2 gap-5 lg:grid-cols-3">
+      {animals.map((animal, index) => (
+        <AnimalCard key={animal.id} animal={animal} index={index} />
       ))}
     </div>
   );

@@ -1,7 +1,9 @@
 "use client";
+
 import { apiClient } from "@/shared/api-client";
 import type { OmitMutationOptions } from "@/shared/types/react-query";
-import { useMutation } from "@tanstack/react-query";
+import { endpoints } from "@dniproanimals/endpoints";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useToggleFavoriteMutation = (
   options: OmitMutationOptions<
@@ -9,8 +11,19 @@ export const useToggleFavoriteMutation = (
     "mutationFn"
   > = {},
 ) => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: apiClient.favorites.toggle,
+
     ...options,
+
+    onSuccess: async (...args) => {
+      await queryClient.invalidateQueries({
+        queryKey: [endpoints.favorites.list()],
+      });
+
+      await options.onSuccess?.(...args);
+    },
   });
 };
