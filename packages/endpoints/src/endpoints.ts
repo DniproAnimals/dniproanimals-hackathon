@@ -19,6 +19,10 @@ export const endpoints = createTypedEndpoints({
     get: "/animals/:id",
     update: "/animals/:id",
     delete: "/animals/:id",
+    listSpecies: "/animals/species",
+    createSpecies: "/animals/species",
+    listBreeds: "/animals/breeds",
+    addBreeds: "/animals/species/add-breeds",
   },
   adoption: {
     list: "/adoption",

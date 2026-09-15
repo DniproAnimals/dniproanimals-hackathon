@@ -74,7 +74,7 @@ export function getAnimalTypeLabel(
   type: AnimalType | string | null | undefined,
 ): string {
   if (!type) return UNKNOWN_LABEL;
-  return ANIMAL_TYPE_LABEL[type as AnimalType] ?? UNKNOWN_LABEL;
+  return ANIMAL_TYPE_LABEL[type as AnimalType] ?? type;
 }
 
 export function getAnimalSizeLabel(

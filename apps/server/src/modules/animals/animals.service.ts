@@ -1,22 +1,28 @@
 import type {
+  AddBreedsBody,
   CreateAnimalBody,
+  CreateSpeciesBody,
   ListAnimalsQuery,
+  ListBreedsQuery,
   UpdateAnimalBody,
 } from "@dniproanimals/contracts";
 import {
   and,
   animalsTable,
   asc,
+  breedsTable,
   db,
   desc,
   eq,
   ilike,
   inArray,
   or,
+  speciesTable,
   sql,
 } from "@dniproanimals/database";
 
 type AnimalInsert = typeof animalsTable.$inferInsert;
+type BreedRow = typeof breedsTable.$inferSelect;
 
 function orderBy(sort: ListAnimalsQuery["sort"]) {
   switch (sort) {
@@ -206,5 +212,113 @@ export const animalsService = {
       .where(eq(animalsTable.id, id))
       .limit(1);
     return !!row;
+  },
+
+  async listSpecies() {
+    const species = await db
+      .select()
+      .from(speciesTable)
+      .orderBy(asc(speciesTable.name));
+
+    if (species.length === 0) {
+      return [];
+    }
+
+    const speciesIds = species.map((s) => s.id);
+    const breeds = await db
+      .select()
+      .from(breedsTable)
+      .where(inArray(breedsTable.speciesId, speciesIds))
+      .orderBy(asc(breedsTable.name));
+
+    const breedsBySpeciesId = new Map<number, BreedRow[]>();
+    for (const breed of breeds) {
+      const list = breedsBySpeciesId.get(breed.speciesId);
+      if (list) {
+        list.push(breed);
+      } else {
+        breedsBySpeciesId.set(breed.speciesId, [breed]);
+      }
+    }
+
+    return species.map((s) => ({
+      ...s,
+      breeds: breedsBySpeciesId.get(s.id) ?? [],
+    }));
+  },
+
+  async listBreeds(query?: ListBreedsQuery) {
+    if (query?.type) {
+      const [species] = await db
+        .select()
+        .from(speciesTable)
+        .where(eq(speciesTable.value, query.type));
+
+      if (!species) return [];
+
+      return db
+        .select()
+        .from(breedsTable)
+        .where(eq(breedsTable.speciesId, species.id))
+        .orderBy(asc(breedsTable.name));
+    }
+
+    return db.select().from(breedsTable).orderBy(asc(breedsTable.name));
+  },
+
+  async createSpecies(body: CreateSpeciesBody) {
+    const slug = body.name;
+    const [inserted] = await db
+      .insert(speciesTable)
+      .values({
+        name: body.name,
+        value: slug,
+      })
+      .returning();
+
+    const uniqueBreeds = Array.from(
+      new Set(body.breeds?.map((b) => b.trim()).filter(Boolean) ?? []),
+    );
+
+    const breeds: BreedRow[] =
+      uniqueBreeds.length > 0
+        ? await db
+            .insert(breedsTable)
+            .values(
+              uniqueBreeds.map((name) => ({
+                name,
+                speciesId: inserted!.id,
+              })),
+            )
+            .returning()
+        : [];
+
+    return {
+      ...inserted!,
+      breeds,
+    };
+  },
+
+  async addBreeds(body: AddBreedsBody) {
+    const uniqueBreeds = Array.from(
+      new Set(body.breeds.map((b) => b.trim()).filter(Boolean)),
+    );
+
+    if (uniqueBreeds.length === 0) {
+      return { success: true, addedCount: 0 };
+    }
+
+    const inserted = await db
+      .insert(breedsTable)
+      .values(
+        uniqueBreeds.map((bName) => ({
+          name: bName,
+          speciesId: body.speciesId,
+        })),
+      )
+      .onConflictDoNothing()
+      .returning();
+
+    return { success: true, addedCount: inserted.length };
   },
 };
