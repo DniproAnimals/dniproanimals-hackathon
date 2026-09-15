@@ -16,6 +16,12 @@ export type AnimalSize = "small" | "medium" | "large";
 export type AnimalSex = "male" | "female";
 export type AnimalStatus = "available" | "reserved" | "adopted";
 export type AdoptionStatus = "pending" | "approved" | "rejected";
+export type EmailTemplateKey =
+  | "verification"
+  | "password-reset"
+  | "adoption-applicant"
+  | "adoption-admin"
+  | "animal-support-update";
 
 export const usersTable = pgTable("users", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -52,6 +58,7 @@ export const animalsTable = pgTable("animals", {
   vaccinated: boolean().notNull().default(true),
   sterilized: boolean().notNull().default(true),
   trained: boolean().notNull().default(true),
+  donationsEnabled: boolean("donations_enabled").notNull().default(false),
   commands: text(),
   photos: text().notNull().default("[]"),
   contactName: varchar("contact_name", { length: 255 }),
@@ -67,6 +74,44 @@ export const animalsTable = pgTable("animals", {
     .$type<AnimalStatus>(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const animalDonationsTable = pgTable(
+  "animal_donations",
+  {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    animalId: integer("animal_id")
+      .notNull()
+      .references(() => animalsTable.id, { onDelete: "cascade" }),
+    isActive: boolean("is_active").notNull().default(true),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    canceledAt: timestamp("canceled_at"),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    unique("animal_donations_user_id_animal_id_unique").on(
+      table.userId,
+      table.animalId,
+    ),
+  ],
+);
+
+export const animalSupportUpdatesTable = pgTable("animal_support_updates", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  animalId: integer("animal_id")
+    .notNull()
+    .references(() => animalsTable.id, { onDelete: "cascade" }),
+  authorId: integer("author_id").references(() => usersTable.id, {
+    onDelete: "set null",
+  }),
+  photos: text().notNull(),
+  recipientCount: integer("recipient_count").notNull(),
+  sentCount: integer("sent_count").notNull(),
+  failedCount: integer("failed_count").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const adoptionRequestsTable = pgTable("adoption_requests", {
@@ -120,10 +165,99 @@ export const foundationTable = pgTable("foundation", {
   instagram: varchar({ length: 255 }),
   telegram: varchar({ length: 255 }),
   facebook: varchar({ length: 255 }),
+  tiktokUrl: varchar("tiktok_url", { length: 512 }),
   monobankJarUrl: varchar("monobank_jar_url", { length: 512 }),
+  monobankCardNumber: varchar("monobank_card_number", { length: 64 }),
+  privatBankCardNumber: varchar("privat_bank_card_number", { length: 64 }),
   paypalEmail: varchar("paypal_email", { length: 255 }),
   patreonUrl: varchar("patreon_url", { length: 512 }),
   buyMeACoffeeUrl: varchar("buy_me_a_coffee_url", { length: 512 }),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const emailTemplatesTable = pgTable("email_templates", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  key: varchar({ length: 64 }).notNull().unique().$type<EmailTemplateKey>(),
+  subject: varchar({ length: 255 }).notNull(),
+  preview: varchar({ length: 255 }).notNull(),
+  heading: varchar({ length: 255 }).notNull(),
+  message: text().notNull(),
+  actionLabel: varchar("action_label", { length: 255 }),
+  secondaryMessage: text("secondary_message"),
+  footer: text().notNull(),
+  content: text(),
+  updatedBy: integer("updated_by").references(() => usersTable.id, {
+    onDelete: "set null",
+  }),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// --- Bank details (вынесено из foundationTable в отдельную таблицу) ---
+
+export type BankAccountDetails = {
+  title: string;
+  recipientName: string;
+  recipientCode: string;
+  recipientAccount: string;
+  bankName: string;
+  paymentPurpose: string;
+};
+
+export type ForeignCurrencyAccount = {
+  title: string;
+  companyName: string;
+  iban: string;
+  bankName: string;
+  bankSwiftCode: string;
+  companyAddress: string;
+};
+
+export type CorrespondentBank = {
+  account: string;
+  swiftCode: string;
+  bankName: string;
+};
+
+export const bankDetailsTable = pgTable("bank_details", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  directBankDetails: jsonb("direct_bank_details")
+    .notNull()
+    .$type<BankAccountDetails>(),
+  foreignCurrencyAccount: jsonb("foreign_currency_account")
+    .notNull()
+    .$type<ForeignCurrencyAccount>(),
+  correspondentBanks: jsonb("correspondent_banks")
+    .notNull()
+    .$type<CorrespondentBank[]>(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type ShelterNeedItem = {
+  id: string;
+  name: string;
+  price?: string;
+};
+
+export type ShelterNeedSubgroup = {
+  id: string;
+  title: string;
+  items: ShelterNeedItem[];
+};
+
+export type ShelterNeedCard = {
+  id: string;
+  title: string;
+  icon: string;
+  gradient: string;
+  color?: string;
+  variant?: "default";
+  items: ShelterNeedItem[];
+  subgroups?: ShelterNeedSubgroup[];
+};
+
+export const shelterNeedsTable = pgTable("shelter_needs", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  cards: jsonb().notNull().$type<ShelterNeedCard[]>(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 

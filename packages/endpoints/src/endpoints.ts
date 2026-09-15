@@ -35,9 +35,20 @@ export const endpoints = createTypedEndpoints({
     update: "/contract-template/:type",
     pdf: "/contract-template/:type/pdf",
   },
+  emailTemplates: {
+    list: "/email-templates",
+    update: "/email-templates/:key",
+  },
   favorites: {
     list: "/favorites",
     toggle: "/favorites",
+  },
+  animalDonations: {
+    status: "/animal-donations/:animalId",
+    start: "/animal-donations/:animalId",
+    cancel: "/animal-donations/:animalId",
+    supporters: "/animal-donations/:animalId/supporters",
+    sendUpdate: "/animal-donations/:animalId/updates",
   },
 
   notifications: {
@@ -52,6 +63,14 @@ export const endpoints = createTypedEndpoints({
   foundation: {
     get: "/foundation",
     update: "/foundation",
+  },
+  bankDetails: {
+    get: "/bank-details",
+    update: "/bank-details",
+  },
+  shelterNeeds: {
+    get: "/shelter-needs",
+    update: "/shelter-needs",
   },
   users: {
     list: "/users",

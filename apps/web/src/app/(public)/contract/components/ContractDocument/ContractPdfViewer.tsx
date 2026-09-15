@@ -47,7 +47,14 @@ export function ContractPdfViewer({ contractId }: Props) {
   }, [contractId]);
 
   if (hasError) {
-    return <div>Не вдалося завантажити PDF.</div>;
+    return (
+      <div className="rounded-2xl border border-dashed border-muted-foreground/30 bg-muted/30 px-6 py-16 text-center">
+        <p className="text-lg font-semibold">Договір поки що не створено</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Адміністратор ще не додав шаблон договору.
+        </p>
+      </div>
+    );
   }
 
   if (!fileUrl) {

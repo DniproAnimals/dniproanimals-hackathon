@@ -3,9 +3,9 @@ import { useVerifyEmailMutation } from "@/shared/query-hooks";
 import { Button, Spinner } from "@dniproanimals/ui";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
-export default function VerifyEmailConfirmPage() {
+function VerifyEmailConfirmContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -53,5 +53,13 @@ export default function VerifyEmailConfirmPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function VerifyEmailConfirmPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[70vh]" />}>
+      <VerifyEmailConfirmContent />
+    </Suspense>
   );
 }

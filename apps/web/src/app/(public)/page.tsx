@@ -1,5 +1,4 @@
 import { BackgroundPaws } from "./components/BackgroundPaws";
-import { ContactsSection } from "./components/ContactsSection";
 import { DailyNeedsSection } from "./components/DailyNeedsSection";
 import { FounderQuote } from "./components/FounderQuote";
 import { HeroSection } from "./components/HeroSection";
@@ -17,7 +16,7 @@ export default function AboutPage() {
       <MissionGrid />
       <DailyNeedsSection />
       <FounderQuote />
-      <ContactsSection />
+      {/* <ContactsSection /> */}
     </div>
   );
 }

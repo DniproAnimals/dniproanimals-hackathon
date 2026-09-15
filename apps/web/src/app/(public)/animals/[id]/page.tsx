@@ -8,6 +8,7 @@ import { AnimalContacts } from "./components/AnimalContacts";
 import { AnimalDescription } from "./components/AnimalDescription";
 import { AnimalDetailHeader } from "./components/AnimalDetailHeader";
 import { AnimalDetailSkeleton } from "./components/AnimalDetailSkeleton";
+import { AnimalDonationButton } from "./components/AnimalDonationButton";
 import { AnimalGallery } from "./components/AnimalGallery";
 import { AnimalNotFound } from "./components/AnimalNotFound";
 
@@ -63,7 +64,12 @@ export default function AnimalDetailPageRoute(
             {animal.breed || "Мікс порід"}
           </p>
           <AnimalAttributes animal={animal} />
-
+          {animal.donationsEnabled && (
+            <AnimalDonationButton
+              animalId={animal.id}
+              animalName={animal.name}
+            />
+          )}
           <AnimalContacts animal={animal} />
         </motion.div>
       </div>

@@ -17,7 +17,7 @@ export default function SignUpPage() {
 
   const onAuthSuccess = (user: User) => {
     queryClient.setQueryData([endpoints.auth.me()], user);
-    if (user.role === "superadmin") router.push("/admin");
+    if (user.role === "superadmin") router.push("/dashboard");
     else if (user.role === "admin" || user.role === "volunteer")
       router.push("/dashboard");
     else router.push("/onboarding");

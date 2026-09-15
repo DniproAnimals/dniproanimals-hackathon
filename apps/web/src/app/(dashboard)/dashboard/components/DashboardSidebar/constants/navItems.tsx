@@ -1,9 +1,11 @@
 import {
-  IconCoin,
+  IconCashBanknote,
   IconFileTextFilled,
   IconLayoutDashboardFilled,
+  IconMail,
   IconPawFilled,
   IconSettingsFilled,
+  IconShoppingBag,
   IconUsersGroup,
 } from "@dniproanimals/icons";
 import type { ReactNode } from "react";
@@ -37,13 +39,30 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     icon: <IconFileTextFilled size={18} />,
   },
   {
-    href: "/dashboard/donations",
-    label: "Пожертви",
-    icon: <IconCoin size={18} />,
+    href: "/dashboard/foundation",
+    label: "Фонд",
+    icon: <IconSettingsFilled size={18} />,
   },
   {
-    href: "/dashboard/foundation",
-    label: "Налаштування",
-    icon: <IconSettingsFilled size={18} />,
+    href: "/dashboard/email-templates",
+    label: "Шаблони листів",
+    icon: <IconMail size={18} />,
+    ownerOnly: true,
+  },
+  {
+    href: "/dashboard/contracts",
+    label: "Шаблон договору",
+    icon: <IconFileTextFilled size={18} />,
+    ownerOnly: true,
+  },
+  {
+    href: "/dashboard/donations",
+    label: "Донати",
+    icon: <IconCashBanknote size={18} />,
+  },
+  {
+    href: "/dashboard/material-help",
+    label: "Матеріальна допомога",
+    icon: <IconShoppingBag size={18} />,
   },
 ];

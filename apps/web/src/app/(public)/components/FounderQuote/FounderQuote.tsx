@@ -1,9 +1,5 @@
 "use client";
-import {
-  IconBrandFacebook,
-  IconBrandInstagram,
-  IconBrandTelegram,
-} from "@dniproanimals/icons";
+import { SocialLinksIcons } from "@/shared/components/Contacts/SocialLinks";
 import { motion } from "motion/react";
 
 // TODO: founder info should come from the server.
@@ -32,32 +28,7 @@ export function FounderQuote() {
           <p className="text-sm text-gray-medium">
             Засновниця БО &laquo;Дніпро Енімалс&raquo;
           </p>
-          <div className="flex gap-3 mt-4 justify-center">
-            <a
-              href="https://instagram.com/dniproanimals"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-foreground transition-colors"
-            >
-              <IconBrandInstagram size={20} />
-            </a>
-            <a
-              href="https://t.me/itsmotherofcats"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-foreground transition-colors"
-            >
-              <IconBrandTelegram size={20} />
-            </a>
-            <a
-              href="https://facebook.com/dniproanimals"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-foreground transition-colors"
-            >
-              <IconBrandFacebook size={20} />
-            </a>
-          </div>
+          <SocialLinksIcons />
         </motion.div>
       </div>
     </div>

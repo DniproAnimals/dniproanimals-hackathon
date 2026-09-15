@@ -1,6 +1,21 @@
 import "@dniproanimals/env/load";
 import { env } from "@dniproanimals/env";
 import type { NextConfig } from "next";
+import "@dniproanimals/env/load";
+
+const remotePatterns: NonNullable<
+  NonNullable<NextConfig["images"]>["remotePatterns"]
+> = [
+  {
+    protocol: "https",
+    hostname: "images.unsplash.com",
+  },
+];
+
+if (process.env.R2_PUBLIC_URL) {
+  const publicUrl = process.env.R2_PUBLIC_URL.replace(/\/$/, "");
+  remotePatterns.push(new URL(`${publicUrl}/**`));
+}
 
 let supabaseHostname = "bmxcvlhiiushaegvkunx.supabase.co";
 try {

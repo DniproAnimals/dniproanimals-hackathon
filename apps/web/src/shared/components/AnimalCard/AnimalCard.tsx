@@ -19,7 +19,7 @@ import {
 } from "@dniproanimals/icons";
 import { Badge, cn } from "@dniproanimals/ui";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const tintColors = [
   "bg-green-50",
@@ -42,7 +42,6 @@ export function AnimalCard({
   const [flipped, setFlipped] = useState(false);
   const [currentPhoto, setCurrentPhoto] = useState(0);
   const [hovered, setHovered] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { data: user } = useMeQuery();
   const { data: favorites } = useFavoritesQuery({ enabled: !!user });
   const toggleFavMut = useToggleFavoriteMutation();
@@ -56,27 +55,17 @@ export function AnimalCard({
     setFlipped(!flipped);
   };
 
-  // Auto-slide photos on hover
-  const startSlideshow = useCallback(() => {
-    if (photos.length <= 1 || flipped) return;
-    intervalRef.current = setInterval(() => {
-      setCurrentPhoto((prev) => (prev + 1) % photos.length);
-    }, 1200);
-  }, [photos.length, flipped]);
-
-  const clearSlideshow = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, []);
-
   useEffect(() => {
-    if (hovered && !flipped) {
-      startSlideshow();
+    if (!hovered || flipped || photos.length <= 1) {
+      return;
     }
-    return clearSlideshow;
-  }, [hovered, flipped, startSlideshow, clearSlideshow]);
+
+    const interval = window.setInterval(() => {
+      setCurrentPhoto((previous) => (previous + 1) % photos.length);
+    }, 1200);
+
+    return () => window.clearInterval(interval);
+  }, [hovered, flipped, photos.length]);
 
   return (
     <div
@@ -108,7 +97,7 @@ export function AnimalCard({
               {photos.length > 0 ? (
                 photos.map((photo, i) => (
                   <ImageFallback
-                    key={i}
+                    key={photo}
                     src={photo}
                     alt={animal.name}
                     fill

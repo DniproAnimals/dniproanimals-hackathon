@@ -131,6 +131,7 @@ export const animalsService = {
       vaccinated: body.vaccinated ?? undefined,
       sterilized: body.sterilized ?? undefined,
       trained: body.trained ?? undefined,
+      donationsEnabled: body.donationsEnabled,
       commands: body.commands ?? null,
       photos: JSON.stringify(body.photos ?? []),
       status: body.status ?? "available",
@@ -165,6 +166,8 @@ export const animalsService = {
     if (body.sterilized !== undefined)
       patch.sterilized = body.sterilized ?? undefined;
     if (body.trained !== undefined) patch.trained = body.trained ?? undefined;
+    if (body.donationsEnabled !== undefined)
+      patch.donationsEnabled = body.donationsEnabled;
     if (body.commands !== undefined) patch.commands = body.commands ?? null;
     if (body.photos !== undefined) patch.photos = JSON.stringify(body.photos);
     if (body.status !== undefined) patch.status = body.status;

@@ -3,12 +3,13 @@ import { useUploadImageMutation } from "@/shared/query-hooks";
 import { IconPhoto } from "@dniproanimals/icons";
 import { FormField, FormItem, FormLabel, FormMessage } from "@dniproanimals/ui";
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useAnimalFormContext } from "../../hooks/useAnimalForm";
 
 export function AnimalPhotoField() {
   const { control } = useAnimalFormContext();
   const fileRef = useRef<HTMLInputElement>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const uploadMutation = useUploadImageMutation();
 
   return (
@@ -18,11 +19,21 @@ export function AnimalPhotoField() {
       render={({ field }) => {
         const photos = field.value;
         const handleFiles = async (files: FileList) => {
-          const uploads = await Promise.all(
-            Array.from(files).map((f) => uploadMutation.mutateAsync(f)),
-          );
-          field.onChange([...photos, ...uploads.map((u) => u.url)]);
-          if (fileRef.current) fileRef.current.value = "";
+          setUploadError(null);
+          try {
+            const uploads = await Promise.all(
+              Array.from(files).map((file) => uploadMutation.mutateAsync(file)),
+            );
+            field.onChange([...photos, ...uploads.map((upload) => upload.url)]);
+          } catch (error) {
+            setUploadError(
+              error instanceof Error
+                ? error.message
+                : "Не вдалося завантажити фото.",
+            );
+          } finally {
+            if (fileRef.current) fileRef.current.value = "";
+          }
         };
         return (
           <FormItem>
@@ -42,7 +53,9 @@ export function AnimalPhotoField() {
               type="file"
               accept="image/jpeg,image/png,image/webp,image/gif"
               multiple
-              onChange={(e) => e.target.files && handleFiles(e.target.files)}
+              onChange={(event) =>
+                event.target.files && void handleFiles(event.target.files)
+              }
               className="hidden"
             />
             {photos.length > 0 && (
@@ -71,6 +84,11 @@ export function AnimalPhotoField() {
                   </div>
                 ))}
               </div>
+            )}
+            {uploadError && (
+              <p role="alert" className="text-xs text-destructive">
+                {uploadError}
+              </p>
             )}
             <FormMessage />
           </FormItem>

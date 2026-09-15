@@ -29,14 +29,26 @@ export function AnimalGallery({
   return (
     <>
       <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-light group/photo">
-        <ImageFallback
-          src={photos[active]!}
-          alt={alt}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 50vw"
-          priority
-        />
+        <div
+          className="flex h-full transition-transform duration-500 ease-in-out"
+          style={{ transform: `translateX(-${active * 100}%)` }}
+        >
+          {photos.map((photo, index) => (
+            <div
+              key={`${photo}-${index}`}
+              className="relative min-w-full h-full"
+            >
+              <ImageFallback
+                src={photo}
+                alt={alt}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority={index === 0}
+              />
+            </div>
+          ))}
+        </div>
         {photos.length > 1 && (
           <>
             <Button

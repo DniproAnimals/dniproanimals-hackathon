@@ -1,4 +1,10 @@
-import { contractTemplates } from "@dniproanimals/database";
+import type { ShelterNeedCard } from "@dniproanimals/database";
+import {
+  DEFAULT_FOUNDATION_VALUES,
+  DEFAULT_SHELTER_NEEDS,
+  contractTemplates,
+  foundationTable,
+} from "@dniproanimals/database";
 import "@dniproanimals/env/load";
 import bcrypt from "bcryptjs";
 import { eq, sql } from "drizzle-orm";
@@ -14,11 +20,54 @@ import {
   favoritesTable,
   notificationsTable,
   speciesTable,
+  bankDetailsTable,
+  favoritesTable,
+  notificationsTable,
+  shelterNeedsTable,
   usersTable,
 } from "../src/db/schema";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+export const donationBankDetails = {
+  directBankDetails: {
+    title: "Прямі банківські реквізити",
+    recipientName: "БО БФ ДНІПРО ЕНІМАЛС",
+    recipientCode: "43794131",
+    recipientAccount: "UA373052990000026004050531067",
+    bankName: 'АТ КБ "ПРИВАТБАНК"',
+    paymentPurpose: "безповоротня фінансова допомога",
+  },
+
+  foreignCurrencyAccount: {
+    title: "Валютний рахунок",
+    companyName: "БО БФ ДНІПРО ЕНІМАЛС",
+    iban: "UA463052990000026009050554306",
+    bankName: 'JSC CB "PRIVATBANK", 1D HRUSHEVSKOHO STR., KYIV, 01001, UKRAINE',
+    bankSwiftCode: "PBANUA2X",
+    companyAddress:
+      "49114, УКРАЇНА, ОБЛ. ДНІПРОПЕТРОВСЬКА, М. ДНІПРО, ВУЛ. ГЕРОЇВ ДНІПРА, Б. 59",
+  },
+
+  correspondentBanks: [
+    {
+      account: "001-1-000080",
+      swiftCode: "CHASUS33",
+      bankName: "JP Morgan Chase Bank, New York, USA",
+    },
+    {
+      account: "890-0085-754",
+      swiftCode: "IRVT US 3N",
+      bankName: "The Bank of New York Mellon, New York, USA",
+    },
+    {
+      account: "36445343",
+      swiftCode: "CITI US 33",
+      bankName: "Citibank N.A., NEW YORK, USA",
+    },
+  ],
+} as const;
 
 interface RawAnimal {
   Вид: string;
@@ -176,19 +225,15 @@ async function seed() {
 
   const userCount = await getCount(usersTable);
 
-  let adminUserId: number | null = null;
   let regularUserId: number | null = null;
 
   if (userCount === 0) {
-    const [admin] = await db
-      .insert(usersTable)
-      .values({
-        name: "Admin",
-        email: "admin@gmail.com",
-        passwordHash: await bcrypt.hash("admin", 10),
-        role: "superadmin",
-      })
-      .returning({ id: usersTable.id });
+    await db.insert(usersTable).values({
+      name: "Admin",
+      email: "admin@gmail.com",
+      passwordHash: await bcrypt.hash("admin", 10),
+      role: "superadmin",
+    });
 
     const [user] = await db
       .insert(usersTable)
@@ -203,15 +248,10 @@ async function seed() {
 
     console.log("Users: admin@gmail.com / admin, user@gmail.com / user");
   } else {
-    const [] = await db
-      .select({ id: usersTable.id })
-      .from(usersTable)
-      .where(eq(usersTable.email, "admin@gmail.com"));
     const [user] = await db
       .select({ id: usersTable.id })
       .from(usersTable)
       .where(eq(usersTable.email, "user@gmail.com"));
-    // adminUserId = admin?.id ?? null;
     regularUserId = user?.id ?? null;
     console.log(`Users: already exist (${userCount})`);
   }
@@ -224,6 +264,31 @@ async function seed() {
     console.log(`Animals: ${animals.length} created`);
   } else {
     console.log(`Animals: already exist (${animalCount})`);
+  }
+
+  const foundationCount = await getCount(foundationTable);
+
+  if (foundationCount === 0) {
+    await db.insert(foundationTable).values(DEFAULT_FOUNDATION_VALUES);
+    console.log("Foundation: default public data created");
+  } else {
+    console.log(`Foundation: already exist (${foundationCount})`);
+  }
+
+  await db.execute(sql`CREATE TABLE IF NOT EXISTS "shelter_needs" (
+    "id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    "cards" jsonb NOT NULL,
+    "updated_at" timestamp DEFAULT now() NOT NULL
+  )`);
+
+  const shelterNeedsCount = await getCount(shelterNeedsTable);
+  if (shelterNeedsCount === 0) {
+    await db
+      .insert(shelterNeedsTable)
+      .values({ cards: DEFAULT_SHELTER_NEEDS as unknown as ShelterNeedCard[] });
+    console.log("Shelter needs: default public data created");
+  } else {
+    console.log(`Shelter needs: already exist (${shelterNeedsCount})`);
   }
 
   const adoptionCount = await getCount(adoptionRequestsTable);
@@ -260,6 +325,20 @@ async function seed() {
     }
   } else {
     console.log(`Adoption requests: already exist (${adoptionCount})`);
+  }
+
+  // Bank details — отдельная таблица, не зависит от юзеров
+  const bankDetailsCount = await getCount(bankDetailsTable);
+
+  if (bankDetailsCount === 0) {
+    await db.insert(bankDetailsTable).values({
+      directBankDetails: donationBankDetails.directBankDetails,
+      foreignCurrencyAccount: donationBankDetails.foreignCurrencyAccount,
+      correspondentBanks: [...donationBankDetails.correspondentBanks],
+    });
+    console.log("Bank details: default donation details created");
+  } else {
+    console.log(`Bank details: already exist (${bankDetailsCount})`);
   }
 
   if (regularUserId) {
@@ -305,6 +384,7 @@ async function seed() {
   } else {
     console.log(`Notifications: already exist (${notifCount})`);
   }
+
   const contractCount = await getCount(contractTemplates);
 
   if (contractCount === 0) {
@@ -313,15 +393,12 @@ async function seed() {
       title: "Договір про передачу тварини в нову сім'ю (зразок)",
       subtitle:
         "Цей документ є демонстраційним зразком для платформи DniproAnimals. Юридичну силу має лише підписаний оригінал між сторонами.",
-
       content: {
         type: "doc",
         content: [
           {
             type: "heading",
-            attrs: {
-              level: 1,
-            },
+            attrs: { level: 1 },
             content: [
               {
                 type: "text",
@@ -329,7 +406,6 @@ async function seed() {
               },
             ],
           },
-
           {
             type: "paragraph",
             content: [
@@ -339,20 +415,11 @@ async function seed() {
               },
             ],
           },
-
           {
             type: "heading",
-            attrs: {
-              level: 2,
-            },
-            content: [
-              {
-                type: "text",
-                text: "1. Предмет договору",
-              },
-            ],
+            attrs: { level: 2 },
+            content: [{ type: "text", text: "1. Предмет договору" }],
           },
-
           {
             type: "paragraph",
             content: [
@@ -362,7 +429,6 @@ async function seed() {
               },
             ],
           },
-
           {
             type: "paragraph",
             content: [
@@ -372,20 +438,13 @@ async function seed() {
               },
             ],
           },
-
           {
             type: "heading",
-            attrs: {
-              level: 2,
-            },
+            attrs: { level: 2 },
             content: [
-              {
-                type: "text",
-                text: "2. Права та обов'язки Нової сім'ї",
-              },
+              { type: "text", text: "2. Права та обов'язки Нової сім'ї" },
             ],
           },
-
           {
             type: "bulletList",
             content: [
@@ -419,20 +478,11 @@ async function seed() {
               },
             ],
           },
-
           {
             type: "heading",
-            attrs: {
-              level: 2,
-            },
-            content: [
-              {
-                type: "text",
-                text: "3. Заключні положення",
-              },
-            ],
+            attrs: { level: 2 },
+            content: [{ type: "text", text: "3. Заключні положення" }],
           },
-
           {
             type: "paragraph",
             content: [
@@ -444,13 +494,13 @@ async function seed() {
           },
         ],
       },
-
       version: 1,
     });
     console.log("Contract template created");
   } else {
     console.log(`Contract template already exists (${contractCount})`);
   }
+
   console.log("\nSeed completed!");
 }
 

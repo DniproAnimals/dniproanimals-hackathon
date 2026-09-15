@@ -26,6 +26,7 @@ export const animalModel = z.object({
   vaccinated: z.boolean().nullable(),
   sterilized: z.boolean().nullable(),
   trained: z.boolean().nullable(),
+  donationsEnabled: z.boolean(),
   commands: z.string().nullable(),
   photos: z.array(z.string()),
   contactName: z.string().nullable(),

@@ -5,12 +5,9 @@ export const envSchema = z.object({
     .enum(["development", "production", "test"])
     .default("development"),
 
-  DATABASE_URL: z.string().optional(),
-  DB_HOST: z.string().default("localhost"),
-  DB_PORT: z.coerce.number().default(55432),
-  DB_USER: z.string().default("postgres"),
-  DB_PASS: z.string().default("postgres"),
-  DB_NAME: z.string().default("dniproanimals"),
+  DATABASE_URL: z.string().url().optional(),
+  DATABASE_URL_UNPOOLED: z.string().url().optional(),
+  NEON_BRANCH: z.string().optional(),
 
   REDIS_HOST: z.string().default("localhost"),
   REDIS_PORT: z.coerce.number().default(6379),
@@ -27,8 +24,11 @@ export const envSchema = z.object({
   SMTP_PASS: z.string().default(""),
   SMTP_FROM: z.string().default("noreply@dniproanimals.local"),
 
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: z.string().min(1),
+  R2_ENDPOINT: z.string().url().optional(),
+  R2_ACCESS_KEY_ID: z.string().min(1).optional(),
+  R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+  R2_BUCKET_NAME: z.string().min(1).optional(),
+  R2_PUBLIC_URL: z.string().url().optional(),
 
   NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.string().min(1),
 });

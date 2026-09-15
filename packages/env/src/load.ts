@@ -3,6 +3,6 @@ import findUp from "find-up";
 
 const envPath = findUp.sync(".env");
 
-if (!envPath) throw new Error(".env not found");
-
-dotenv.config({ path: envPath });
+if (envPath) {
+  dotenv.config({ path: envPath });
+}

@@ -8,6 +8,7 @@ import {
   IconBrandFacebook,
   IconBrandInstagram,
   IconBrandTelegram,
+  IconBrandTiktok,
   IconMail,
   IconMapPin,
   IconPhone,
@@ -22,7 +23,6 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  Textarea,
 } from "@dniproanimals/ui";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -41,6 +41,13 @@ export default function FoundationPage() {
       instagram: "",
       telegram: "",
       facebook: "",
+      tiktokUrl: "",
+      monobankJarUrl: "",
+      monobankCardNumber: "",
+      privatBankCardNumber: "",
+      paypalEmail: "",
+      patreonUrl: "",
+      buyMeACoffeeUrl: "",
     },
   });
 
@@ -55,6 +62,13 @@ export default function FoundationPage() {
         instagram: foundation.instagram || "",
         telegram: foundation.telegram || "",
         facebook: foundation.facebook || "",
+        tiktokUrl: foundation.tiktokUrl || "",
+        monobankJarUrl: foundation.monobankJarUrl || "",
+        monobankCardNumber: foundation.monobankCardNumber || "",
+        privatBankCardNumber: foundation.privatBankCardNumber || "",
+        paypalEmail: foundation.paypalEmail || "",
+        patreonUrl: foundation.patreonUrl || "",
+        buyMeACoffeeUrl: foundation.buyMeACoffeeUrl || "",
       });
     }
   }, [foundation, form]);
@@ -85,25 +99,6 @@ export default function FoundationPage() {
                       placeholder="Притулок ДніпроAnimals"
                       {...field}
                       value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Опис</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Розкажіть про ваш притулок..."
-                      className="min-h-[120px]"
-                      {...field}
-                      value={field.value || ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -232,6 +227,27 @@ export default function FoundationPage() {
                     <FormControl>
                       <Input
                         placeholder="URL або Username"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="tiktokUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <IconBrandTiktok size={16} />
+                      TikTok
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="https://www.tiktok.com/@..."
                         {...field}
                         value={field.value ?? ""}
                       />

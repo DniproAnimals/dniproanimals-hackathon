@@ -6,8 +6,13 @@ import bcrypt from "bcryptjs";
 import { randomBytes } from "crypto";
 import React from "react";
 import { PasswordResetEmail } from "../../shared/emails/PasswordResetEmail.js";
+import {
+  getEmailTemplateText,
+  resolveEmailTemplate,
+} from "../../shared/emails/template";
 import { VerificationEmail } from "../../shared/emails/VerificationEmail.js";
 import { sendMail } from "../../shared/lib/mailer";
+import { emailTemplateService } from "../email-templates/email-template.service";
 import { googleService } from "../google";
 
 const ROUNDS = 10;
@@ -23,36 +28,42 @@ function buildVerificationLink(token: string) {
 
 async function sendVerificationEmail(email: string, token: string) {
   const verificationLink = buildVerificationLink(token);
+  const template = await emailTemplateService.get("verification");
+  const content = resolveEmailTemplate(template);
 
   const html = await render(
     React.createElement(VerificationEmail, {
       verficationLink: verificationLink,
-      baseUrl: baseUrl,
+      template,
     }),
   );
 
   await sendMail({
     to: email,
-    subject: "Підтвердження Пошти | DniproAnimals",
-    text: "Дякуємо за створення облікового запису.",
+    subject: content.subject,
+    text: [getEmailTemplateText(content.content), verificationLink].join(
+      "\n\n",
+    ),
     html,
   });
 }
 
 async function sendPasswordResetEmail(email: string, token: string) {
   const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(token)}`;
+  const template = await emailTemplateService.get("password-reset");
+  const content = resolveEmailTemplate(template);
 
   const html = await render(
     React.createElement(PasswordResetEmail, {
       resetLink: resetLink,
-      baseUrl: baseUrl,
+      template,
     }),
   );
 
   await sendMail({
     to: email,
-    subject: "Скидання пароля | DniproAnimals",
-    text: `Посилання для зміни пароля: ${resetLink}`,
+    subject: content.subject,
+    text: [getEmailTemplateText(content.content), resetLink].join("\n\n"),
     html,
   });
 }

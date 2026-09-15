@@ -1,0 +1,1 @@
+ALTER TABLE "foundation" ADD COLUMN "donation_bank_details" jsonb;

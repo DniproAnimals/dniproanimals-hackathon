@@ -20,6 +20,7 @@ export const createAnimalBodySchema = z.object({
   vaccinated: z.boolean().nullish(),
   sterilized: z.boolean().nullish(),
   trained: z.boolean().nullish(),
+  donationsEnabled: z.boolean().default(false),
   commands: z.string().nullish(),
   photos: z.array(z.string()).default([]),
   status: animalStatusSchema.default("available"),
