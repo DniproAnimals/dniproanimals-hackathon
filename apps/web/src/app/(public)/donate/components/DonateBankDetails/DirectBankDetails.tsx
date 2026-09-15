@@ -15,34 +15,55 @@ export function DirectBankDetails() {
   };
 
   const accounts = [
-    { label: "Отримувач", number: details.recipientName },
-    { label: "Код отримувача", number: details.recipientCode },
-    { label: details.bankName, number: details.recipientAccount },
-    { label: "Призначення платежу", number: details.paymentPurpose },
+    {
+      label: "Отримувач",
+      value: details.recipientName,
+    },
+    {
+      label: "Код отримувача",
+      value: details.recipientCode,
+    },
+    {
+      label: details.bankName,
+      value: details.recipientAccount,
+    },
+    {
+      label: "Призначення платежу",
+      value: details.paymentPurpose,
+    },
   ];
 
   return (
     <Card
-      className="p-8 rounded-3xl border-gray-100 shadow-sm mb-8"
-      style={{ borderTop: `6px solid ${details.color || "#5b7765"}` }}
+      className="w-full max-w-xl rounded-3xl border-gray-100 p-4 shadow-sm sm:p-6 lg:p-8"
+      style={{
+        borderTop: `6px solid ${details.color || "#5b7765"}`,
+      }}
     >
-      <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
-        <IconCreditCard size={24} />
-        {details.title}
+      <h2 className="mb-5 flex items-start gap-3 text-lg font-bold sm:mb-6 sm:text-xl">
+        <IconCreditCard size={24} className="mt-0.5 shrink-0" />
+
+        <span className="min-w-0 wrap-break-word">{details.title}</span>
       </h2>
-      <div className="flex flex-col gap-2">
+
+      <div className="flex flex-col gap-3">
         {accounts.map((account) => (
-          <div key={account.label} className="bg-gray-50 rounded-2xl">
-            <p className="text-xs text-gray-500 uppercase font-bold mb-1">
+          <div
+            key={account.label}
+            className="min-w-0 rounded-2xl bg-gray-50 p-3 sm:p-4"
+          >
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-wide text-gray-500 sm:text-xs">
               {account.label}
             </p>
-            <li
-              className="text-xl ml-6 font-mono font-bold text-green-secondary cursor-pointer"
-              title="Нажмите, чтобы скопировать"
-              onClick={() => copyToClipboard(account.number)}
+
+            <button
+              type="button"
+              title="Натисніть, щоб скопіювати"
+              onClick={() => copyToClipboard(account.value)}
+              className="block w-full min-w-0 cursor-pointer text-left font-mono text-sm font-bold leading-relaxed text-green-secondary transition-opacity hover:opacity-70 sm:text-base lg:text-lg"
             >
-              {account.number}
-            </li>
+              <span className="block wrap-break-word">{account.value}</span>
+            </button>
           </div>
         ))}
       </div>
