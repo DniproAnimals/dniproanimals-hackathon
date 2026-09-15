@@ -1,7 +1,7 @@
 "use client";
 
 import { useFoundationQuery } from "@/shared/query-hooks";
-import { IconFileText, IconHeartFilled } from "@dniproanimals/icons";
+import { IconFileText } from "@dniproanimals/icons";
 import { Button, Separator } from "@dniproanimals/ui";
 import Image from "next/image";
 import Link from "next/link";
@@ -77,26 +77,6 @@ export function Footer() {
                     <IconFileText size={16} />
                     Договір
                   </Link>
-                </Button>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-foreground/40 uppercase tracking-wider mb-3">
-                  Допомога
-                </p>
-                <Button
-                  asChild
-                  variant="soft"
-                  size="md"
-                  className="bg-foreground/10 text-foreground hover:bg-foreground/20"
-                >
-                  <a
-                    href={foundation?.monobankJarUrl ?? "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <IconHeartFilled size={16} />
-                    Задонатити
-                  </a>
                 </Button>
               </div>
             </div>
