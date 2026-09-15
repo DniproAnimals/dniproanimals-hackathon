@@ -1,4 +1,5 @@
 import NeedButton from "./NeedsButton";
+import { getShelterNeedIcon } from "./shelterNeedIcons";
 import type { ShelterNeedCard as ShelterNeedCardType } from "./shelterNeeds.types";
 
 type Props = {
@@ -7,6 +8,7 @@ type Props = {
 
 const ShelterNeedCard = ({ card }: Props) => {
   const hasSubgroups = card.subgroups && card.subgroups.length > 0;
+  const selectedIcon = getShelterNeedIcon(card.icon);
 
   return (
     <article
@@ -29,11 +31,26 @@ const ShelterNeedCard = ({ card }: Props) => {
 
       {/* Header */}
       <div className="mb-5 flex items-center gap-3 px-6">
-        <img
-          src={card.icon}
-          alt=""
-          className="h-10 w-10 shrink-0 rounded-2xl object-cover"
-        />
+        {selectedIcon ? (
+          <div
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl"
+            style={{
+              backgroundColor: selectedIcon.background,
+            }}
+          >
+            <selectedIcon.icon
+              size={24}
+              stroke="1.8"
+              style={{
+                color: selectedIcon.color,
+              }}
+            />
+          </div>
+        ) : (
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gray-100 text-gray-400">
+            ?
+          </div>
+        )}
 
         <h3 className="text-lg font-bold text-[#0C1014]">{card.title}</h3>
       </div>

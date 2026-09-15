@@ -1,7 +1,7 @@
 declare module "nodemailer" {
   type SendMailOptions = {
     from?: string;
-    to: string;
+    to: string | string[];
     subject: string;
     text?: string;
     html?: string;

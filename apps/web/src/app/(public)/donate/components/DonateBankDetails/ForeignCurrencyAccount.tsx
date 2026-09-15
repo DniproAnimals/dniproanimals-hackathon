@@ -15,52 +15,85 @@ export function ForeignCurrencyAccount() {
   };
 
   const accounts = [
-    { label: "Отримувач", number: details.companyName },
-    { label: "IBAN", number: details.iban },
-    { label: "Банк", number: details.bankName },
-    { label: "SWIFT", number: details.bankSwiftCode },
-    { label: "Адреса", number: details.companyAddress },
+    {
+      label: "Отримувач",
+      value: details.companyName,
+    },
+    {
+      label: "IBAN",
+      value: details.iban,
+    },
+    {
+      label: "Банк",
+      value: details.bankName,
+    },
+    {
+      label: "SWIFT",
+      value: details.bankSwiftCode,
+    },
+    {
+      label: "Адреса",
+      value: details.companyAddress,
+    },
   ];
 
   return (
     <Card
       className="
-    relative
-    w-1/2
-    p-8
-    rounded-3xl
-    border-gray-100
-    shadow-sm
-    mb-8
-    overflow-hidden
-    before:absolute
-    before:left-0
-    before:top-0
-    before:h-full
-    before:w-1.5
-    before:content-['']
-  "
-      style={{ borderTop: `6px solid ${details.color || "#5b7765"}` }}
+        relative
+        w-full
+        max-w-full
+        overflow-hidden
+        rounded-3xl
+        border-gray-100
+        p-4
+        shadow-sm
+        sm:p-6
+        lg:p-8
+      "
+      style={{
+        borderTop: `6px solid ${details.color || "#5b7765"}`,
+      }}
     >
-      <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
-        <IconCreditCard size={24} />
-        {details.title}
+      <h2 className="mb-5 flex items-start gap-3 text-lg font-bold sm:mb-6 sm:text-xl">
+        <IconCreditCard size={24} className="mt-0.5 shrink-0" />
+
+        <span className="min-w-0 wrap-break-words">{details.title}</span>
       </h2>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex min-w-0 flex-col gap-3">
         {accounts.map((account) => (
-          <div key={account.label} className="bg-gray-50 rounded-2xl">
-            <p className="text-xs text-gray-500 uppercase font-bold mb-1">
+          <div
+            key={account.label}
+            className="min-w-0 rounded-2xl bg-gray-50 p-3 sm:p-4"
+          >
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-wide text-gray-500 sm:text-xs">
               {account.label}
             </p>
 
-            <li
-              className="text-xl ml-6 font-mono font-bold text-green-secondary cursor-pointer"
-              title="Нажмите, чтобы скопировать"
-              onClick={() => copyToClipboard(account.number)}
+            <button
+              type="button"
+              title="Натисніть, щоб скопіювати"
+              onClick={() => copyToClipboard(account.value)}
+              className="
+                block
+                w-full
+                min-w-0
+                cursor-pointer
+                text-left
+                font-mono
+                text-sm
+                font-bold
+                leading-relaxed
+                text-green-secondary
+                transition-opacity
+                hover:opacity-70
+                sm:text-base
+                lg:text-lg
+              "
             >
-              {account.number}
-            </li>
+              <span className="block wrap-break-words">{account.value}</span>
+            </button>
           </div>
         ))}
       </div>

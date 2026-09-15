@@ -1,11 +1,12 @@
 import { db, eq, type UserRole, usersTable } from "@dniproanimals/database";
 import { ForbiddenError, UnauthorizedError } from "../../shared/errors";
+import { sessionCookieOptions } from "../../shared/plugins/session";
 import { createGuard } from "../../shared/utils/createGuard";
 
 export const withAuth = createGuard(async (request, reply) => {
   if (!request.session.userId) {
     await request.session.destroy();
-    reply.clearCookie("session");
+    reply.clearCookie("session", sessionCookieOptions);
     throw new UnauthorizedError();
   }
 });
@@ -20,7 +21,7 @@ export const withDashboardRole = createGuard(async (request, reply) => {
   const userId = request.session.userId;
   if (!userId) {
     await request.session.destroy();
-    reply.clearCookie("session");
+    reply.clearCookie("session", sessionCookieOptions);
     throw new UnauthorizedError();
   }
 
@@ -32,7 +33,7 @@ export const withDashboardRole = createGuard(async (request, reply) => {
 
   if (!user) {
     await request.session.destroy();
-    reply.clearCookie("session");
+    reply.clearCookie("session", sessionCookieOptions);
     throw new UnauthorizedError();
   }
 

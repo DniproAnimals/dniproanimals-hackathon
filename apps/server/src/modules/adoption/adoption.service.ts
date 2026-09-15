@@ -52,7 +52,7 @@ async function sendAdoptionAdminEmail(
   );
 
   await sendMail({
-    to: adminEmails.join(", "),
+    to: adminEmails,
     subject,
     text,
     html,

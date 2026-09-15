@@ -244,12 +244,11 @@ export const authService = {
     const coolDown = 60 * 1000;
 
     if (user.emailVerificationTokenExpires) {
-      if (
-        now -
-          user.emailVerificationTokenExpires.getTime() -
-          EMAIL_VERIFICATION_TTL_MS <
-        coolDown
-      )
+      const sentAt =
+        user.emailVerificationTokenExpires.getTime() -
+        EMAIL_VERIFICATION_TTL_MS;
+
+      if (now - sentAt < coolDown)
         return { ok: true, reason: "rate-limit" } as const;
     }
 
@@ -289,7 +288,7 @@ export const authService = {
       })
       .where(eq(usersTable.id, user.id));
 
-    await sendPasswordResetEmail(user.email, token);
+    await sendVerificationEmail(user.email, token);
 
     return { ok: true } as const;
   },
