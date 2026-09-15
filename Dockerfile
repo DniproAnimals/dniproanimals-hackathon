@@ -2,8 +2,20 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Redis
-RUN apk add --no-cache redis
+# Redis + Chromium dependencies
+RUN apk add --no-cache \
+    redis \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+# Не скачивать Chrome от Puppeteer.
+# Используем системный Chromium из Alpine.
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Копируем весь monorepo
 COPY . .
@@ -13,9 +25,8 @@ RUN npm ci
 
 RUN npx turbo run build --filter=@dniproanimals/server...
 
-# Render будет передавать PORT через environment
 ENV PORT=10000
+
 EXPOSE 10000
 
-# Запускаем Redis и Fastify
 CMD ["sh", "-c", "redis-server --daemonize yes && npm run start --workspace=@dniproanimals/server"]
