@@ -1,26 +1,18 @@
 "use client";
-import { useBreedsQuery } from "@/shared/query-hooks";
-import { useMemo } from "react";
+import { ALL_BREEDS } from "@/shared/constants";
 import { useCatalogFilterState } from "../../../../hooks/useCatalogFilterState";
 import { FilterDropdown } from "../FilterDropdown";
 
+const OPTIONS = ALL_BREEDS.map((b) => ({ value: b, label: b }));
+
 export function FilterBreedField() {
   const [filters, setFilters] = useCatalogFilterState();
-  const { data: breeds = [] } = useBreedsQuery(
-    filters.type ? { type: filters.type } : undefined,
-  );
-
-  const options = useMemo(
-    () => breeds.map((b) => ({ value: b.name, label: b.name })),
-    [breeds],
-  );
-
   return (
     <FilterDropdown
       label="Порода"
       icon="🏷️"
       values={filters.breed}
-      options={options}
+      options={OPTIONS}
       search
       onToggle={(v) => {
         const next = filters.breed.includes(v)

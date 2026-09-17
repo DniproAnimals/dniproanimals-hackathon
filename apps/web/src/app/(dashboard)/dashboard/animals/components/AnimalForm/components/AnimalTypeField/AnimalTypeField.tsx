@@ -1,5 +1,4 @@
 "use client";
-import { useSpeciesQuery } from "@/shared/query-hooks";
 import {
   FormControl,
   FormField,
@@ -10,20 +9,14 @@ import {
 import { useAnimalFormContext } from "../../hooks/useAnimalForm";
 import { AnimalChipGroup } from "../AnimalChipGroup";
 
+const OPTIONS = [
+  { value: "dog", label: "🐕 Собака" },
+  { value: "cat", label: "🐈 Кіт" },
+  { value: "other", label: "🐾 Інше" },
+];
+
 export function AnimalTypeField() {
   const { control, setValue } = useAnimalFormContext();
-  const { data: species = [] } = useSpeciesQuery();
-
-  const options = species.map((s) => {
-    let emoji = "🐾";
-    if (s.value === "dog") emoji = "🐕";
-    else if (s.value === "cat") emoji = "🐈";
-    return {
-      value: s.value,
-      label: `${emoji} ${s.name}`,
-    };
-  });
-
   return (
     <FormField
       control={control}
@@ -33,7 +26,7 @@ export function AnimalTypeField() {
           <FormLabel>Вид *</FormLabel>
           <FormControl>
             <AnimalChipGroup
-              options={options}
+              options={OPTIONS}
               value={field.value}
               onChange={(v) => {
                 field.onChange(v);

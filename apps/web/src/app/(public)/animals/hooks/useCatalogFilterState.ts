@@ -2,6 +2,7 @@
 import {
   animalSexSchema,
   animalSizeSchema,
+  animalTypeSchema,
   listAnimalsSortSchema,
 } from "@dniproanimals/contracts";
 import {
@@ -13,7 +14,7 @@ import {
 
 export function useCatalogFilterState() {
   return useQueryStates({
-    type: parseAsString,
+    type: parseAsStringLiteral(animalTypeSchema.options),
     sex: parseAsStringLiteral(animalSexSchema.options),
     size: parseAsStringLiteral(animalSizeSchema.options),
     breed: parseAsArrayOf(parseAsString).withDefault([]),
