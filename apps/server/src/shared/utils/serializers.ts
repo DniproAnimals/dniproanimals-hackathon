@@ -1,9 +1,7 @@
 import type {
   adoptionRequestsTable,
   animalsTable,
-  breedsTable,
   notificationsTable,
-  speciesTable,
   usersTable,
 } from "@dniproanimals/database";
 
@@ -11,8 +9,6 @@ type UserRow = typeof usersTable.$inferSelect;
 type AnimalRow = typeof animalsTable.$inferSelect;
 type AdoptionRow = typeof adoptionRequestsTable.$inferSelect;
 type NotificationRow = typeof notificationsTable.$inferSelect;
-type SpeciesRow = typeof speciesTable.$inferSelect;
-type BreedRow = typeof breedsTable.$inferSelect;
 
 export const parsePhotos = (raw: string | null): string[] => {
   if (!raw) return [];
@@ -97,24 +93,5 @@ export function toNotificationResponse(n: NotificationRow) {
     link: n.link ?? null,
     isRead: n.isRead,
     createdAt: n.createdAt.toISOString(),
-  };
-}
-
-export function toBreedResponse(b: BreedRow) {
-  return {
-    id: b.id,
-    name: b.name,
-    speciesId: b.speciesId,
-    createdAt: b.createdAt.toISOString(),
-  };
-}
-
-export function toSpeciesResponse(s: SpeciesRow & { breeds?: BreedRow[] }) {
-  return {
-    id: s.id,
-    name: s.name,
-    value: s.value,
-    createdAt: s.createdAt.toISOString(),
-    breeds: s.breeds?.map(toBreedResponse) ?? [],
   };
 }

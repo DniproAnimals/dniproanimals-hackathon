@@ -1,5 +1,5 @@
 "use client";
-import { useSpeciesQuery } from "@/shared/query-hooks";
+import { CAT_BREEDS_WITH_MIX, DOG_BREEDS_WITH_MIX } from "@/shared/constants";
 import { IconCheck, IconChevronDown } from "@dniproanimals/icons";
 import {
   FormControl,
@@ -19,12 +19,8 @@ export function AnimalBreedField() {
   const { control } = useAnimalFormContext();
   const type = useWatch({ control, name: "type" });
   const [open, setOpen] = useState(false);
-  const [customBreed, setCustomBreed] = useState("");
 
-  const { data: species = [] } = useSpeciesQuery();
-
-  const selectedSpecies = species.find((s) => s.value === type);
-  const breeds = selectedSpecies?.breeds?.map((b) => b.name) ?? [];
+  const breeds = type === "cat" ? CAT_BREEDS_WITH_MIX : DOG_BREEDS_WITH_MIX;
 
   return (
     <FormField
@@ -47,63 +43,24 @@ export function AnimalBreedField() {
             </PopoverTrigger>
             <PopoverContent
               align="start"
-              className="w-(--radix-popover-trigger-width) p-2 max-h-72 overflow-auto flex flex-col gap-2 bg-white shadow-md border rounded-xl"
+              className="w-(--radix-popover-trigger-width) p-1 max-h-60 overflow-auto"
             >
-              <div className="flex gap-1.5 p-1 border-b border-gray-100">
-                <input
-                  type="text"
-                  placeholder="Власна порода..."
-                  className="flex-1 px-2.5 py-1.5 rounded-lg border border-gray-200 text-sm focus:outline-hidden"
-                  value={customBreed}
-                  onChange={(e) => setCustomBreed(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      if (customBreed.trim()) {
-                        field.onChange(customBreed.trim());
-                        setCustomBreed("");
-                        setOpen(false);
-                      }
-                    }
-                  }}
-                />
+              {breeds.map((b) => (
                 <button
+                  key={b}
                   type="button"
                   onClick={() => {
-                    if (customBreed.trim()) {
-                      field.onChange(customBreed.trim());
-                      setCustomBreed("");
-                      setOpen(false);
-                    }
+                    field.onChange(b);
+                    setOpen(false);
                   }}
-                  className="px-2.5 py-1.5 text-xs bg-primary text-white rounded-lg font-medium hover:bg-primary/90"
+                  className="w-full flex items-center justify-between px-4 py-2 text-sm hover:bg-gray-light rounded-lg"
                 >
-                  Ок
+                  {b}
+                  {field.value === b && (
+                    <IconCheck size={14} className="text-primary" />
+                  )}
                 </button>
-              </div>
-              <div className="flex flex-col gap-0.5 max-h-48 overflow-auto">
-                {breeds.map((b) => (
-                  <button
-                    key={b}
-                    type="button"
-                    onClick={() => {
-                      field.onChange(b);
-                      setOpen(false);
-                    }}
-                    className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-gray-light rounded-lg text-left"
-                  >
-                    {b}
-                    {field.value === b && (
-                      <IconCheck size={14} className="text-primary" />
-                    )}
-                  </button>
-                ))}
-                {breeds.length === 0 && (
-                  <span className="text-xs text-gray-500 p-2 text-center">
-                    Немає збережених порід. Введіть власну вище.
-                  </span>
-                )}
-              </div>
+              ))}
             </PopoverContent>
           </Popover>
           <FormMessage />

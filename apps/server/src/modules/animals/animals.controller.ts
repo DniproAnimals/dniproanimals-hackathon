@@ -1,20 +1,13 @@
 import {
-  addBreedsBodySchema,
-  addBreedsResponseSchema,
   animalsStatsResponseSchema,
   createAnimalBodySchema,
   createAnimalResponseSchema,
-  createSpeciesBodySchema,
-  createSpeciesResponseSchema,
   deleteAnimalParamsSchema,
   deleteAnimalResponseSchema,
   getAnimalParamsSchema,
   getAnimalResponseSchema,
   listAnimalsQuerySchema,
   listAnimalsResponseSchema,
-  listBreedsQuerySchema,
-  listBreedsResponseSchema,
-  listSpeciesResponseSchema,
   updateAnimalBodySchema,
   updateAnimalParamsSchema,
   updateAnimalResponseSchema,
@@ -22,11 +15,7 @@ import {
 import { endpoints } from "@dniproanimals/endpoints";
 import { NotFoundError } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
-import {
-  toAnimalResponse,
-  toBreedResponse,
-  toSpeciesResponse,
-} from "../../shared/utils/serializers";
+import { toAnimalResponse } from "../../shared/utils/serializers";
 import { withAuth } from "../auth/auth.guard";
 import { animalsService } from "./animals.service";
 
@@ -115,57 +104,6 @@ export const animalsController = createController({
       if (!exists) throw new NotFoundError("Animal");
       await animalsService.delete(request.params.id);
       return reply.send({ success: true });
-    }),
-  }),
-
-  listSpecies: defineRoute({
-    method: "GET",
-    url: endpoints.animals.listSpecies(),
-    schema: {
-      response: { 200: listSpeciesResponseSchema },
-    },
-    handler: async (request, reply) => {
-      const rows = await animalsService.listSpecies();
-      return reply.send(rows.map(toSpeciesResponse));
-    },
-  }),
-
-  listBreeds: defineRoute({
-    method: "GET",
-    url: endpoints.animals.listBreeds(),
-    schema: {
-      querystring: listBreedsQuerySchema,
-      response: { 200: listBreedsResponseSchema },
-    },
-    handler: async (request, reply) => {
-      const rows = await animalsService.listBreeds(request.query);
-      return reply.send(rows.map(toBreedResponse));
-    },
-  }),
-
-  createSpecies: defineRoute({
-    method: "POST",
-    url: endpoints.animals.createSpecies(),
-    schema: {
-      body: createSpeciesBodySchema,
-      response: { 200: createSpeciesResponseSchema },
-    },
-    handler: withAuth(async (request, reply) => {
-      const created = await animalsService.createSpecies(request.body);
-      return reply.send(toSpeciesResponse(created));
-    }),
-  }),
-
-  addBreeds: defineRoute({
-    method: "POST",
-    url: endpoints.animals.addBreeds(),
-    schema: {
-      body: addBreedsBodySchema,
-      response: { 200: addBreedsResponseSchema },
-    },
-    handler: withAuth(async (request, reply) => {
-      const result = await animalsService.addBreeds(request.body);
-      return reply.send(result);
     }),
   }),
 });

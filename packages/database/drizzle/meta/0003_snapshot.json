@@ -1,6 +1,6 @@
 {
-  "id": "9079dfca-9bc2-4e16-a4e0-68ebe8108cde",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "70ec0cfc-55fc-4658-92da-0f6a05cfe131",
+  "prevId": "9079dfca-9bc2-4e16-a4e0-68ebe8108cde",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -774,7 +774,44 @@
           "name": "password_hash",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "google_id": {
+          "name": "google_id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email_verified": {
+          "name": "email_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "email_verification_token": {
+          "name": "email_verification_token",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email_verification_token_expires": {
+          "name": "email_verification_token_expires",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reset_password_token": {
+          "name": "reset_password_token",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reset_password_expires": {
+          "name": "reset_password_expires",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
         },
         "role": {
           "name": "role",
@@ -842,6 +879,13 @@
           "nullsNotDistinct": false,
           "columns": [
             "email"
+          ]
+        },
+        "users_google_id_unique": {
+          "name": "users_google_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "google_id"
           ]
         }
       },
