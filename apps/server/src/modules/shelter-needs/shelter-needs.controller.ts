@@ -6,7 +6,7 @@ import {
 import { endpoints } from "@dniproanimals/endpoints";
 import { z } from "zod";
 import { createController, defineRoute } from "../../shared/types/controller";
-import { withAuth } from "../auth/auth.guard";
+import { withDashboardRole } from "../auth/auth.guard";
 import { shelterNeedsService } from "./shelter-needs.service";
 
 export const shelterNeedsController = createController({
@@ -34,7 +34,7 @@ export const shelterNeedsController = createController({
       body: updateShelterNeedsBodySchema,
       response: { 200: updateShelterNeedsResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
+    handler: withDashboardRole(async (request, reply) => {
       const result = await shelterNeedsService.update(request.body);
       return reply.send(result);
     }),

@@ -14,7 +14,7 @@ export type DashboardNavItem = {
   href: string;
   label: string;
   icon: ReactNode;
-  ownerOnly?: boolean;
+  superadminOnly?: boolean;
 };
 
 export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
@@ -25,8 +25,9 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
   },
   {
     href: "/dashboard/volunteers",
-    label: "Волонтери",
+    label: "Користувачі",
     icon: <IconUsersGroup size={18} />,
+    superadminOnly: true,
   },
   {
     href: "/dashboard/animals",
@@ -47,13 +48,11 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     href: "/dashboard/email-templates",
     label: "Шаблони листів",
     icon: <IconMail size={18} />,
-    ownerOnly: true,
   },
   {
     href: "/dashboard/contracts",
     label: "Шаблон договору",
     icon: <IconFileTextFilled size={18} />,
-    ownerOnly: true,
   },
   {
     href: "/dashboard/donations",

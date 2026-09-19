@@ -3,7 +3,7 @@ import { ContractEditorPage } from "./ContractEditorPage";
 
 export default function Page() {
   return (
-    <RequiredRole roles={["superadmin"]}>
+    <RequiredRole roles={["admin", "superadmin"]}>
       <div className="mx-auto max-w-5xl">
         <h1 className="mb-6 text-2xl font-bold text-foreground">
           Шаблон договору

@@ -6,7 +6,7 @@ import {
 import { endpoints } from "@dniproanimals/endpoints";
 import { z } from "zod";
 import { createController, defineRoute } from "../../shared/types/controller";
-import { withAuth } from "../auth/auth.guard";
+import { withAuth, withDashboardRole } from "../auth/auth.guard";
 import { contractTemplatePdfService } from "./contract-template-pdf.service";
 import { contractTemplateService } from "./contract-template.service";
 
@@ -18,7 +18,7 @@ export const contractTemplateController = createController({
       params: z.object({ type: z.string() }),
       response: { 200: contractTemplateResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
+    handler: withDashboardRole(async (request, reply) => {
       const row = await contractTemplateService.getActive(request.params.type);
 
       if (!row) {
@@ -70,7 +70,7 @@ export const contractTemplateController = createController({
       body: updateContractTemplateBodySchema,
       response: { 200: updateContractTemplateResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
+    handler: withDashboardRole(async (request, reply) => {
       await contractTemplateService.update(
         request.params.type,
         request.body,

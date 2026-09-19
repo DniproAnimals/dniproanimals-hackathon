@@ -4,9 +4,10 @@ import {
   updateUserRoleResponseSchema,
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
+import { ForbiddenError, NotFoundError } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
 import { toUserResponse } from "../../shared/utils/serializers";
-import { withAuth } from "../auth/auth.guard";
+import { withSuperadminRole } from "../auth/auth.guard";
 import { usersService } from "./users.service";
 
 export const usersController = createController({
@@ -16,7 +17,7 @@ export const usersController = createController({
     schema: {
       response: { 200: listUsersResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
+    handler: withSuperadminRole(async (request, reply) => {
       const users = await usersService.list();
       return reply.send(users.map(toUserResponse));
     }),
@@ -29,8 +30,15 @@ export const usersController = createController({
       body: updateUserRoleBodySchema,
       response: { 200: updateUserRoleResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
-      // Only superadmins or admins should do this, but withAuth is enough for now if we don't have RBAC in middleware
+    handler: withSuperadminRole(async (request, reply) => {
+      if (request.body.id === request.session.userId) {
+        throw new ForbiddenError();
+      }
+
+      const user = await usersService.getById(request.body.id);
+      if (!user) throw new NotFoundError("User");
+      if (user.role === "superadmin") throw new ForbiddenError();
+
       const result = await usersService.updateRole(
         request.body.id,
         request.body.role,

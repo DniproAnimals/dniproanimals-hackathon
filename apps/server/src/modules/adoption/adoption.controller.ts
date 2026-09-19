@@ -12,7 +12,7 @@ import { NotFoundError } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
 import { toAdoptionResponse } from "../../shared/utils/serializers";
 import { animalsService } from "../animals/animals.service";
-import { withAuth } from "../auth/auth.guard";
+import { withDashboardRole } from "../auth/auth.guard";
 import { adoptionService } from "./adoption.service";
 
 export const adoptionController = createController({
@@ -23,7 +23,7 @@ export const adoptionController = createController({
       querystring: listAdoptionQuerySchema,
       response: { 200: listAdoptionResponseSchema },
     },
-    handler: async (request, reply) => {
+    handler: withDashboardRole(async (request, reply) => {
       const rows = await adoptionService.list(request.query);
       return reply.send(
         rows.map((r) => ({
@@ -32,7 +32,7 @@ export const adoptionController = createController({
           animalType: r.animalType,
         })),
       );
-    },
+    }),
   }),
 
   stats: defineRoute({
@@ -41,7 +41,7 @@ export const adoptionController = createController({
     schema: {
       response: { 200: adoptionStatsResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
+    handler: withDashboardRole(async (_request, reply) => {
       const stats = await adoptionService.stats();
       return reply.send(stats);
     }),
@@ -69,7 +69,7 @@ export const adoptionController = createController({
       body: updateAdoptionStatusBodySchema,
       response: { 200: updateAdoptionStatusResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
+    handler: withDashboardRole(async (request, reply) => {
       await adoptionService.updateStatus(request.body.id, request.body.status);
       if (request.body.status === "approved") {
         const animalId = await adoptionService.getAnimalId(request.body.id);

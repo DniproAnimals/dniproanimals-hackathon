@@ -10,7 +10,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-export type UserRole = "user" | "admin" | "volunteer" | "superadmin";
+export type UserRole = "user" | "admin" | "superadmin";
 export type AnimalType = "dog" | "cat" | "other";
 export type AnimalSize = "small" | "medium" | "large";
 export type AnimalSex = "male" | "female";

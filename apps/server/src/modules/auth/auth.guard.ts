@@ -11,31 +11,34 @@ export const withAuth = createGuard(async (request, reply) => {
   }
 });
 
-const dashboardRoles: ReadonlySet<UserRole> = new Set([
-  "admin",
-  "superadmin",
-  "volunteer",
-]);
+const dashboardRoles: ReadonlySet<UserRole> = new Set(["admin", "superadmin"]);
 
-export const withDashboardRole = createGuard(async (request, reply) => {
-  const userId = request.session.userId;
-  if (!userId) {
-    await request.session.destroy();
-    reply.clearCookie("session", sessionCookieOptions);
-    throw new UnauthorizedError();
-  }
+const superadminRoles: ReadonlySet<UserRole> = new Set(["superadmin"]);
 
-  const [user] = await db
-    .select({ role: usersTable.role })
-    .from(usersTable)
-    .where(eq(usersTable.id, userId))
-    .limit(1);
+function createRoleGuard(allowedRoles: ReadonlySet<UserRole>) {
+  return createGuard(async (request, reply) => {
+    const userId = request.session.userId;
+    if (!userId) {
+      await request.session.destroy();
+      reply.clearCookie("session", sessionCookieOptions);
+      throw new UnauthorizedError();
+    }
 
-  if (!user) {
-    await request.session.destroy();
-    reply.clearCookie("session", sessionCookieOptions);
-    throw new UnauthorizedError();
-  }
+    const [user] = await db
+      .select({ role: usersTable.role })
+      .from(usersTable)
+      .where(eq(usersTable.id, userId))
+      .limit(1);
 
-  if (!dashboardRoles.has(user.role)) throw new ForbiddenError();
-});
+    if (!user) {
+      await request.session.destroy();
+      reply.clearCookie("session", sessionCookieOptions);
+      throw new UnauthorizedError();
+    }
+
+    if (!allowedRoles.has(user.role)) throw new ForbiddenError();
+  });
+}
+
+export const withDashboardRole = createRoleGuard(dashboardRoles);
+export const withSuperadminRole = createRoleGuard(superadminRoles);

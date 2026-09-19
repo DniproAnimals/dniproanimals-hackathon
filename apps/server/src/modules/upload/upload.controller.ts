@@ -3,7 +3,7 @@ import { endpoints } from "@dniproanimals/endpoints";
 import type { MultipartFile } from "@fastify/multipart";
 import { BadRequestError } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
-import { withAuth } from "../auth/auth.guard";
+import { withDashboardRole } from "../auth/auth.guard";
 import { uploadService } from "./upload.service";
 
 export const uploadController = createController({
@@ -13,7 +13,7 @@ export const uploadController = createController({
     schema: {
       response: { 200: uploadImageResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
+    handler: withDashboardRole(async (request, reply) => {
       const body = request.body as Record<string, unknown> | null;
       const file = body?.file as MultipartFile | undefined;
       if (!file) throw new BadRequestError("File is required");
