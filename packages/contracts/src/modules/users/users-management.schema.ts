@@ -7,7 +7,7 @@ export type ListUsersResponse = z.infer<typeof listUsersResponseSchema>;
 
 export const updateUserRoleBodySchema = z.object({
   id: z.number(),
-  role: z.enum(["user", "admin", "volunteer", "superadmin"]),
+  role: z.enum(["user", "admin"]),
 });
 
 export type UpdateUserRoleBody = z.infer<typeof updateUserRoleBodySchema>;

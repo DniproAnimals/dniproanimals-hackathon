@@ -4,7 +4,7 @@ import { Button } from "@dniproanimals/ui";
 import Link from "next/link";
 
 export function SidebarUserPanel({ user }: { user: User }) {
-  const roleLabel = user.role === "admin" ? "Власник" : "Волонтер";
+  const roleLabel = user.role === "superadmin" ? "Суперадмін" : "Адміністратор";
 
   return (
     <div className="p-4 border-t border-gray-border/60">

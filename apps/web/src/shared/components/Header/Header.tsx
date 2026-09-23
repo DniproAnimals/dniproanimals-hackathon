@@ -84,9 +84,7 @@ export function Header() {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
-                {(user.role === "admin" ||
-                  user.role === "superadmin" ||
-                  user.role === "volunteer") && (
+                {(user.role === "admin" || user.role === "superadmin") && (
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard">
                       <IconHomeFilled className="text-green-secondary" />

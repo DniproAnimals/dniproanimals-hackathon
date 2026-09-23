@@ -16,7 +16,7 @@ import { endpoints } from "@dniproanimals/endpoints";
 import { NotFoundError } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
 import { toAnimalResponse } from "../../shared/utils/serializers";
-import { withAuth } from "../auth/auth.guard";
+import { withDashboardRole } from "../auth/auth.guard";
 import { animalsService } from "./animals.service";
 
 export const animalsController = createController({
@@ -39,7 +39,7 @@ export const animalsController = createController({
     schema: {
       response: { 200: animalsStatsResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
+    handler: withDashboardRole(async (_request, reply) => {
       const stats = await animalsService.stats();
       return reply.send(stats);
     }),
@@ -66,7 +66,7 @@ export const animalsController = createController({
       body: createAnimalBodySchema,
       response: { 200: createAnimalResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
+    handler: withDashboardRole(async (request, reply) => {
       const created = await animalsService.create(request.body);
       return reply.send(toAnimalResponse(created));
     }),
@@ -80,7 +80,7 @@ export const animalsController = createController({
       body: updateAnimalBodySchema,
       response: { 200: updateAnimalResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
+    handler: withDashboardRole(async (request, reply) => {
       const exists = await animalsService.exists(request.params.id);
       if (!exists) throw new NotFoundError("Animal");
       const updated = await animalsService.update(
@@ -99,7 +99,7 @@ export const animalsController = createController({
       params: deleteAnimalParamsSchema,
       response: { 200: deleteAnimalResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
+    handler: withDashboardRole(async (request, reply) => {
       const exists = await animalsService.exists(request.params.id);
       if (!exists) throw new NotFoundError("Animal");
       await animalsService.delete(request.params.id);

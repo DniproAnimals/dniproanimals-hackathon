@@ -5,7 +5,7 @@ import {
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import { createController, defineRoute } from "../../shared/types/controller";
-import { withAuth } from "../auth/auth.guard";
+import { withDashboardRole } from "../auth/auth.guard";
 import { foundationService } from "./foundation.service";
 
 export const foundationController = createController({
@@ -28,8 +28,7 @@ export const foundationController = createController({
       body: updateFoundationBodySchema,
       response: { 200: updateFoundationResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
-      // Only admins and volunteers can update foundation info
+    handler: withDashboardRole(async (request, reply) => {
       const result = await foundationService.update(request.body);
       return reply.send(result);
     }),

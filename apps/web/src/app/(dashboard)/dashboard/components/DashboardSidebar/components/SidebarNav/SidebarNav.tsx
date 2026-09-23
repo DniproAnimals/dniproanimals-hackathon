@@ -7,10 +7,10 @@ import {
 } from "../../constants/navItems";
 
 export function SidebarNav({
-  isOwner,
+  isSuperadmin,
   onNavigate,
 }: {
-  isOwner: boolean;
+  isSuperadmin: boolean;
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
@@ -23,7 +23,7 @@ export function SidebarNav({
   return (
     <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
       {DASHBOARD_NAV_ITEMS.map((item) => {
-        if (item.ownerOnly && !isOwner) return null;
+        if (item.superadminOnly && !isSuperadmin) return null;
         return (
           <SidebarNavItem
             key={item.href}

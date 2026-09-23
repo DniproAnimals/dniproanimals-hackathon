@@ -5,12 +5,10 @@ import {
   listEmailTemplatesResponseSchema,
   updateEmailTemplateResponseSchema,
 } from "@dniproanimals/contracts";
-import { db, eq, usersTable } from "@dniproanimals/database";
 import { endpoints } from "@dniproanimals/endpoints";
 import { z } from "zod";
-import { ForbiddenError } from "../../shared/errors";
 import { createController, defineRoute } from "../../shared/types/controller";
-import { withAuth } from "../auth/auth.guard";
+import { withDashboardRole } from "../auth/auth.guard";
 import { emailTemplateService } from "./email-template.service";
 
 function toEmailTemplateResponse(template: {
@@ -23,16 +21,6 @@ function toEmailTemplateResponse(template: {
   return { ...template, updatedAt: template.updatedAt.toISOString() };
 }
 
-async function ensureSuperadmin(userId: number) {
-  const [user] = await db
-    .select({ role: usersTable.role })
-    .from(usersTable)
-    .where(eq(usersTable.id, userId))
-    .limit(1);
-
-  if (user?.role !== "superadmin") throw new ForbiddenError();
-}
-
 export const emailTemplateController = createController({
   list: defineRoute({
     method: "GET",
@@ -40,8 +28,7 @@ export const emailTemplateController = createController({
     schema: {
       response: { 200: listEmailTemplatesResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
-      await ensureSuperadmin(request.session.userId);
+    handler: withDashboardRole(async (_request, reply) => {
       const templates = await emailTemplateService.list();
       return reply.send(templates.map(toEmailTemplateResponse));
     }),
@@ -55,8 +42,7 @@ export const emailTemplateController = createController({
       body: emailTemplateContentSchema,
       response: { 200: updateEmailTemplateResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
-      await ensureSuperadmin(request.session.userId);
+    handler: withDashboardRole(async (request, reply) => {
       await emailTemplateService.update(
         request.params.key,
         request.body,

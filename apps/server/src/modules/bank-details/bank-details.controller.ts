@@ -6,7 +6,7 @@ import {
 import { endpoints } from "@dniproanimals/endpoints";
 import { z } from "zod";
 import { createController, defineRoute } from "../../shared/types/controller";
-import { withAuth } from "../auth/auth.guard";
+import { withDashboardRole } from "../auth/auth.guard";
 import { bankDetailsService } from "./bank-details.service";
 
 export const bankDetailsController = createController({
@@ -34,7 +34,7 @@ export const bankDetailsController = createController({
       body: updateBankDetailsBodySchema,
       response: { 200: updateBankDetailsResponseSchema },
     },
-    handler: withAuth(async (request, reply) => {
+    handler: withDashboardRole(async (request, reply) => {
       const result = await bankDetailsService.update(request.body);
       return reply.send(result);
     }),

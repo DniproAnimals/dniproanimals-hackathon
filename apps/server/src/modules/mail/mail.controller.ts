@@ -4,6 +4,7 @@ import {
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import { createController, defineRoute } from "../../shared/types/controller";
+import { withDashboardRole } from "../auth/auth.guard";
 import { mailService } from "./mail.service";
 
 export const mailController = createController({
@@ -14,9 +15,9 @@ export const mailController = createController({
       body: sendTestEmailBodySchema,
       response: { 200: sendTestEmailResponseSchema },
     },
-    handler: async (request, reply) => {
+    handler: withDashboardRole(async (request, reply) => {
       await mailService.sendTestEmail(request.body);
       return reply.send({ success: true });
-    },
+    }),
   }),
 });

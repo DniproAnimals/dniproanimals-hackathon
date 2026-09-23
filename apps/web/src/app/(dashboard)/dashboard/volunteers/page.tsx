@@ -1,16 +1,15 @@
 "use client";
+
+import { RequiredRole } from "@/shared/components/RequiredRole";
 import { useUpdateUserRoleMutation, useUsersQuery } from "@/shared/query-hooks";
-import type { UpdateUserRoleBody } from "@dniproanimals/contracts";
+import type { UpdateUserRoleBody, User } from "@dniproanimals/contracts";
 import {
   Avatar,
   AvatarFallback,
   Badge,
+  Button,
   Card,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Input,
   Table,
   TableBody,
   TableCell,
@@ -18,25 +17,61 @@ import {
   TableHeader,
   TableRow,
 } from "@dniproanimals/ui";
+import { useDeferredValue, useState } from "react";
 
-export default function VolunteersPage() {
+const ROLE_LABELS: Record<User["role"], string> = {
+  user: "Користувач",
+  admin: "Адміністратор",
+  superadmin: "Суперадмін",
+};
+
+function UsersManagement() {
   const { data: users = [], isLoading } = useUsersQuery();
   const updateRoleMutation = useUpdateUserRoleMutation();
+  const [emailQuery, setEmailQuery] = useState("");
+  const deferredEmailQuery = useDeferredValue(emailQuery);
+  const normalizedEmailQuery = deferredEmailQuery.trim().toLocaleLowerCase();
+  const filteredUsers = normalizedEmailQuery
+    ? users.filter((user) =>
+        user.email.toLocaleLowerCase().includes(normalizedEmailQuery),
+      )
+    : users;
 
-  const handleRoleChange = (userId: number, role: string) => {
+  const handleRoleChange = (
+    userId: number,
+    role: UpdateUserRoleBody["role"],
+  ) => {
     updateRoleMutation.mutate({
       id: userId,
-      role: role as UpdateUserRoleBody["role"],
+      role,
     });
   };
 
   if (isLoading) return <div>Завантаження...</div>;
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-foreground">
-        Волонтери та команда
-      </h1>
+    <div className="flex flex-col gap-6">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">
+          Користувачі та команда
+        </h1>
+        <p className="mt-1 text-sm text-gray-medium">
+          Призначайте адміністраторів серед зареєстрованих користувачів.
+        </p>
+      </div>
+
+      <div className="max-w-md">
+        <label htmlFor="user-email-search" className="sr-only">
+          Пошук користувача за email
+        </label>
+        <Input
+          id="user-email-search"
+          type="search"
+          value={emailQuery}
+          placeholder="Пошук за email"
+          onChange={(event) => setEmailQuery(event.target.value)}
+        />
+      </div>
 
       <Card>
         <Table>
@@ -49,7 +84,7 @@ export default function VolunteersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
+            {filteredUsers.map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="flex items-center gap-3">
                   <Avatar className="size-8">
@@ -67,38 +102,58 @@ export default function VolunteersPage() {
                         ? "danger"
                         : user.role === "admin"
                           ? "brand"
-                          : user.role === "volunteer"
-                            ? "success"
-                            : "soft"
+                          : "soft"
                     }
                     size="sm"
                     className="uppercase"
                   >
-                    {user.role}
+                    {ROLE_LABELS[user.role]}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Select
-                    value={user.role}
-                    onValueChange={(val) => handleRoleChange(user.id, val)}
-                    disabled={updateRoleMutation.isPending}
-                  >
-                    <SelectTrigger className="w-[140px] ml-auto">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user">Користувач</SelectItem>
-                      <SelectItem value="volunteer">Волонтер</SelectItem>
-                      <SelectItem value="admin">Адмін</SelectItem>
-                      <SelectItem value="superadmin">Superadmin</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {user.role === "superadmin" ? (
+                    <span className="text-sm text-gray-medium">Захищено</span>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant={user.role === "admin" ? "outline" : "primary"}
+                      disabled={updateRoleMutation.isPending}
+                      onClick={() =>
+                        handleRoleChange(
+                          user.id,
+                          user.role === "admin" ? "user" : "admin",
+                        )
+                      }
+                    >
+                      {user.role === "admin"
+                        ? "Зняти адміністратора"
+                        : "Призначити адміністратором"}
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
+            {filteredUsers.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="py-10 text-center text-gray-medium"
+                >
+                  Користувачів із таким email не знайдено
+                </TableCell>
+              </TableRow>
+            ) : null}
           </TableBody>
         </Table>
       </Card>
     </div>
+  );
+}
+
+export default function VolunteersPage() {
+  return (
+    <RequiredRole roles={["superadmin"]}>
+      <UsersManagement />
+    </RequiredRole>
   );
 }

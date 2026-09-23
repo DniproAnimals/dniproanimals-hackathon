@@ -111,7 +111,7 @@ export default function EmailTemplatesPage() {
   };
 
   return (
-    <RequiredRole roles={["superadmin"]}>
+    <RequiredRole roles={["admin", "superadmin"]}>
       <div className="mx-auto max-w-4xl">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground">Шаблони листів</h1>

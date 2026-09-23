@@ -29,10 +29,7 @@ export const usersService = {
     return db.select().from(usersTable).orderBy(usersTable.id);
   },
 
-  async updateRole(
-    id: number,
-    role: "user" | "admin" | "volunteer" | "superadmin",
-  ) {
+  async updateRole(id: number, role: "user" | "admin") {
     await db.update(usersTable).set({ role }).where(eq(usersTable.id, id));
     return { success: true };
   },

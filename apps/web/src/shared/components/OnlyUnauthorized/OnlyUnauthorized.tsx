@@ -17,8 +17,7 @@ export function OnlyUnauthorized({
 
   useEffect(() => {
     if (!user) return;
-    if (user.role === "superadmin") router.replace("/profile");
-    else if (user.role === "admin" || user.role === "volunteer")
+    if (user.role === "admin" || user.role === "superadmin")
       router.replace("/dashboard");
     else router.replace("/profile");
   }, [user, router]);
