@@ -112,13 +112,15 @@ export const authService = {
       .where(eq(usersTable.email, input.email))
       .limit(1);
 
-    if (!user || !user.passwordHash) return null;
+    if (!user?.passwordHash) return { user: null, reason: "invalid" } as const;
 
     const ok = await bcrypt.compare(input.password, user.passwordHash);
-    if (!ok) return null;
-    if (!user.emailVerified) return null;
+    if (!ok) return { user: null, reason: "invalid" } as const;
+    if (!user.emailVerified) {
+      return { user: null, reason: "email-not-verified" } as const;
+    }
 
-    return user;
+    return { user, reason: null } as const;
   },
 
   async loginWithGoogleIdToken(idToken: string) {

@@ -16,6 +16,7 @@ import { endpoints } from "@dniproanimals/endpoints";
 import {
   BadRequestError,
   ConflictError,
+  EmailNotVerifiedError,
   NotFoundError,
   TooManyRequestsError,
   UnauthorizedError,
@@ -49,10 +50,13 @@ export const authController = createController({
       response: { 200: userModel },
     },
     handler: async (request, reply) => {
-      const user = await authService.login(request.body);
-      if (!user) throw new UnauthorizedError();
-      request.session.userId = user.id;
-      return reply.send(toUserResponse(user));
+      const result = await authService.login(request.body);
+      if (result.reason === "email-not-verified") {
+        throw new EmailNotVerifiedError();
+      }
+      if (!result.user) throw new UnauthorizedError();
+      request.session.userId = result.user.id;
+      return reply.send(toUserResponse(result.user));
     },
   }),
 

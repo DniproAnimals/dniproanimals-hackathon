@@ -1,5 +1,6 @@
 "use client";
 import { useGoogleLoginMutation, useLoginMutation } from "@/shared/query-hooks";
+import { getAuthErrorMessage } from "@/shared/utils";
 import type { LoginBody, User } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import { useQueryClient } from "@tanstack/react-query";
@@ -34,12 +35,12 @@ export default function SignInPage() {
 
   const loginMutation = useLoginMutation({
     onSuccess: onAuthSuccess,
-    onError: (err) => setErrorMessage(err.message || "Помилка"),
+    onError: (err) => setErrorMessage(getAuthErrorMessage(err, "login")),
   });
 
   const googleLoginMutation = useGoogleLoginMutation({
     onSuccess: onAuthSuccess,
-    onError: (err) => setErrorMessage(err.message || "Помилка"),
+    onError: (err) => setErrorMessage(getAuthErrorMessage(err, "google")),
   });
 
   const handleSubmit = (values: LoginBody) => {

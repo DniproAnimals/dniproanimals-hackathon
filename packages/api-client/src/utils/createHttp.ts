@@ -16,6 +16,18 @@ export interface HttpRequestOptions {
 
 export type HttpFn = <T>(options: HttpRequestOptions) => Promise<T>;
 
+export class ApiError extends Error {
+  readonly status: number;
+  readonly code?: string;
+
+  constructor(message: string, status: number, code?: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
 export function createHttp(config: ApiClientConfig): HttpFn {
   return async function http<T>(options: HttpRequestOptions): Promise<T> {
     const { endpoint, method = "GET", query, body, headers, signal } = options;
@@ -38,10 +50,12 @@ export function createHttp(config: ApiClientConfig): HttpFn {
         string,
         unknown
       >;
-      throw new Error(
-        (data.error as string) ||
-          (data.message as string) ||
+      throw new ApiError(
+        (data.message as string) ||
+          (data.error as string) ||
           `Request failed with status ${response.status}`,
+        response.status,
+        typeof data.code === "string" ? data.code : undefined,
       );
     }
 
