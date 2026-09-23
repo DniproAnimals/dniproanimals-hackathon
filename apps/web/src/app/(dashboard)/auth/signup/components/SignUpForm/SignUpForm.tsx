@@ -26,6 +26,7 @@ export function SignUpForm({
   return (
     <Form {...form}>
       <form
+        noValidate
         onSubmit={form.handleSubmit(onSubmit)}
         className="bg-white rounded-2xl p-6 shadow-sm border border-gray-border space-y-3"
       >
@@ -34,7 +35,13 @@ export function SignUpForm({
         <SignUpPasswordField />
 
         {errorMessage && (
-          <p className="text-xs text-destructive">{errorMessage}</p>
+          <p
+            role="alert"
+            aria-live="polite"
+            className="rounded-lg bg-destructive/10 p-3 text-xs text-destructive"
+          >
+            {errorMessage}
+          </p>
         )}
 
         <Button

@@ -6,6 +6,12 @@ export const UnauthorizedError = createError(
   401,
 );
 
+export const EmailNotVerifiedError = createError(
+  "EMAIL_NOT_VERIFIED",
+  "Email is not verified",
+  403,
+);
+
 export const ForbiddenError = createError("FORBIDDEN", "Forbidden", 403);
 
 export const NotFoundError = createError("NOT_FOUND", "%s not found", 404);
