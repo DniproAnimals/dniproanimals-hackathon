@@ -3,7 +3,13 @@ import type {
   AdoptionRequestWithAnimal,
   AdoptionStatus,
 } from "@dniproanimals/contracts";
-import { Dialog, DialogContent, type DialogProps } from "@dniproanimals/ui";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  type DialogProps,
+} from "@dniproanimals/ui";
 import { RequestAnimalCard } from "./components/RequestAnimalCard";
 import { RequestContactList } from "./components/RequestContactList";
 import { RequestDetailHeader } from "./components/RequestDetailHeader";
@@ -23,6 +29,10 @@ export function RequestDetailDialog({
   return (
     <Dialog {...dialogProps}>
       <DialogContent className="max-w-lg p-0 overflow-hidden">
+        <DialogTitle className="sr-only">Деталі заявки</DialogTitle>
+        <DialogDescription className="sr-only">
+          Контактні дані, повідомлення та статус заявки на усиновлення.
+        </DialogDescription>
         {request && (
           <>
             <RequestDetailHeader request={request} />

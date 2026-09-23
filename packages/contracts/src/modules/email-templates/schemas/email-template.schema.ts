@@ -5,6 +5,8 @@ export const EMAIL_TEMPLATE_KEYS = [
   "password-reset",
   "adoption-applicant",
   "adoption-admin",
+  "animal-support-thank-you",
+  "animal-support-admin",
   "animal-support-update",
 ] as const;
 

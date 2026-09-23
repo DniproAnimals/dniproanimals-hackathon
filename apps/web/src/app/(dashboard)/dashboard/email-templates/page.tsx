@@ -64,6 +64,29 @@ const TEMPLATE_META: Record<
     placeholders: [{ token: "{{animalName}}", description: "Ім'я тварини" }],
     hasAction: false,
   },
+  "animal-support-thank-you": {
+    label: "Подяка за підтримку",
+    description: "Надсилається користувачу після підписки на підтримку.",
+    placeholders: [
+      { token: "{{supporterName}}", description: "Ім'я користувача" },
+      { token: "{{animalName}}", description: "Ім'я тварини" },
+      { token: "{{supportType}}", description: "Тип підтримки" },
+      { token: "{{phone}}", description: "Телефон користувача" },
+    ],
+    hasAction: true,
+  },
+  "animal-support-admin": {
+    label: "Команді про підтримку",
+    description: "Надсилається адміністраторам після нової підписки.",
+    placeholders: [
+      { token: "{{supporterName}}", description: "Ім'я користувача" },
+      { token: "{{animalName}}", description: "Ім'я тварини" },
+      { token: "{{supportType}}", description: "Тип підтримки" },
+      { token: "{{phone}}", description: "Телефон користувача" },
+      { token: "{{email}}", description: "Email користувача" },
+    ],
+    hasAction: true,
+  },
   "animal-support-update": {
     label: "Новини для підтримувачів",
     description: "Надсилається разом з новими фото тварини.",

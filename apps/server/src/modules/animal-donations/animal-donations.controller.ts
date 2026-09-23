@@ -1,9 +1,11 @@
 import {
   animalDonationParamsSchema,
   animalDonationResponseSchema,
+  animalDonationSupporterParamsSchema,
   animalDonationSupportersSummarySchema,
   sendAnimalSupportUpdateBodySchema,
   sendAnimalSupportUpdateResponseSchema,
+  startAnimalDonationBodySchema,
 } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
 import { BadRequestError, NotFoundError } from "../../shared/errors";
@@ -34,6 +36,7 @@ export const animalDonationsController = createController({
     url: endpoints.animalDonations.start({ animalId: ":animalId" }),
     schema: {
       params: animalDonationParamsSchema,
+      body: startAnimalDonationBodySchema,
       response: { 200: animalDonationResponseSchema },
     },
     handler: withAuth(async (request, reply) => {
@@ -46,6 +49,8 @@ export const animalDonationsController = createController({
       const active = await animalDonationsService.start(
         request.session.userId,
         request.params.animalId,
+        animal.name,
+        request.body,
       );
       return reply.send({ active });
     }),
@@ -79,6 +84,25 @@ export const animalDonationsController = createController({
         request.params.animalId,
       );
       return reply.send({ count: supporters.length, supporters });
+    }),
+  }),
+
+  deactivateSupporter: defineRoute({
+    method: "DELETE",
+    url: endpoints.animalDonations.deactivateSupporter({
+      animalId: ":animalId",
+      userId: ":userId",
+    }),
+    schema: {
+      params: animalDonationSupporterParamsSchema,
+      response: { 200: animalDonationResponseSchema },
+    },
+    handler: withDashboardRole(async (request, reply) => {
+      const active = await animalDonationsService.deactivateSupporter(
+        request.params.userId,
+        request.params.animalId,
+      );
+      return reply.send({ active });
     }),
   }),
 

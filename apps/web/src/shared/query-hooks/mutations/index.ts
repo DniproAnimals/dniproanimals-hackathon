@@ -1,6 +1,7 @@
 export * from "./useCancelAnimalDonationMutation";
 export * from "./useCreateAdoptionMutation";
 export * from "./useCreateAnimalMutation";
+export * from "./useDeactivateAnimalSupporterMutation";
 export * from "./useDeleteAnimalMutation";
 export * from "./useForgotPasswordMutation";
 export * from "./useGoogleLoginMutation";
