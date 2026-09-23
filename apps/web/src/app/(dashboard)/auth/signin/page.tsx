@@ -29,7 +29,7 @@ export default function SignInPage() {
 
     if (user.role === "admin" || user.role === "superadmin")
       router.push("/dashboard");
-    else router.push("/onboarding");
+    else router.push("/profile");
   };
 
   const loginMutation = useLoginMutation({
