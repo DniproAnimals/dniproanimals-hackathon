@@ -44,6 +44,7 @@ export const endpoints = createTypedEndpoints({
     start: "/animal-donations/:animalId",
     cancel: "/animal-donations/:animalId",
     supporters: "/animal-donations/:animalId/supporters",
+    deactivateSupporter: "/animal-donations/:animalId/supporters/:userId",
     sendUpdate: "/animal-donations/:animalId/updates",
   },
 

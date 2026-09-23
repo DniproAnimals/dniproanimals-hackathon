@@ -1,5 +1,6 @@
 import {
   boolean,
+  index,
   integer,
   jsonb,
   pgTable,
@@ -16,11 +17,19 @@ export type AnimalSize = "small" | "medium" | "large";
 export type AnimalSex = "male" | "female";
 export type AnimalStatus = "available" | "reserved" | "adopted";
 export type AdoptionStatus = "pending" | "approved" | "rejected";
+export type AnimalSupportType =
+  | "financial"
+  | "food-and-medicine"
+  | "transport"
+  | "foster-care"
+  | "other";
 export type EmailTemplateKey =
   | "verification"
   | "password-reset"
   | "adoption-applicant"
   | "adoption-admin"
+  | "animal-support-thank-you"
+  | "animal-support-admin"
   | "animal-support-update";
 
 export const usersTable = pgTable("users", {
@@ -86,6 +95,10 @@ export const animalDonationsTable = pgTable(
     animalId: integer("animal_id")
       .notNull()
       .references(() => animalsTable.id, { onDelete: "cascade" }),
+    supportType: varchar("support_type", {
+      length: 40,
+    }).$type<AnimalSupportType>(),
+    phone: varchar({ length: 50 }),
     isActive: boolean("is_active").notNull().default(true),
     startedAt: timestamp("started_at").defaultNow().notNull(),
     canceledAt: timestamp("canceled_at"),
@@ -95,6 +108,11 @@ export const animalDonationsTable = pgTable(
     unique("animal_donations_user_id_animal_id_unique").on(
       table.userId,
       table.animalId,
+    ),
+    index("animal_donations_animal_id_is_active_idx").on(
+      table.animalId,
+      table.isActive,
+      table.startedAt,
     ),
   ],
 );

@@ -65,6 +65,32 @@ export const EMAIL_TEMPLATE_DEFAULTS: Record<
       paragraph("DniproAnimals"),
     ]),
   },
+  "animal-support-thank-you": {
+    subject: "Дякуємо за підтримку {{animalName}} — DniproAnimals",
+    preview: "Ми отримали вашу заявку на підтримку {{animalName}}",
+    content: createDocument([
+      heading("Дякуємо за підтримку {{animalName}}"),
+      paragraph(
+        "{{supporterName}}, ми отримали вашу заявку. Обраний тип підтримки: {{supportType}}.",
+      ),
+      quote(
+        "Наш адміністратор зателефонує вам за номером {{phone}}, щоб узгодити деталі.",
+      ),
+      action("Переглянути сторінку тварини"),
+      paragraph("Дякуємо, що допомагаєте тваринам Дніпра."),
+    ]),
+  },
+  "animal-support-admin": {
+    subject: "Нова заявка на підтримку {{animalName}}",
+    preview: "Нова заявка на підтримку {{animalName}}",
+    content: createDocument([
+      heading("Нова заявка на підтримку"),
+      paragraph(
+        "{{supporterName}} хоче підтримати {{animalName}}. Зв'яжіться з користувачем, щоб узгодити деталі.",
+      ),
+      action("Відкрити картку тварини"),
+    ]),
+  },
   "animal-support-update": {
     subject: "Нові фото від {{animalName}} — DniproAnimals",
     preview: "Нові фото від {{animalName}}",

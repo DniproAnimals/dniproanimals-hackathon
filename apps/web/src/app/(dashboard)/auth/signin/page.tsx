@@ -14,6 +14,19 @@ export default function SignInPage() {
 
   const onAuthSuccess = (user: User) => {
     queryClient.setQueryData([endpoints.auth.me()], user);
+    const returnTo = new URLSearchParams(window.location.search).get(
+      "returnTo",
+    );
+    if (returnTo?.startsWith("/")) {
+      const returnUrl = new URL(returnTo, window.location.origin);
+      if (returnUrl.origin === window.location.origin) {
+        router.push(
+          `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`,
+        );
+        return;
+      }
+    }
+
     if (user.role === "admin" || user.role === "superadmin")
       router.push("/dashboard");
     else router.push("/onboarding");

@@ -6,5 +6,6 @@ export function registerAnimalDonationsRoutes(app: FastifyZodInstance) {
   app.route(animalDonationsController.start);
   app.route(animalDonationsController.cancel);
   app.route(animalDonationsController.supporters);
+  app.route(animalDonationsController.deactivateSupporter);
   app.route(animalDonationsController.sendUpdate);
 }

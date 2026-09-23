@@ -1,14 +1,21 @@
 "use client";
 import {
   useAnimalDonationSupportersQuery,
+  useDeactivateAnimalSupporterMutation,
   useSendAnimalSupportUpdateMutation,
   useUploadImageMutation,
 } from "@/shared/query-hooks";
-import type { Animal } from "@dniproanimals/contracts";
+import {
+  ANIMAL_SUPPORT_TYPE_LABELS,
+  type Animal,
+} from "@dniproanimals/contracts";
+import { endpoints } from "@dniproanimals/endpoints";
 import {
   IconMail,
+  IconPhone,
   IconPhoto,
   IconSend,
+  IconTrash,
   IconUsers,
   IconX,
 } from "@dniproanimals/icons";
@@ -23,6 +30,7 @@ import {
   Separator,
   Spinner,
 } from "@dniproanimals/ui";
+import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
@@ -31,11 +39,20 @@ interface AnimalSupportManagerProps {
 }
 
 export function AnimalSupportManager({ animal }: AnimalSupportManagerProps) {
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [photos, setPhotos] = useState<string[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const supporters = useAnimalDonationSupportersQuery(animal.id);
   const upload = useUploadImageMutation();
+  const deactivate = useDeactivateAnimalSupporterMutation({
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: [
+          endpoints.animalDonations.supporters({ animalId: animal.id }),
+        ],
+      }),
+  });
   const sendUpdate = useSendAnimalSupportUpdateMutation({
     onSuccess: () => {
       setPhotos([]);
@@ -77,9 +94,14 @@ export function AnimalSupportManager({ animal }: AnimalSupportManagerProps) {
     });
   };
 
+  const handleDeactivate = (userId: number, name: string) => {
+    if (!confirm(`Припинити підтримку від ${name}?`)) return;
+    deactivate.mutate({ animalId: animal.id, userId });
+  };
+
   const summary = supporters.data;
   const supporterCount = summary?.count ?? 0;
-  const error = supporters.error ?? sendUpdate.error;
+  const error = supporters.error ?? sendUpdate.error ?? deactivate.error;
 
   return (
     <Card className="mt-8">
@@ -112,36 +134,69 @@ export function AnimalSupportManager({ animal }: AnimalSupportManagerProps) {
             id="animal-supporters-title"
             className="mb-3 text-sm font-semibold"
           >
-            Активні жертвувателі
+            Активна підтримка
           </h2>
 
           {supporters.isLoading ? (
             <div className="flex items-center gap-2 text-sm text-gray-medium">
-              <Spinner aria-label="Завантаження списку жертвувателів" />
+              <Spinner aria-label="Завантаження списку підтримки" />
               Завантаження...
             </div>
           ) : summary?.supporters.length ? (
-            <ul className="flex max-h-48 flex-col gap-2 overflow-y-auto">
+            <ul className="flex max-h-80 flex-col gap-2 overflow-y-auto">
               {summary.supporters.map((supporter) => (
                 <li
                   key={supporter.userId}
-                  className="flex items-center gap-3 rounded-xl bg-gray-light p-3"
+                  className="flex flex-col gap-3 rounded-xl bg-gray-light p-3 sm:flex-row sm:items-center"
                 >
-                  <IconMail
-                    aria-hidden="true"
-                    className="text-green-secondary"
-                  />
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">
                       {supporter.name}
                     </p>
-                    <a
-                      href={`mailto:${supporter.email}`}
-                      className="block truncate text-xs text-gray-medium hover:underline"
-                    >
-                      {supporter.email}
-                    </a>
+                    <div className="mt-1 flex flex-col gap-1 text-xs text-gray-medium">
+                      <a
+                        href={`mailto:${supporter.email}`}
+                        className="flex items-center gap-1.5 hover:underline"
+                      >
+                        <IconMail aria-hidden="true" />
+                        <span className="truncate">{supporter.email}</span>
+                      </a>
+                      {supporter.phone ? (
+                        <a
+                          href={`tel:${supporter.phone}`}
+                          className="flex items-center gap-1.5 hover:underline"
+                        >
+                          <IconPhone aria-hidden="true" />
+                          {supporter.phone}
+                        </a>
+                      ) : null}
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <Badge variant="soft" size="sm">
+                        {supporter.supportType
+                          ? ANIMAL_SUPPORT_TYPE_LABELS[supporter.supportType]
+                          : "Тип не вказано"}
+                      </Badge>
+                      <span className="text-xs text-gray-medium">
+                        З{" "}
+                        {new Date(supporter.startedAt).toLocaleDateString(
+                          "uk-UA",
+                        )}
+                      </span>
+                    </div>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-destructive"
+                    disabled={deactivate.isPending}
+                    onClick={() =>
+                      handleDeactivate(supporter.userId, supporter.name)
+                    }
+                  >
+                    <IconTrash aria-hidden="true" data-icon="inline-start" />
+                    Видалити
+                  </Button>
                 </li>
               ))}
             </ul>
@@ -162,7 +217,7 @@ export function AnimalSupportManager({ animal }: AnimalSupportManagerProps) {
             Нове фотооновлення
           </h2>
           <p className="mb-3 text-xs text-gray-medium">
-            Додайте до 10 фотографій. Кожен жертвуватель отримає окремий лист.
+            Додайте до 10 фотографій. Кожен підтримувач отримає окремий лист.
           </p>
 
           <input
