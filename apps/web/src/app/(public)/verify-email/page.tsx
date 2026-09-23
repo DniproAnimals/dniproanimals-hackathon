@@ -15,11 +15,6 @@ export default function VerifyEmailPage() {
         <div className="rounded-xl border border-gray-border bg-white p-6 text-sm text-gray-medium">
           <p>Якщо листа немає — перевірте папку «Спам».</p>
           <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Button asChild variant="outline">
-              <a href="http://localhost:8025" target="_blank" rel="noreferrer">
-                Mailpit (тест)
-              </a>
-            </Button>
             <Button asChild>
               <Link href="/auth/signin">Увійти</Link>
             </Button>
