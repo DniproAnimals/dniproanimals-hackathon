@@ -6,7 +6,7 @@ import {
 import { endpoints } from "@dniproanimals/endpoints";
 import { z } from "zod";
 import { createController, defineRoute } from "../../shared/types/controller";
-import { withAuth, withDashboardRole } from "../auth/auth.guard";
+import { withDashboardRole } from "../auth/auth.guard";
 import { contractTemplatePdfService } from "./contract-template-pdf.service";
 import { contractTemplateService } from "./contract-template.service";
 
@@ -47,7 +47,7 @@ export const contractTemplateController = createController({
         type: z.string(),
       }),
     },
-    handler: withAuth(async (request, reply) => {
+    handler: async (request, reply) => {
       const pdf = await contractTemplatePdfService.generate(
         request.params.type,
       );
@@ -60,7 +60,7 @@ export const contractTemplateController = createController({
         );
 
       return reply.send(pdf);
-    }),
+    },
   }),
   update: defineRoute({
     method: "PUT",

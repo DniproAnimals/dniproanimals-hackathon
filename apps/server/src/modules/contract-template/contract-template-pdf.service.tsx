@@ -45,11 +45,9 @@ ${body}
 </html>
 `;
 
-      console.log("3. Запускаем Chrome...");
-
+      const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
       const browser = await puppeteer.launch({
-        executablePath:
-          process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
+        ...(executablePath ? { executablePath } : {}),
         headless: true,
         args: [
           "--no-sandbox",
@@ -58,18 +56,12 @@ ${body}
         ],
       });
 
-      console.log("4. Chrome запущен");
-
       try {
         const page = await browser.newPage();
-
-        console.log("5. Создаем страницу");
 
         await page.setContent(html, {
           waitUntil: "domcontentloaded",
         });
-
-        console.log("6. Генерируем PDF");
 
         const pdf = await page.pdf({
           format: "A4",
@@ -81,8 +73,6 @@ ${body}
             left: "15mm",
           },
         });
-
-        console.log("7. PDF готов");
 
         return Buffer.from(pdf);
       } finally {
