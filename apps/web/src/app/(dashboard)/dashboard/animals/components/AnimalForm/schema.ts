@@ -1,3 +1,4 @@
+import { ANIMAL_COLORS } from "@/shared/constants";
 import {
   animalSexSchema,
   animalSizeSchema,
@@ -5,6 +6,24 @@ import {
   type CreateAnimalBody,
 } from "@dniproanimals/contracts";
 import { z } from "zod";
+
+const HEX_COLOR_REGEX = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+
+const animalColorSchema = z
+  .string()
+  .min(1, "Оберіть колір")
+  .refine(
+    (value) => {
+      const isPresetColor = ANIMAL_COLORS.some(
+        (color) => color.value === value,
+      );
+
+      return isPresetColor || HEX_COLOR_REGEX.test(value);
+    },
+    {
+      message: "Оберіть коректний колір",
+    },
+  );
 
 export const animalFormSchema = z.object({
   name: z.string().min(1, "Вкажіть ім'я"),
@@ -15,7 +34,7 @@ export const animalFormSchema = z.object({
   ageMonths: z.number().nullable(),
   weightKg: z.number().nullable(),
   size: z.union([animalSizeSchema, z.literal("")]),
-  color: z.string(),
+  color: animalColorSchema,
   vaccinated: z.boolean(),
   sterilized: z.boolean(),
   trained: z.boolean(),
