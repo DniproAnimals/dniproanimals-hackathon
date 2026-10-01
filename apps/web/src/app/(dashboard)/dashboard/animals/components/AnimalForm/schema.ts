@@ -1,5 +1,4 @@
-import { ANIMAL_COLORS, CUSTOM_BREED } from "@/shared/constants";
-import { OTHER_ANIMAL_COLOR_VALUE } from "@/shared/constants";
+import { CUSTOM_BREED, OTHER_ANIMAL_COLOR_VALUE } from "@/shared/constants";
 import {
   animalSexSchema,
   animalSizeSchema,

@@ -1,7 +1,11 @@
 "use client";
 
 import { ImageFallback } from "@/shared/components/ImageFallback";
-import { getAnimalAgeLabel, getAnimalSizeLabel } from "@/shared/constants";
+import {
+  getAnimalAgeLabel,
+  getAnimalColorLabel,
+  getAnimalSizeLabel,
+} from "@/shared/constants";
 import {
   useFavoritesQuery,
   useMeQuery,
@@ -239,7 +243,7 @@ export function AnimalCard({
                     </span>
 
                     <span className="ml-auto text-[11px] text-foreground/70">
-                      {animal.color}
+                      {getAnimalColorLabel(animal.color)}
                     </span>
                   </div>
                 )}

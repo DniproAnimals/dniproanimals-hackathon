@@ -2,8 +2,11 @@
 
 import {
   ANIMAL_COLORS,
+  createCustomAnimalColor,
   getAnimalColorHex,
+  getAnimalColorLabel,
   isValidHexColor,
+  parseCustomAnimalColor,
 } from "@/shared/constants";
 import { IconChevronDown } from "@dniproanimals/icons";
 import {
@@ -51,19 +54,24 @@ function AnimalColorFieldContent({
   const handleOpenChange = (nextOpen: boolean) => {
     if (nextOpen) {
       const currentColor = field.value;
+      const customColor = parseCustomAnimalColor(currentColor);
 
-      if (isValidHexColor(currentColor)) {
-        setPendingCustomColor(currentColor.toUpperCase());
+      if (customColor) {
+        setPendingCustomColor(customColor.hex.toUpperCase());
+        setPendingCustomName(customColor.name);
       } else {
-        setPendingCustomColor(DEFAULT_CUSTOM_COLOR);
-      }
-
-      setPendingCustomName(
-        ANIMAL_COLORS.some((color) => color.value === currentColor) ||
+        setPendingCustomColor(
           isValidHexColor(currentColor)
-          ? ""
-          : currentColor,
-      );
+            ? currentColor.toUpperCase()
+            : DEFAULT_CUSTOM_COLOR,
+        );
+        setPendingCustomName(
+          ANIMAL_COLORS.some((color) => color.value === currentColor) ||
+            isValidHexColor(currentColor)
+            ? ""
+            : currentColor,
+        );
+      }
     }
 
     setOpen(nextOpen);
@@ -88,7 +96,9 @@ function AnimalColorFieldContent({
                   style={{ backgroundColor: previewColor }}
                 />
 
-                {field.value || "Оберіть колір"}
+                {field.value
+                  ? getAnimalColorLabel(field.value)
+                  : "Оберіть колір"}
               </span>
 
               <IconChevronDown size={14} />
@@ -116,13 +126,20 @@ function AnimalColorFieldContent({
             </button>
           ))}
 
-          <div className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-gray-light rounded-lg">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-border bg-gray-light">
+            <Input
+              value={pendingCustomName}
+              onChange={(event) => setPendingCustomName(event.target.value)}
+              placeholder="Назва кольору"
+              aria-label="Назва власного кольору"
+              size="sm"
+              className="flex-1 border-0 bg-transparent px-1 shadow-none"
+            />
+
             <span
               className="size-4 rounded-full border shrink-0"
               style={{ backgroundColor: pendingCustomColor }}
             />
-
-            <span className="flex-1">Свій колір</span>
 
             <input
               type="color"
@@ -135,15 +152,6 @@ function AnimalColorFieldContent({
             />
           </div>
 
-          <Input
-            value={pendingCustomName}
-            onChange={(event) => setPendingCustomName(event.target.value)}
-            placeholder="Назва кольору"
-            aria-label="Назва власного кольору"
-            size="sm"
-            className="mx-2 mb-1 w-[calc(100%-1rem)]"
-          />
-
           <div className="border-t mt-1 pt-1">
             <Button
               type="button"
@@ -151,7 +159,14 @@ function AnimalColorFieldContent({
               size="sm"
               className="w-full"
               onClick={() => {
-                field.onChange(pendingCustomName.trim() || pendingCustomColor);
+                field.onChange(
+                  pendingCustomName.trim()
+                    ? createCustomAnimalColor(
+                        pendingCustomName,
+                        pendingCustomColor,
+                      )
+                    : pendingCustomColor,
+                );
                 setOpen(false);
               }}
             >

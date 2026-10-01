@@ -1,6 +1,5 @@
 "use client";
 
-import { useFoundationQuery } from "@/shared/query-hooks";
 import { IconFileText } from "@dniproanimals/icons";
 import { Button, Separator } from "@dniproanimals/ui";
 import Image from "next/image";
@@ -14,8 +13,6 @@ const navLinks = [
 import { SocialLinksList } from "@/shared/components/Contacts/SocialLinks";
 
 export function Footer() {
-  const { data: foundation } = useFoundationQuery();
-
   return (
     <footer className="bg-primary mt-16 pb-16 md:pb-0">
       <div className="max-w-6xl mx-auto px-6 py-10">
