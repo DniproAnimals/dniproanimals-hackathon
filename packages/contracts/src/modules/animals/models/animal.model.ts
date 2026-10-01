@@ -18,6 +18,7 @@ export const animalModel = z.object({
   description: z.string().nullable(),
   type: animalTypeSchema,
   breed: z.string().nullable(),
+  customType: z.string().nullable(),
   sex: animalSexSchema.nullable(),
   ageMonths: z.number().nullable(),
   weightKg: z.number().nullable(),

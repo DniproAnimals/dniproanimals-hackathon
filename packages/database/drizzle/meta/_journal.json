@@ -92,6 +92,13 @@
       "when": 1790000000000,
       "tag": "0011_add_animal_support_details",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791000000000,
+      "tag": "0012_add_animal_custom_type",
+      "breakpoints": true
     }
   ]
 }

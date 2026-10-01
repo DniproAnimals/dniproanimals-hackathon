@@ -1,12 +1,16 @@
 "use client";
+
 import { Button, Form } from "@dniproanimals/ui";
 import { AnimalAgeField } from "./components/AnimalAgeField";
 import { AnimalBreedField } from "./components/AnimalBreedField";
 import { AnimalColorField } from "./components/AnimalColorField";
 import { AnimalContactsFields } from "./components/AnimalContactsFields";
+import { AnimalCustomBreedField } from "./components/AnimalCustomBreedField";
+import { AnimalCustomTypeField } from "./components/AnimalCustomTypeField";
 import { AnimalDescriptionField } from "./components/AnimalDescriptionField";
 import { AnimalDonationField } from "./components/AnimalDonationField";
 import { AnimalNameField } from "./components/AnimalNameField";
+import { AnimalOtherBreedField } from "./components/AnimalOtherBreedField";
 import { AnimalPhotoField } from "./components/AnimalPhotoField";
 import { AnimalSexField } from "./components/AnimalSexField";
 import { AnimalSizeField } from "./components/AnimalSizeField";
@@ -29,6 +33,7 @@ export function AnimalForm({
   submitLabel,
 }: AnimalFormProps) {
   const form = useAnimalForm(defaultValues);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
@@ -36,9 +41,12 @@ export function AnimalForm({
         <AnimalNameField />
         <AnimalDescriptionField />
         <AnimalTypeField />
+        <AnimalCustomTypeField />
         <AnimalBreedField />
-        <AnimalSexField />
+        <AnimalCustomBreedField />
+        <AnimalOtherBreedField />
         <AnimalAgeField />
+        <AnimalSexField />
         <AnimalWeightField />
         <AnimalSizeField />
         <AnimalColorField />

@@ -43,6 +43,7 @@ export function toAnimalResponse(a: AnimalRow) {
     description: a.description ?? null,
     type: a.type,
     breed: a.breed ?? null,
+    customType: a.customType ?? null,
     sex: a.sex ?? null,
     ageMonths: a.ageMonths ?? null,
     weightKg: a.weightKg ?? null,

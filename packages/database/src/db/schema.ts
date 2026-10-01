@@ -59,6 +59,7 @@ export const animalsTable = pgTable("animals", {
   description: text(),
   type: varchar({ length: 20 }).notNull().$type<AnimalType>(),
   breed: varchar({ length: 255 }),
+  customType: varchar("custom_type", { length: 255 }),
   sex: varchar({ length: 10 }).$type<AnimalSex>(),
   ageMonths: integer("age_months"),
   weightKg: real("weight_kg"),
