@@ -3,7 +3,7 @@ export type AnimalColorOption = {
   hex: string;
 };
 
-export const OTHER_ANIMAL_COLOR_VALUE = "other";
+export const OTHER_ANIMAL_COLOR_VALUE = "__other__";
 
 export const ANIMAL_COLORS: readonly AnimalColorOption[] = [
   { value: "Білий", hex: "#FFFFFF" },
@@ -16,7 +16,7 @@ export const ANIMAL_COLORS: readonly AnimalColorOption[] = [
   { value: "Кремовий", hex: "#F5DEB3" },
 ];
 
-export const DEFAULT_ANIMAL_COLOR_HEX = "#CED48C";
+export const DEFAULT_ANIMAL_COLOR_HEX = "#ced48c";
 
 const ANIMAL_COLOR_HEX_BY_NAME: Record<string, string> = Object.fromEntries(
   ANIMAL_COLORS.map((c) => [c.value.toLowerCase(), c.hex]),

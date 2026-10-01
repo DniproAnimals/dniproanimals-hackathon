@@ -13,6 +13,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  Input,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -45,6 +46,7 @@ function AnimalColorFieldContent({
   const [open, setOpen] = useState(false);
   const [pendingCustomColor, setPendingCustomColor] =
     useState(DEFAULT_CUSTOM_COLOR);
+  const [pendingCustomName, setPendingCustomName] = useState("");
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (nextOpen) {
@@ -55,6 +57,13 @@ function AnimalColorFieldContent({
       } else {
         setPendingCustomColor(DEFAULT_CUSTOM_COLOR);
       }
+
+      setPendingCustomName(
+        ANIMAL_COLORS.some((color) => color.value === currentColor) ||
+          isValidHexColor(currentColor)
+          ? ""
+          : currentColor,
+      );
     }
 
     setOpen(nextOpen);
@@ -126,6 +135,15 @@ function AnimalColorFieldContent({
             />
           </div>
 
+          <Input
+            value={pendingCustomName}
+            onChange={(event) => setPendingCustomName(event.target.value)}
+            placeholder="Назва кольору"
+            aria-label="Назва власного кольору"
+            size="sm"
+            className="mx-2 mb-1 w-[calc(100%-1rem)]"
+          />
+
           <div className="border-t mt-1 pt-1">
             <Button
               type="button"
@@ -133,7 +151,7 @@ function AnimalColorFieldContent({
               size="sm"
               className="w-full"
               onClick={() => {
-                field.onChange(pendingCustomColor);
+                field.onChange(pendingCustomName.trim() || pendingCustomColor);
                 setOpen(false);
               }}
             >
