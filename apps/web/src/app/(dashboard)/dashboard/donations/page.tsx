@@ -168,9 +168,9 @@ export default function DonationsPage() {
   const isSaving =
     updateFoundationMutation.isPending || updateBankDetailsMutation.isPending;
 
-  const updateLink = (field: keyof DonationLinks, value: string) => {
-    setLinks((current) => (current ? { ...current, [field]: value } : current));
-  };
+  // const updateLink = (field: keyof DonationLinks, value: string) => {
+  //   setLinks((current) => (current ? { ...current, [field]: value } : current));
+  // };
 
   return (
     <div className="max-w-6xl space-y-6">
@@ -463,27 +463,27 @@ function EditableField({
   );
 }
 
-function LinkField({
-  label,
-  value,
-  icon,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  icon?: ReactNode;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div>
-      <Label className="mb-2 flex items-center gap-2">
-        {icon}
-        {label}
-      </Label>
-      <Input value={value} onChange={(event) => onChange(event.target.value)} />
-    </div>
-  );
-}
+// function LinkField({
+//   label,
+//   value,
+//   icon,
+//   onChange,
+// }: {
+//   label: string;
+//   value: string;
+//   icon?: ReactNode;
+//   onChange: (value: string) => void;
+// }) {
+//   return (
+//     <div>
+//       <Label className="mb-2 flex items-center gap-2">
+//         {icon}
+//         {label}
+//       </Label>
+//       <Input value={value} onChange={(event) => onChange(event.target.value)} />
+//     </div>
+//   );
+// }
 
 function IconButton({
   label,
