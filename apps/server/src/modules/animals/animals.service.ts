@@ -12,11 +12,25 @@ import {
   eq,
   ilike,
   inArray,
+  isNotNull,
+  not,
   or,
   sql,
 } from "@dniproanimals/database";
 
 type AnimalInsert = typeof animalsTable.$inferInsert;
+
+const OTHER_ANIMAL_COLOR_VALUE = "__other__";
+const STANDARD_ANIMAL_COLORS = [
+  "Білий",
+  "Чорний",
+  "Сірий",
+  "Коричневий",
+  "Рудий",
+  "Бежевий",
+  "Золотистий",
+  "Кремовий",
+] as const;
 
 function orderBy(sort: ListAnimalsQuery["sort"]) {
   switch (sort) {
@@ -62,7 +76,14 @@ export const animalsService = {
     const colors = query.color ?? [];
     if (colors.length) {
       const colorFilter = or(
-        ...colors.map((c) => ilike(animalsTable.color, `%${c}%`)),
+        ...colors.map((color) =>
+          color === OTHER_ANIMAL_COLOR_VALUE
+            ? and(
+                isNotNull(animalsTable.color),
+                not(inArray(animalsTable.color, STANDARD_ANIMAL_COLORS)),
+              )
+            : ilike(animalsTable.color, `%${color}%`),
+        ),
       );
       if (colorFilter) filters.push(colorFilter);
     }
