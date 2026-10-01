@@ -1,0 +1,1 @@
+ALTER TABLE "animals" ADD COLUMN IF NOT EXISTS "custom_type" varchar(255);

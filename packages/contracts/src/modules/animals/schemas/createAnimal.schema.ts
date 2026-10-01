@@ -12,6 +12,7 @@ export const createAnimalBodySchema = z.object({
   description: z.string().nullish(),
   type: animalTypeSchema,
   breed: z.string().nullish(),
+  customType: z.string().nullable().optional(),
   sex: animalSexSchema.nullish(),
   ageMonths: z.number().int().nullish(),
   weightKg: z.number().nullish(),

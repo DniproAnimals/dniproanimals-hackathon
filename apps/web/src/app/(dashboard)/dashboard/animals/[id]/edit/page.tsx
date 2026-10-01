@@ -1,4 +1,10 @@
 "use client";
+
+import {
+  CAT_BREEDS_WITH_MIX,
+  CUSTOM_BREED,
+  DOG_BREEDS_WITH_MIX,
+} from "@/shared/constants";
 import { useAnimalQuery, useUpdateAnimalMutation } from "@/shared/query-hooks";
 import type { Animal } from "@dniproanimals/contracts";
 import { endpoints } from "@dniproanimals/endpoints";
@@ -13,11 +19,25 @@ import {
 import { AnimalSupportManager } from "./components/AnimalSupportManager";
 
 function animalToFormValues(animal: Animal): AnimalFormValues {
+  const standardBreeds =
+    animal.type === "cat" ? CAT_BREEDS_WITH_MIX : DOG_BREEDS_WITH_MIX;
+  const hasCustomBreed =
+    animal.type !== "other" &&
+    !!animal.breed &&
+    !standardBreeds.includes(animal.breed);
+
   return {
     name: animal.name,
     description: animal.description ?? "",
     type: animal.type,
-    breed: animal.breed ?? "",
+    customType: animal.customType ?? "",
+    breed:
+      animal.type === "other"
+        ? (animal.breed ?? "")
+        : hasCustomBreed
+          ? CUSTOM_BREED
+          : (animal.breed ?? ""),
+    customBreed: hasCustomBreed ? (animal.breed ?? "") : "",
     sex: animal.sex ?? "",
     ageMonths: animal.ageMonths,
     weightKg: animal.weightKg,
@@ -43,15 +63,18 @@ export default function EditAnimalPage(
   const router = useRouter();
   const queryClient = useQueryClient();
   const { data: animal } = useAnimalQuery(numericId);
+
   const updateMutation = useUpdateAnimalMutation({
     onSuccess: (updated) => {
       queryClient.setQueryData(
         [endpoints.animals.get({ id: updated.id })],
         updated,
       );
+
       void queryClient.invalidateQueries({
         queryKey: [endpoints.animals.list()],
       });
+
       router.push(`/animals/${updated.id}`);
     },
   });
@@ -71,6 +94,7 @@ export default function EditAnimalPage(
         submitting={updateMutation.isPending}
         submitLabel="Зберегти зміни"
       />
+
       <AnimalSupportManager animal={animal} />
     </>
   );

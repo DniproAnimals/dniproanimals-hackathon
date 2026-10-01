@@ -1,4 +1,5 @@
 "use client";
+
 import {
   FormControl,
   FormField,
@@ -17,6 +18,7 @@ const OPTIONS = [
 
 export function AnimalTypeField() {
   const { control, setValue } = useAnimalFormContext();
+
   return (
     <FormField
       control={control}
@@ -24,16 +26,21 @@ export function AnimalTypeField() {
       render={({ field }) => (
         <FormItem>
           <FormLabel>Вид *</FormLabel>
+
           <FormControl>
             <AnimalChipGroup
               options={OPTIONS}
               value={field.value}
-              onChange={(v) => {
-                field.onChange(v);
+              onChange={(value) => {
+                field.onChange(value);
+
+                setValue("customType", "");
                 setValue("breed", "");
+                setValue("customBreed", "");
               }}
             />
           </FormControl>
+
           <FormMessage />
         </FormItem>
       )}

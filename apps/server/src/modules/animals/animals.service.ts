@@ -138,6 +138,7 @@ export const animalsService = {
       description: body.description ?? null,
       type: body.type,
       breed: body.breed ?? null,
+      customType: body.customType ?? null,
       sex: body.sex ?? null,
       ageMonths: body.ageMonths ?? null,
       weightKg: body.weightKg ?? null,
@@ -171,6 +172,8 @@ export const animalsService = {
       patch.description = body.description ?? null;
     if (body.type !== undefined) patch.type = body.type;
     if (body.breed !== undefined) patch.breed = body.breed ?? null;
+    if (body.customType !== undefined)
+      patch.customType = body.customType ?? null;
     if (body.sex !== undefined) patch.sex = body.sex ?? null;
     if (body.ageMonths !== undefined) patch.ageMonths = body.ageMonths ?? null;
     if (body.weightKg !== undefined) patch.weightKg = body.weightKg ?? null;
