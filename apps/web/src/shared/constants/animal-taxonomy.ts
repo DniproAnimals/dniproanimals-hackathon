@@ -72,8 +72,10 @@ const UNKNOWN_LABEL = "Невідомо";
 
 export function getAnimalTypeLabel(
   type: AnimalType | string | null | undefined,
+  customType?: string | null,
 ): string {
   if (!type) return UNKNOWN_LABEL;
+  if (type === "other" && customType?.trim()) return customType.trim();
   return ANIMAL_TYPE_LABEL[type as AnimalType] ?? UNKNOWN_LABEL;
 }
 
