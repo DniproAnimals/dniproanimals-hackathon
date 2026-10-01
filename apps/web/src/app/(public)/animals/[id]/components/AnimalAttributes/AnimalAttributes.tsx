@@ -1,6 +1,7 @@
 import {
   getAnimalAgeLabel,
   getAnimalColorHex,
+  getAnimalColorLabel,
   getAnimalSexLabel,
   getAnimalSizeLabel,
   getAnimalTypeLabel,
@@ -69,7 +70,7 @@ export function AnimalAttributes({ animal }: AnimalAttributesProps) {
           label="Колір"
           value={
             <span className="flex items-center gap-2">
-              {animal.color}
+              {getAnimalColorLabel(animal.color)}
               <span
                 className="inline-block size-4 rounded-full border border-gray-border shrink-0"
                 style={{ backgroundColor: getAnimalColorHex(animal.color) }}
