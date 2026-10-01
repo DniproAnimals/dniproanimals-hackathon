@@ -31,7 +31,7 @@ export function AnimalAttributes({ animal }: AnimalAttributesProps) {
       <AnimalAttributeRow
         icon={<IconPaw />}
         label="Вид"
-        value={getAnimalTypeLabel(animal.type)}
+        value={getAnimalTypeLabel(animal.type, animal.customType)}
       />
       {animal.breed && (
         <AnimalAttributeRow

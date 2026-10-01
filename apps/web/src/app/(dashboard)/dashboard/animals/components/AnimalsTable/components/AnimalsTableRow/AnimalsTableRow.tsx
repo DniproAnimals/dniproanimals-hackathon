@@ -59,7 +59,7 @@ export function AnimalsTableRow({ animal }: AnimalsTableRowProps) {
         </Link>
       </TableCell>
       <TableCell className="hidden sm:table-cell text-gray-medium">
-        {getAnimalTypeLabel(animal.type)}
+        {getAnimalTypeLabel(animal.type, animal.customType)}
       </TableCell>
       <TableCell className="hidden md:table-cell text-gray-medium">
         {animal.sex ? getAnimalSexLabel(animal.sex) : ""}
