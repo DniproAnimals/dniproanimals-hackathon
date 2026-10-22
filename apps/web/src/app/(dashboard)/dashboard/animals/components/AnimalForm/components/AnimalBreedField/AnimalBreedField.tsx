@@ -46,7 +46,7 @@ export function AnimalBreedField() {
         <FormItem>
           <FormLabel>Порода</FormLabel>
 
-          <Popover open={open} onOpenChange={setOpen}>
+          <Popover key={type} open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <FormControl>
                 <button

@@ -34,9 +34,18 @@ export function AnimalTypeField() {
               onChange={(value) => {
                 field.onChange(value);
 
-                setValue("customType", "");
-                setValue("breed", "");
-                setValue("customBreed", "");
+                setValue("customType", "", {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+                setValue("breed", "", {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+                setValue("customBreed", "", {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
               }}
             />
           </FormControl>
